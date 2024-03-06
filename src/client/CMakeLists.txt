@@ -1,0 +1,30 @@
+ADD_EXECUTABLE(client)
+MESSAGE("Begin to build " client)
+
+INCLUDE(readline)
+TDB_FIND_READLINE()
+
+IF (HAVE_READLINE)
+    TARGET_LINK_LIBRARIES(client ${READLINE_LIBRARY})
+    TARGET_INCLUDE_DIRECTORIES(client PRIVATE ${READLINE_INCLUDE_DIR})
+    ADD_DEFINITIONS(-DUSE_READLINE)
+    MESSAGE ("client use readline")
+ELSE ()
+    MESSAGE ("readline is not found")
+ENDIF()
+
+FILE(GLOB_RECURSE ALL_SRC *.cpp)
+FOREACH (F ${ALL_SRC})
+
+    SET(PRJ_SRC ${PRJ_SRC} ${F})
+    MESSAGE("Use " ${F})
+
+ENDFOREACH (F)
+
+TARGET_SOURCES(client PRIVATE ${PRJ_SRC})
+TARGET_LINK_LIBRARIES(client common pthread dl)
+
+# Target 必须在定义 ADD_EXECUTABLE 之后， programs 不受这个限制
+# TARGETS和PROGRAMS 的默认权限是OWNER_EXECUTE, GROUP_EXECUTE, 和WORLD_EXECUTE，即755权限， programs 都是处理脚步类
+# 类型分为RUNTIME／LIBRARY／ARCHIVE, prog
+INSTALL(TARGETS client RUNTIME DESTINATION bin)

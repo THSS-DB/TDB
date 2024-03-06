@@ -1,0 +1,7 @@
+/home/ycycse/workSpace/TDB-Draft/tools/cmake-build-debug/CMakeFiles/clog_reader.dir
+/home/ycycse/workSpace/TDB-Draft/tools/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/ycycse/workSpace/TDB-Draft/tools/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/ycycse/workSpace/TDB-Draft/tools/cmake-build-debug/CMakeFiles/list_install_components.dir
+/home/ycycse/workSpace/TDB-Draft/tools/cmake-build-debug/CMakeFiles/install.dir
+/home/ycycse/workSpace/TDB-Draft/tools/cmake-build-debug/CMakeFiles/install/local.dir
+/home/ycycse/workSpace/TDB-Draft/tools/cmake-build-debug/CMakeFiles/install/strip.dir
