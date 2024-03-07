@@ -27,9 +27,9 @@ bool QueryEngine::process_session_request(SessionRequest *request) {
     request->get_communicator()->write_state(request->sql_result(), need_disconnect);
     request->get_communicator()->flush();
     return need_disconnect;
+  }else{
+    executor_.execute(request, &query_info, need_disconnect);
   }
-
-  rc = executor_.execute(request, &query_info, need_disconnect);
 
   request->session()->set_current_request(nullptr);
   Session::set_current_session(nullptr);
