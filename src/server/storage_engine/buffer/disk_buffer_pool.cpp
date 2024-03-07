@@ -197,6 +197,30 @@ RC FileBufferPool::open_file(const char *file_name)
 
 RC FileBufferPool::close_file()
 {
+  RC rc = RC::SUCCESS;
+  if (file_desc_ < 0) {
+    return rc;
+  }
+
+  hdr_frame_->unpin();
+
+  // TODO: 理论上是在回放时回滚未提交事务，但目前没有undo log，因此不下刷数据page，只通过redo log回放
+  rc = purge_all_pages();
+  if (rc != RC::SUCCESS) {
+    LOG_ERROR("failed to close %s, due to failed to purge pages. rc=%s", file_name_.c_str(), strrc(rc));
+    return rc;
+  }
+
+  disposed_pages_.clear();
+
+  if (close(file_desc_) < 0) {
+    LOG_ERROR("Failed to close fileId:%d, fileName:%s, error:%s", file_desc_, file_name_.c_str(), strerror(errno));
+    return RC::IOERR_CLOSE;
+  }
+  LOG_INFO("Successfully close file %d:%s.", file_desc_, file_name_.c_str());
+  file_desc_ = -1;
+
+  bp_manager_.close_file(file_name_.c_str());
   return RC::SUCCESS;
 }
 
@@ -494,6 +518,35 @@ RC BufferPoolManager::open_file(const char *_file_name, FileBufferPool *&_bp)
 
 RC BufferPoolManager::close_file(const char *_file_name)
 {
+  std::string file_name(_file_name);
+
+  lock_.lock();
+
+  auto iter = buffer_pools_.find(file_name);
+  if (iter == buffer_pools_.end()) {
+    LOG_TRACE("file has not opened: %s", _file_name);
+    lock_.unlock();
+    return RC::INTERNAL;
+  }
+
+  int fd = iter->second->file_desc();
+  if (0 == fd_buffer_pools_.erase(fd)) {
+    int count = 0;
+    for (auto fd_iter = fd_buffer_pools_.begin(); fd_iter != fd_buffer_pools_.end(); ++fd_iter) {
+      if (fd_iter->second == iter->second) {
+        fd_buffer_pools_.erase(fd_iter);
+        count = 1;
+        break;
+      }
+    }
+    ASSERT(count == 1, "the buffer pool was not erased from fd buffer pools.");
+  }
+
+  FileBufferPool *bp = iter->second;
+  buffer_pools_.erase(iter);
+  lock_.unlock();
+
+  delete bp;
   return RC::SUCCESS;
 }
 
