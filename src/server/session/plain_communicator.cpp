@@ -92,6 +92,8 @@ RC PlainCommunicator::write_state(SqlResult *sql_result, bool &need_disconnect)
     return RC::IOERR_WRITE;
   }
 
+  send_message_delimiter();
+
   need_disconnect = false;
   delete[] buf;
 
