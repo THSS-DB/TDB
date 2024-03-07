@@ -1,8 +1,8 @@
 #pragma once
 
 #include <functional>
-#include "src/server/include/common/rc.h"
-#include "src/server/include/query_engine/parser/parse_defs.h"
+#include "include/common/rc.h"
+#include "include/query_engine/parser/parse_defs.h"
 
 class Db;
 

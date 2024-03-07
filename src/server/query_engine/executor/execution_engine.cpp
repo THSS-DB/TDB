@@ -5,7 +5,7 @@
 #include "include/query_engine/analyzer/statement/select_stmt.h"
 #include "include/session/communicator.h"
 #include "include/query_engine/structor/query_info.h"
-#include "storage/trx/trx.h"
+#include "include/storage_engine/transaction/trx.h"
 #include "include/session/session.h"
 
 const char *DELIM = " | ";

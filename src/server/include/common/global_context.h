@@ -2,7 +2,7 @@
 
 class BufferPoolManager;
 class DefaultHandler;
-class TrxKit;
+class TrxManager;
 
 /**
  * @brief 放一些全局对象
@@ -12,7 +12,7 @@ struct GlobalContext
 {
   BufferPoolManager *buffer_pool_manager_ = nullptr;
   DefaultHandler *handler_ = nullptr;
-  TrxKit *trx_kit_ = nullptr;
+  TrxManager *trx_manager_ = nullptr;
 
   static GlobalContext &instance();
 };

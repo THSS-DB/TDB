@@ -1,5 +1,5 @@
 #include "include/query_engine/analyzer/statement/desc_table_stmt.h"
-#include "storage/db/db.h"
+#include "include/storage_engine/schema/database.h"
 
 RC DescTableStmt::create(Db *db, const DescTableSqlNode &desc_table, Stmt *&stmt)
 {

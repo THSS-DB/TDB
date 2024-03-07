@@ -1,11 +1,10 @@
 #include "include/query_engine/planner/operator/update_physical_operator.h"
 
 #include "common/log/log.h"
-#include "include/common/typecast.h"
-
-#include "storage/record/record.h"
-#include "storage/table/table.h"
-#include "storage/trx/trx.h"
+#include "include/storage_engine/recorder/record.h"
+#include "include/storage_engine/recorder/table.h"
+#include "include/storage_engine/transaction/trx.h"
+#include "include/query_engine/parser/value.h"
 #include "include/query_engine/analyzer/statement/update_stmt.h"
 #include "include/query_engine/structor/expression/value_expression.h"
 #include "include/query_engine/structor/tuple/row_tuple.h"

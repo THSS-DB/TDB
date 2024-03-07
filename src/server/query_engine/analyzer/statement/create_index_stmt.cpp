@@ -1,6 +1,6 @@
 #include "include/query_engine/analyzer/statement/create_index_stmt.h"
-#include "storage/table/table.h"
-#include "storage/db/db.h"
+#include "include/storage_engine/recorder/table.h"
+#include "include/storage_engine/schema/database.h"
 #include "common/lang/string.h"
 #include "common/log/log.h"
 

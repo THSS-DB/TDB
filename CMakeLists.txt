@@ -11,7 +11,7 @@ SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
 
 OPTION(ENABLE_ASAN "Enable build with address sanitizer" ON)
-OPTION(WITH_UNIT_TESTS "Compile tdb with unit tests" ON)
+OPTION(WITH_UNIT_TESTS "Compile TDB with unit tests" ON)
 OPTION(CONCURRENCY "Support concurrency operations" OFF)
 OPTION(STATIC_STDLIB "Link std library static or dynamic, such as libgcc, libstdc++, libasan" OFF)
 
@@ -96,7 +96,6 @@ INCLUDE_DIRECTORIES(. ${PROJECT_SOURCE_DIR}/deps /usr/local/include)
 ADD_SUBDIRECTORY(deps)
 ADD_SUBDIRECTORY(src/client)
 ADD_SUBDIRECTORY(src/server)
-ADD_SUBDIRECTORY(tools)
 
 IF(WITH_UNIT_TESTS)
     SET(CMAKE_COMMON_FLAGS "${CMAKE_COMMON_FLAGS} -fprofile-arcs -ftest-coverage")

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "src/server/include/common/rc.h"
+#include "include/common/rc.h"
 #include "stmt.h"
-#include "src/server/include/query_engine/structor/expression/expression.h"
+#include "include/query_engine/structor/expression/expression.h"
 
 class GroupByStmt : public Stmt {
 public:

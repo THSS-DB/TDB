@@ -1,8 +1,8 @@
 #include "common/log/log.h"
 #include "include/query_engine/analyzer/statement/delete_stmt.h"
 #include "include/query_engine/analyzer/statement/filter_stmt.h"
-#include "storage/db/db.h"
-#include "storage/table/table.h"
+#include "include/storage_engine/schema/database.h"
+#include "include/storage_engine/recorder/table.h"
 
 DeleteStmt::DeleteStmt(Table *table, FilterStmt *filter_stmt) : table_(table), filter_stmt_(filter_stmt)
 {}

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "include/query_engine/structor/expression/expression.h"
-#include "storage/db/db.h"
+#include "include/storage_engine/schema/database.h"
 #include "common/lang/string.h"
 
 RC analyze_expression(

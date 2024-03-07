@@ -111,3 +111,8 @@ private:
   std::string text_value_;
   bool check_date(int y, int m, int d);
 };
+
+/**
+ * @brief 类型转换，不支持的类型转换会返回true
+ */
+bool type_cast_not_support(AttrType i, AttrType j);

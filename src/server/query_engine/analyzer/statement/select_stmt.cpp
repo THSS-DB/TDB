@@ -7,8 +7,8 @@
 
 #include "common/log/log.h"
 #include "common/lang/string.h"
-#include "storage/db/db.h"
-#include "storage/table/table.h"
+#include "include/storage_engine/schema/database.h"
+#include "include/storage_engine/recorder/table.h"
 
 SelectStmt::~SelectStmt()
 {

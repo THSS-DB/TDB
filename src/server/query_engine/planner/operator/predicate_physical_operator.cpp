@@ -1,6 +1,6 @@
 #include "common/log/log.h"
 #include "include/query_engine/planner/operator/predicate_physical_operator.h"
-#include "storage/record/record.h"
+#include "include/storage_engine/recorder/record.h"
 #include "include/query_engine/structor/expression/conjunction_expression.h"
 #include "include/query_engine/structor/expression/comparison_expression.h"
 #include "include/query_engine/structor/tuple/join_tuple.h"

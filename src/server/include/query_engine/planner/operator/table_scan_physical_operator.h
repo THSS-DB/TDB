@@ -1,7 +1,7 @@
 #pragma once
 
 #include "physical_operator.h"
-#include "storage/record/record_manager.h"
+#include "include/storage_engine/recorder/record_manager.h"
 #include "include/common/rc.h"
 #include "include/query_engine/structor/tuple/row_tuple.h"
 

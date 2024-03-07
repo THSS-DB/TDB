@@ -2,9 +2,9 @@
 
 #include <vector>
 #include <unordered_map>
-#include "src/server/include/query_engine/parser/parse_defs.h"
+#include "include/query_engine/parser/parse_defs.h"
 #include "stmt.h"
-#include "src/server/include/query_engine/structor/expression/expression.h"
+#include "include/query_engine/structor/expression/expression.h"
 
 class Db;
 class Table;

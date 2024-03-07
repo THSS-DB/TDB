@@ -1,7 +1,7 @@
 #include "include/query_engine/analyzer/statement/group_by_stmt.h"
 #include "include/query_engine/structor/expression/field_expression.h"
 #include "common/lang/string.h"
-#include "storage/db/db.h"
+#include "include/storage_engine/schema/database.h"
 
 GroupByStmt::~GroupByStmt() {
   for (auto *expr : exprs_) {

@@ -1,8 +1,8 @@
 #include "include/query_engine/analyzer/statement/insert_stmt.h"
 #include "common/log/log.h"
-#include "storage/db/db.h"
-#include "storage/table/table.h"
-#include "storage/table/table_meta.h"
+#include "include/storage_engine/schema/database.h"
+#include "include/storage_engine/recorder/table.h"
+#include "include/storage_engine/recorder/table_meta.h"
 
 InsertStmt::InsertStmt(Table *table, const std::vector<std::vector<Value>> &multi_values, int record_amount, int value_amount)
     : table_(table), multi_values_(multi_values), record_amount_(record_amount),value_amount_(value_amount)

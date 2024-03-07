@@ -4,7 +4,7 @@
 #include "include/query_engine/analyzer/statement/stmt.h"
 #include "include/query_engine/analyzer/statement/create_table_stmt.h"
 #include "include/session/session.h"
-#include "storage/db/db.h"
+#include "include/storage_engine/schema/database.h"
 
 RC CreateTableExecutor::execute(QueryInfo *query_info)
 {

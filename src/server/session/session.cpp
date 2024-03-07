@@ -1,7 +1,7 @@
 #include "include/session/session.h"
-#include "storage/trx/trx.h"
-#include "storage/db/db.h"
-#include "storage/default/default_handler.h"
+#include "include/storage_engine/transaction/trx.h"
+#include "include/storage_engine/schema/database.h"
+#include "include/storage_engine/schema/default_handler.h"
 #include "include/common/global_context.h"
 
 Session &Session::default_session()
@@ -16,7 +16,7 @@ Session::Session(const Session &other) : db_(other.db_)
 Session::~Session()
 {
   if (nullptr != trx_) {
-    GCTX.trx_kit_->destroy_trx(trx_);
+    GCTX.trx_manager_->destroy_trx(trx_);
     trx_ = nullptr;
   }
 }
@@ -60,7 +60,7 @@ bool Session::is_trx_multi_operation_mode() const
 Trx *Session::current_trx()
 {
   if (trx_ == nullptr) {
-    trx_ = GCTX.trx_kit_->create_trx(db_->clog_manager());
+    trx_ = GCTX.trx_manager_->create_trx(db_->redolog_manager());
   }
   return trx_;
 }

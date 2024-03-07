@@ -3,8 +3,8 @@
 #include <iostream>
 
 #include "include/query_engine/structor/expression/expression.h"
-#include "storage/table/table.h"
-#include "storage/field/field_meta.h"
+#include "include/storage_engine/recorder/table.h"
+#include "include/storage_engine/recorder/field_meta.h"
 
 class TupleCellSpec
 {

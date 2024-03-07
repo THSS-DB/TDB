@@ -1,6 +1,6 @@
 #include "include/query_engine/query_engine.h"
 #include "common/lang/string.h"
-#include "storage/record/record.h"
+#include "include/storage_engine/recorder/record.h"
 #include "include/session/session.h"
 #include "include/query_engine/parser/parser.h"
 #include "include/query_engine/analyzer/analyzer.h"

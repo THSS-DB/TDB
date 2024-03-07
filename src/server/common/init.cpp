@@ -1,6 +1,6 @@
 #include "include/common/init.h"
 
-#include "include/common/ini_setting.h"
+#include "include/common/setting.h"
 #include "common/conf/ini.h"
 #include "common/lang/string.h"
 #include "common/log/log.h"
@@ -9,9 +9,9 @@
 #include "common/os/process.h"
 #include "common/os/signal.h"
 #include "include/session/session.h"
-#include "storage/buffer/disk_buffer_pool.h"
-#include "storage/default/default_handler.h"
-#include "storage/trx/trx.h"
+#include "include/storage_engine/buffer/disk_buffer_pool.h"
+#include "include/storage_engine/schema/default_handler.h"
+#include "include/storage_engine/transaction/trx.h"
 #include "include/common/global_context.h"
 
 using namespace common;
@@ -132,12 +132,12 @@ int init_global_objects(ProcessParam *process_param, Ini &properties)
   DefaultHandler::set_default(GCTX.handler_);
 
   int ret = 0;
-  RC rc = TrxKit::init_global(process_param->trx_kit_name().c_str());
+  RC rc = TrxManager::init_global(process_param->trx_kit_name().c_str());
   if (rc != RC::SUCCESS) {
     LOG_ERROR("failed to init trx kit. rc=%s", strrc(rc));
     ret = -1;
   }
-  GCTX.trx_kit_ = TrxKit::instance();
+  GCTX.trx_manager_ = TrxManager::instance();
 
   rc = GCTX.handler_->init("tdb");
   if (RC_FAIL(rc)) {

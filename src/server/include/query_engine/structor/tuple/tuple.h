@@ -10,7 +10,7 @@
 #include "tuple_cell.h"
 #include "include/query_engine/parser/value.h"
 #include "include/query_engine/structor/expression/field_expression.h"
-#include "storage/record/record.h"
+#include "include/storage_engine/recorder/record.h"
 
 class Table;
 

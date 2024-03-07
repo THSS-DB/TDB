@@ -3,8 +3,8 @@
 #include <utility>
 #include "include/query_engine/analyzer/statement/filter_stmt.h"
 #include "common/log/log.h"
-#include "storage/db/db.h"
-#include "storage/table/table.h"
+#include "include/storage_engine/schema/database.h"
+#include "include/storage_engine/recorder/table.h"
 
 UpdateStmt::UpdateStmt(Table *table, std::vector<UpdateUnit> update_units, FilterStmt *filter_stmt) : table_(table), update_units_(std::move(update_units)), filter_stmt_(filter_stmt)
 {}

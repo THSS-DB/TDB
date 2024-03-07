@@ -1,7 +1,7 @@
 #include "common/log/log.h"
 #include "include/query_engine/planner/operator/project_physical_operator.h"
-#include "storage/record/record.h"
-#include "storage/table/table.h"
+#include "include/storage_engine/recorder/record.h"
+#include "include/storage_engine/recorder/table.h"
 
 RC ProjectPhysicalOperator::open(Trx *trx)
 {

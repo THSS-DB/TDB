@@ -1,7 +1,7 @@
 #include "include/query_engine/planner/operator/insert_physical_operator.h"
 #include "include/query_engine/analyzer/statement/insert_stmt.h"
-#include "storage/table/table.h"
-#include "storage/trx/trx.h"
+#include "include/storage_engine/recorder/table.h"
+#include "include/storage_engine/transaction/trx.h"
 
 using namespace std;
 

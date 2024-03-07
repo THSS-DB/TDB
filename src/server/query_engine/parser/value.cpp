@@ -1,6 +1,5 @@
 #include <sstream>
 #include "include/query_engine/parser/value.h"
-#include "storage/field/field.h"
 #include "common/log/log.h"
 #include "common/lang/comparator.h"
 #include "common/lang/string.h"
@@ -404,4 +403,66 @@ bool Value::check_date(int y, int m, int d) {
   bool leap = (y % 400 == 0 || (y % 100 && y % 4 == 0));
   return y > 0 && (m > 0) &&(m <= 12)
          && (d > 0) && (d <= ((m ==2 && leap ) ? 1 : 0) + mon[m]);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+bool cast_to[AttrType::FLOATS + 1][AttrType::FLOATS + 1] = {
+    {
+        // UNDEFINED
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+    },
+    {
+        // CHARS
+        false,
+        true,
+        true,
+        false,
+        false,
+        true,
+    },
+    {
+        // INTS
+        false,
+        true,
+        true,
+        false,
+        false,
+        true,
+    },
+    {
+        // DATES
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+    },
+    {
+        // NULLS
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+    },
+    {
+        // FLOATS
+        false,
+        true,
+        true,
+        false,
+        false,
+        true,
+    }};
+bool type_cast_not_support(AttrType i, AttrType j)
+{
+  return ! cast_to[i][j];
 }

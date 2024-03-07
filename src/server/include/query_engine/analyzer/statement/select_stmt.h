@@ -5,11 +5,11 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
-#include "src/server/include/common/rc.h"
+#include "include/common/rc.h"
 #include "stmt.h"
-#include "src/server/include/query_engine/structor/expression/expression.h"
-#include "src/server/storage/field/field.h"
-#include "src/server/include/query_engine/structor/expression/analyze_expression.h"
+#include "include/query_engine/structor/expression/expression.h"
+#include "include/storage_engine/recorder/field.h"
+#include "include/query_engine/structor/expression/analyze_expression.h"
 
 class FieldMeta;
 class FilterStmt;

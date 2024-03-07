@@ -1,6 +1,6 @@
 #include "include/query_engine/executor/sql_result.h"
 #include "include/session/session.h"
-#include "storage/trx/trx.h"
+#include "include/storage_engine/transaction/trx.h"
 #include "common/log/log.h"
 #include "include/query_engine/structor/tuple/tuple.h"
 

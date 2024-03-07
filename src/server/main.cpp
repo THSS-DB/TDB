@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "include/common/init.h"
-#include "include/common/ini_setting.h"
+#include "include/common/setting.h"
 #include "common/os/process.h"
 #include "common/os/signal.h"
 #include "common/lang/string.h"

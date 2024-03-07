@@ -3,10 +3,10 @@
 #include "include/query_engine/structor/query_info.h"
 #include "include/session/session.h"
 #include "common/log/log.h"
-#include "storage/table/table.h"
+#include "include/storage_engine/recorder/table.h"
 #include "include/query_engine/analyzer/statement/drop_table_stmt.h"
 #include "include/query_engine/structor/query_info.h"
-#include "storage/db/db.h"
+#include "include/storage_engine/schema/database.h"
 
 RC DropTableExecutor::execute(QueryInfo *query_info)
 {

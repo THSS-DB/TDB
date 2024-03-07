@@ -1,5 +1,5 @@
 #include "include/query_engine/planner/operator/table_scan_physical_operator.h"
-#include "storage/table/table.h"
+#include "include/storage_engine/recorder/table.h"
 
 using namespace std;
 

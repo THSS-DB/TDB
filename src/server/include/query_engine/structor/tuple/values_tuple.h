@@ -1,6 +1,5 @@
 #pragma once
 
-
 /**
  * @brief 常量值组成的Tuple，主要用于在explain中传递一行字符串
  * @ingroup Tuple

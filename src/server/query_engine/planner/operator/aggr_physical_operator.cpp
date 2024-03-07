@@ -1,6 +1,6 @@
 #include "common/log/log.h"
 #include "include/query_engine/planner/operator/aggr_physical_operator.h"
-#include "storage/table/table.h"
+#include "include/storage_engine/recorder/table.h"
 
 RC AggrPhysicalOperator::open(Trx *trx)
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "src/server/include/common/rc.h"
+#include "include/common/rc.h"
 #include "stmt.h"
 
 class Table;

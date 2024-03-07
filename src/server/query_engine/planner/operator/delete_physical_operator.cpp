@@ -1,7 +1,7 @@
 #include "common/log/log.h"
 #include "include/query_engine/planner/operator/delete_physical_operator.h"
-#include "storage/record/record.h"
-#include "storage/trx/trx.h"
+#include "include/storage_engine/transaction/trx.h"
+#include "include/storage_engine/recorder/record.h"
 #include "include/query_engine/analyzer/statement/delete_stmt.h"
 #include "include/query_engine/structor/tuple/row_tuple.h"
 
