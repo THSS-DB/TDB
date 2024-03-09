@@ -30,6 +30,56 @@ bash build.sh
 ```
 bash build.sh --make -j4
 ```
+完成编译后，根目录下会存在build文件夹，可以在该文件夹下运行TDB，目前TDB有两种运行方式：
+- 基于TCP运行的Client-Service架构
+数据库管理系统的经典CS架构，需要首先启动一个服务作为server，之后通过client来访问server。
+```shell
+./bin/server -f -p 8888
+```
+之后新开一个终端启动client，就可以进入TDB cli交互界面
+ ```shell
+ ./bin/client -p 8888
+```
+- 无状态服务的启动
+除了CS架构，TDB还支持无状态的单线程服务启动（类似于SqlLite），通过单独的指令就可以启动
+```
+./bin/server -f -P cli
+```
+完成TDB的启动后，就可以在TDB的交互窗口运行SQL了。
+
+目前TDB支持基本的增（create, insert）,删（delete）,改（update）,查（select）SQL语句，其中Select语句支持单表的基本查询，条件过滤语句(where，having)，聚合计算语句(聚合函数max())以及排序语句(order by)。
+
+以下是部分SQL示例：
+```SQL
+CREATE TABLE TDB(id int, num int, price float, name char(4), day date);
+
+INSERT INTO TDB VALUES (30, 1, 11.0, 'M', '2025-06-19');
+INSERT INTO TDB VALUES (50, 1, 16.0, '5I', '2017-09-16');
+INSERT INTO TDB VALUES (70, 1, 1.0, 'O', '1993-01-21');
+INSERT INTO TDB VALUES (80, 1, 1.0, 'GQY0', '2007-11-04');
+INSERT INTO TDB VALUES (90, 1, 16.0, 'GU', '2022-02-08');  
+
+SELECT * FROM TDB;
+SELECT * FROM TDB ORDER BY id desc;
+SELECT * FROM TDB ORDER BY price;
+
+SELECT avg(price) FROM TDB; 
+SELECT avg(price) FROM TDB WHERE id>70; 
+SELECT avg(price) FROM TDB WHERE day>'1993-01-21';
+
+
+SELECT count(*) FROM TDB;
+SELECT min(num) FROM TDB;
+SELECT max(price) FROM TDB;
+
+SELECT min(num),max(num),avg(num) FROM TDB;
+
+SHOW TABLES;
+DROP TABLE hello;
+SHOW TABLES;
+
+bye
+```
 
 ## 致谢
 该项目的session模块参考了OceanBase的net模块实现，查询引擎则基于IoTDB的架构进行简化。
