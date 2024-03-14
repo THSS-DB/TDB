@@ -23,6 +23,7 @@ int FrameId::file_desc() const
 {
   return file_desc_;
 }
+
 PageNum FrameId::page_num() const
 {
   return page_num_;

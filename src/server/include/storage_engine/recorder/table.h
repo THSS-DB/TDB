@@ -5,7 +5,7 @@
 
 #include "include/storage_engine/recorder/table_meta.h"
 #include "include/query_engine/parser/value.h"
-#include "include/storage_engine/buffer/disk_buffer_pool.h"
+#include "include/storage_engine/buffer/buffer_pool.h"
 #include "include/storage_engine/recorder/record.h"
 
 class RecordFileScanner;

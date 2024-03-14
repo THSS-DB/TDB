@@ -1,6 +1,6 @@
 #pragma once
 
-#include "include/storage_engine/buffer/disk_buffer_pool.h"
+#include "include/storage_engine/buffer/buffer_pool.h"
 #include "include/storage_engine/recorder/record.h"
 #include "include/storage_engine/recorder/condition_filter.h"
 #include "common/lang/bitmap.h"

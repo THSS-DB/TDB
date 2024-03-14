@@ -1,149 +1,10 @@
-#include "include/storage_engine/buffer/disk_buffer_pool.h"
+#include "include/storage_engine/buffer/buffer_pool.h"
 
 using namespace common;
 using namespace std;
 
 static const int MEM_POOL_ITEM_NUM = 20;
 
-////////////////////////////////////////////////////////////////////////////////
-
-string FileHeader::to_string() const
-{
-  stringstream ss;
-  ss << "pageCount:" << page_count
-     << ", allocatedCount:" << allocated_pages;
-  return ss.str();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-FrameManager::FrameManager(const char *tag) : allocator_(tag)
-{}
-
-RC FrameManager::init(int pool_num)
-{
-  int ret = allocator_.init(false, pool_num);
-  if (ret == 0) {
-    return RC::SUCCESS;
-  }
-  return RC::NOMEM;
-}
-
-RC FrameManager::cleanup()
-{
-  if (frames_.count() > 0) {
-    return RC::INTERNAL;
-  }
-  frames_.destroy();
-  return RC::SUCCESS;
-}
-
-Frame *FrameManager::alloc(int file_desc, PageNum page_num)
-{
-  FrameId frame_id(file_desc, page_num);
-
-  std::lock_guard<std::mutex> lock_guard(lock_);
-  Frame *frame = get_internal(frame_id);
-  if (frame != nullptr) {
-      return frame;
-  }
-
-  frame = allocator_.alloc();
-  if (frame != nullptr) {
-      ASSERT(frame->pin_count() == 0, "got an invalid frame that pin count is not 0. frame=%s",
-             to_string(*frame).c_str());
-      frame->set_page_num(page_num);
-      frame->pin();
-      frames_.put(frame_id, frame);
-  }
-  return frame;
-}
-
-Frame *FrameManager::get(int file_desc, PageNum page_num)
-{
-  FrameId frame_id(file_desc, page_num);
-  std::lock_guard<std::mutex> lock_guard(lock_);
-  return get_internal(frame_id);
-}
-
-RC FrameManager::free(int file_desc, PageNum page_num, Frame *frame)
-{
-  return RC::SUCCESS;
-}
-
-int FrameManager::purge_frames(int count, std::function<RC(Frame *frame)> purger)
-{
-  return 0;
-}
-
-Frame *FrameManager::get_internal(const FrameId &frame_id)
-{
-  Frame *frame = nullptr;
-  (void)frames_.get(frame_id, frame);
-  if (frame != nullptr) {
-    frame->pin();
-  }
-  return frame;
-}
-
-/**
- * @brief 查找目标文件的frame
- * FramesCache中选出所有与给定文件描述符(file_desc)相匹配的Frame对象，并将它们添加到列表中
- */
-std::list<Frame *> FrameManager::find_list(int file_desc)
-{
-  std::lock_guard<std::mutex> lock_guard(lock_);
-
-  std::list<Frame *> frames;
-  auto fetcher = [&frames, file_desc](const FrameId &frame_id, Frame *const frame) -> bool {
-    if (file_desc == frame_id.file_desc()) {
-      frame->pin();
-      frames.push_back(frame);
-    }
-    return true;
-  };
-  frames_.foreach (fetcher);
-  return frames;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-BufferPoolIterator::BufferPoolIterator()
-{}
-BufferPoolIterator::~BufferPoolIterator()
-{}
-RC BufferPoolIterator::init(FileBufferPool &bp, PageNum start_page /* = 0 */)
-{
-  bitmap_.init(bp.file_header_->bitmap, bp.file_header_->page_count);
-  if (start_page <= 0) {
-    current_page_num_ = 0;
-  } else {
-    current_page_num_ = start_page;
-  }
-  return RC::SUCCESS;
-}
-
-bool BufferPoolIterator::has_next()
-{
-  return bitmap_.next_setted_bit(current_page_num_ + 1) != -1;
-}
-
-PageNum BufferPoolIterator::next()
-{
-  PageNum next_page = bitmap_.next_setted_bit(current_page_num_ + 1);
-  if (next_page != -1) {
-    current_page_num_ = next_page;
-  }
-  return next_page;
-}
-
-RC BufferPoolIterator::reset()
-{
-  current_page_num_ = 0;
-  return RC::SUCCESS;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 
 FileBufferPool::FileBufferPool(BufferPoolManager &bp_manager, FrameManager &frame_manager)
     : bp_manager_(bp_manager), frame_manager_(frame_manager)
@@ -185,8 +46,13 @@ RC FileBufferPool::open_file(const char *file_name)
   hdr_frame_->set_file_desc(fd);
   hdr_frame_->access();
 
-  rc = load_page(BP_HEADER_PAGE, hdr_frame_);
-  ASSERT(rc == RC::SUCCESS, "Failed to load page %s:%d", file_name_.c_str(), page_num);
+  if ((rc = load_page(BP_HEADER_PAGE, hdr_frame_)) != RC::SUCCESS) {
+    LOG_ERROR("Failed to load first page of %s, due to %s.", file_name, strerror(errno));
+    evict_page(BP_HEADER_PAGE, hdr_frame_);
+    close(fd);
+    file_desc_ = -1;
+    return rc;
+  }
 
   file_header_ = (FileHeader *)hdr_frame_->data();
 
@@ -195,6 +61,11 @@ RC FileBufferPool::open_file(const char *file_name)
   return RC::SUCCESS;
 }
 
+/**
+ * @brief 关闭文件
+ * 1. 清理所有的frame
+ * 2. 关闭文件
+ */
 RC FileBufferPool::close_file()
 {
   RC rc = RC::SUCCESS;
@@ -204,8 +75,7 @@ RC FileBufferPool::close_file()
 
   hdr_frame_->unpin();
 
-  // TODO: 理论上是在回放时回滚未提交事务，但目前没有undo log，因此不下刷数据page，只通过redo log回放
-  rc = purge_all_pages();
+  rc = evict_all_pages();
   if (rc != RC::SUCCESS) {
     LOG_ERROR("failed to close %s, due to failed to purge pages. rc=%s", file_name_.c_str(), strrc(rc));
     return rc;
@@ -254,8 +124,11 @@ RC FileBufferPool::get_this_page(PageNum page_num, Frame **frame)
   // allocated_frame->pin(); // pined in manager::get
   allocated_frame->access();
 
-  rc = load_page(page_num, allocated_frame);
-  ASSERT(rc == RC::SUCCESS, "Failed to load page %s:%d", file_name_.c_str(), page_num);
+  if ((rc = load_page(page_num, allocated_frame)) != RC::SUCCESS) {
+    LOG_ERROR("Failed to load page %s:%d", file_name_.c_str(), page_num);
+    evict_page(page_num, allocated_frame);
+    return rc;
+  }
 
   *frame = allocated_frame;
   return RC::SUCCESS;
@@ -266,7 +139,7 @@ RC FileBufferPool::allocate_page(Frame **frame)
   RC rc = RC::SUCCESS;
 
   lock_.lock();
-  
+
   int byte = 0, bit = 0;
   if ((file_header_->allocated_pages) < (file_header_->page_count)) {
     // There is one free page
@@ -276,7 +149,6 @@ RC FileBufferPool::allocate_page(Frame **frame)
       if (((file_header_->bitmap[byte]) & (1 << bit)) == 0) {
         (file_header_->allocated_pages)++;
         file_header_->bitmap[byte] |= (1 << bit);
-        // TODO,  do we need clean the loaded page's data?
         hdr_frame_->mark_dirty();
 
         lock_.unlock();
@@ -329,11 +201,6 @@ RC FileBufferPool::allocate_page(Frame **frame)
   return RC::SUCCESS;
 }
 
-RC FileBufferPool::dispose_page(PageNum page_num)
-{
-  return RC::SUCCESS;
-}
-
 RC FileBufferPool::unpin_page(Frame *frame)
 {
   frame->unpin();
@@ -341,46 +208,56 @@ RC FileBufferPool::unpin_page(Frame *frame)
 }
 
 /**
- * @brief 释放一个page
- * 1. 根据文件描述符和page_num从FrameCache中获取frame
- * 2. 检查引用计数，如果该frame的pin_count > 1，则返回错误
- * 3. 如果该frame是脏页，则需要将数据刷新到磁盘上
- * 4. 在FrameCache中释放frame
+ * TODO [Lab1] 需要同学们实现页面刷盘，下面是可参考的思路
  */
-RC FileBufferPool::purge_page(PageNum page_num)
-{
-  return RC::SUCCESS;
-}
-RC FileBufferPool::purge_all_pages()
-{
-  return RC::SUCCESS;
-}
-
 RC FileBufferPool::flush_page(Frame &frame)
 {
+  std::scoped_lock lock_guard(lock_);
+  return flush_page_internal(frame);
+}
+/**
+ * TODO [Lab1] 需要同学们实现页面刷盘，下面是可参考的思路
+ */
+RC FileBufferPool::flush_page_internal(Frame &frame)
+{
+//  1. 获取页面Page
+//  2. 计算该Page在文件中的偏移量
+//  3. 写入数据到文件的目标位置
+//  4. 清除frame的脏标记
+//  5. 记录和返回成功
   return RC::SUCCESS;
 }
 
 /**
- * @brief 从磁盘上恢复一个页面
- * 1. 根据page_num计算出该页面在位图中的位置
- * 2. 更新文件头信息
+ * TODO [Lab1] 需要同学们实现某个指定页面的驱逐
  */
-RC FileBufferPool::recover_page(PageNum page_num)
+RC FileBufferPool::evict_page(PageNum page_num, Frame *buf)
+{
+  return RC::SUCCESS;
+}
+/**
+ * TODO [Lab1] 需要同学们实现该文件所有页面的驱逐
+ */
+RC FileBufferPool::evict_all_pages()
 {
   return RC::SUCCESS;
 }
 
 /**
- * @brief 申请一个frame，如果没有空闲的frame，则需要清理一些frame
+ * @brief 申请一个frame，如果没有空闲的frame，则驱逐一些frame
  */
 RC FileBufferPool::allocate_frame(PageNum page_num, Frame **buffer)
 {
-  auto purger = [this](Frame *frame) {
+  auto evict_action = [this](Frame *frame) {
     if (!frame->dirty()) {
       return RC::SUCCESS;
     }
-    RC rc = bp_manager_.flush_page(*frame);
+    RC rc = RC::SUCCESS;
+    if (frame->file_desc() == file_desc_) {
+      rc = this->flush_page_internal(*frame);
+    } else {
+      rc = bp_manager_.flush_page(*frame);
+    }
     if (rc != RC::SUCCESS) {
       LOG_ERROR("Failed to aclloc block due to failed to flush old block. rc=%s", strrc(rc));
     }
@@ -393,8 +270,8 @@ RC FileBufferPool::allocate_frame(PageNum page_num, Frame **buffer)
       *buffer = frame;
       return RC::SUCCESS;
     }
-    LOG_TRACE("frames are all allocated, so we should purge some frames to get one free frame");
-    (void)frame_manager_.purge_frames(1/*count*/, purger);
+    LOG_TRACE("frames are all allocated, so we should evict some frames to get one free frame");
+    (void)frame_manager_.evict_frames(1, evict_action);
   }
   return RC::BUFFERPOOL_NOBUF;
 }
@@ -428,7 +305,49 @@ int FileBufferPool::file_desc() const
   return file_desc_;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+RC FileBufferPool::recover_page(PageNum page_num)
+{
+  return RC::SUCCESS;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+BufferPoolIterator::BufferPoolIterator()
+{}
+BufferPoolIterator::~BufferPoolIterator()
+{}
+RC BufferPoolIterator::init(FileBufferPool &bp, PageNum start_page /* = 0 */)
+{
+  bitmap_.init(bp.file_header_->bitmap, bp.file_header_->page_count);
+  if (start_page <= 0) {
+    current_page_num_ = 0;
+  } else {
+    current_page_num_ = start_page;
+  }
+  return RC::SUCCESS;
+}
+
+bool BufferPoolIterator::has_next()
+{
+  return bitmap_.next_setted_bit(current_page_num_ + 1) != -1;
+}
+
+PageNum BufferPoolIterator::next()
+{
+  PageNum next_page = bitmap_.next_setted_bit(current_page_num_ + 1);
+  if (next_page != -1) {
+    current_page_num_ = next_page;
+  }
+  return next_page;
+}
+
+RC BufferPoolIterator::reset()
+{
+  current_page_num_ = 0;
+  return RC::SUCCESS;
+}
+
+//////////////////////////////////////////////////////////////////////////////
 
 BufferPoolManager::BufferPoolManager(int memory_size /* = 0 */)
 {
@@ -550,6 +469,9 @@ RC BufferPoolManager::close_file(const char *_file_name)
   return RC::SUCCESS;
 }
 
+/**
+ * TODO [Lab1] 需要同学们实现页面刷盘
+ */
 RC BufferPoolManager::flush_page(Frame &frame)
 {
   return RC::SUCCESS;
