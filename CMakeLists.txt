@@ -96,11 +96,12 @@ INCLUDE_DIRECTORIES(. ${PROJECT_SOURCE_DIR}/deps /usr/local/include)
 ADD_SUBDIRECTORY(deps)
 ADD_SUBDIRECTORY(src/client)
 ADD_SUBDIRECTORY(src/server)
+#ADD_SUBDIRECTORY(test/unittest)
 
 IF(WITH_UNIT_TESTS)
     SET(CMAKE_COMMON_FLAGS "${CMAKE_COMMON_FLAGS} -fprofile-arcs -ftest-coverage")
     enable_testing()
-#    ADD_SUBDIRECTORY(unittest)
+    ADD_SUBDIRECTORY(test/unittest)
 ENDIF(WITH_UNIT_TESTS)
 
 SET(CMAKE_CXX_FLAGS ${CMAKE_COMMON_FLAGS})

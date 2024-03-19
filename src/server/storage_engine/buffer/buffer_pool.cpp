@@ -188,13 +188,6 @@ RC FileBufferPool::allocate_page(Frame **frame)
   allocated_frame->clear_page();
   allocated_frame->set_page_num(file_header_->page_count - 1);
 
-  // Use flush operation to extension file
-  if ((rc = flush_page(*allocated_frame)) != RC::SUCCESS) {
-    LOG_WARN("Failed to alloc page %s , due to failed to extend one page.", file_name_.c_str());
-    // skip return false, delay flush the extended page
-    // return tmp;
-  }
-
   lock_.unlock();
 
   *frame = allocated_frame;

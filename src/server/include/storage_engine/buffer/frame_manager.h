@@ -45,12 +45,6 @@ public:
  Frame *get(int file_desc, PageNum page_num);
 
  /**
-  * @brief 释放一个frame, 释放的时候需要确保frame的pin_count为1
-  * 尽管frame中已经包含了file_desc和page_num，但是依然要求传入，因为frame可能忘记初始化或者没有初始化
-  */
- RC free(int file_desc, PageNum page_num, Frame *frame);
-
- /**
   * 当分配的frame已满时，就尝试驱逐一些pin count=0的frame
   * @param count 想要驱逐多少个frame
   * @param evict_action 需要在释放frame之前，对页面做些什么操作，应该是把脏数据刷到磁盘
@@ -65,9 +59,10 @@ public:
   */
  std::list<Frame *> find_list(int file_desc);
 
+ size_t frame_num() const { return frames_.count(); }
+
 private:
  Frame *get_internal(const FrameId &frame_id);
- RC     free_internal(const FrameId &frame_id, Frame *frame);
 
 private:
  class FrameIdHasher {
@@ -82,6 +77,6 @@ private:
  using FrameAllocator = common::MemPoolSimple<Frame>;
 
  std::mutex lock_;  // 对frames_进行操作时需要加锁
- FrameLruCache  frames_;  // 用于存放Frame，但内存有限，所以不可能存放所有的Frame
- FrameAllocator allocator_;  // 用于分配新的Frame，当LRUCache中的Frame不够用时，就从这里分配
+ FrameLruCache  frames_;  // 用于存放Frame，但内存有限
+ FrameAllocator allocator_;  // 用于分配新的Frame
 };

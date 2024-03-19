@@ -49,33 +49,10 @@ Frame *FrameManager::get(int file_desc, PageNum page_num)
 }
 
 /**
- * TODO [Lab1] 需要同学们实现指定页帧的释放
- */
-RC FrameManager::free(int file_desc, PageNum page_num, Frame *frame)
-{
-  return RC::SUCCESS;
-}
-
-/**
- * TODO [Lab1] 需要同学们实现页帧驱逐，下面是部分可参考的代码，但不完整
+ * TODO [Lab1] 需要同学们实现页帧驱逐
  */
 int FrameManager::evict_frames(int count, std::function<RC(Frame *frame)> evict_action)
 {
-  //  std::lock_guard<std::mutex> lock_guard(lock_);
-  //  std::vector<Frame *> frames_can_evict;
-  //  auto evict_finder = [&frames_can_evict, count](const FrameId &frame_id, Frame *const frame) {
-  //    if (frame->can_evict()) {
-  //      frame->pin();
-  //      frames_can_evict.push_back(frame);
-  //      if (frames_can_evict.size() >= static_cast<size_t>(count)) {
-  //        return false;
-  //      }
-  //    }
-  //    return true;
-  //  };
-  //  frames_.foreach_reverse(evict_finder);
-  //  LOG_INFO("evict frames find %ld pages total", frames_can_evict.size());
-
   return 0;
 }
 
