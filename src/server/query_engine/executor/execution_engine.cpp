@@ -7,13 +7,34 @@
 #include "include/query_engine/structor/query_info.h"
 #include "include/storage_engine/transaction/trx.h"
 #include "include/session/session.h"
+#include <algorithm>
+#include <cstddef>
+#include <cstring>
 
 const char *DELIM = " | ";
 const char END_DELIM = '\0';
 const char NEW_LINE = '\n';
 
+RC write_to_communicator(const char* data, int32_t size, Communicator* communicator, const size_t &min_width){
+  if(size < min_width){
+    int diff = min_width - size;
+    char* padding = new char[diff];
+    memset(padding, ' ', diff);
+    RC rc = communicator->write_result(padding, diff);
+    if(RC_FAIL(rc)){
+      LOG_WARN("failed to send data to client. err=%s", strerror(errno));
+      return rc;
+    }
+  }
+  RC rc = communicator->write_result(data, size);
+  if(RC_FAIL(rc)){
+    LOG_WARN("failed to send data to client. err=%s", strerror(errno));
+    return rc;
+  }
+  return RC::SUCCESS;
+}
 
-void set_operator_schema(QueryInfo *query_info)
+void set_operator_schema(QueryInfo *query_info, size_t& min_width)
 {
   std::unique_ptr<PhysicalOperator> &physical_operator = query_info->physical_operator();
   Stmt *stmt = query_info->stmt();
@@ -28,7 +49,9 @@ void set_operator_schema(QueryInfo *query_info)
         break;
       }
       for (const auto *expr : select_stmt->projects()) {
-        schema.append_cell(expr->alias().empty() ? expr->name().c_str() : expr->alias().c_str());
+        const char* alias = expr->alias().empty() ? expr->name().c_str() : expr->alias().c_str();
+        schema.append_cell(alias);
+        min_width = min_width < strlen(alias) ? strlen(alias) : min_width;
       }
     } break;
 
@@ -44,7 +67,7 @@ void set_operator_schema(QueryInfo *query_info)
   sql_result->set_operator(std::move(physical_operator));
 }
 
-RC send_schema(TupleSchema schema, int cell_num, Communicator* communicator){
+RC send_schema(TupleSchema schema, int cell_num, Communicator* communicator, const size_t &min_width){
   RC rc = RC::SUCCESS;
   for (int i = 0; i < cell_num; i++) {
     const TupleCellSpec &spec = schema.cell_at(i);
@@ -58,7 +81,7 @@ RC send_schema(TupleSchema schema, int cell_num, Communicator* communicator){
         }
 
         int len = strlen(alias);
-        rc = communicator->write_result(alias, len);
+        rc = write_to_communicator(alias, len, communicator, min_width);
         if (RC_FAIL(rc)) {
           return rc;
         }
@@ -102,7 +125,7 @@ RC value_to_string(Value &value, std::string &cell_str){
   return RC::SUCCESS;
 }
 
-RC send_result(SessionRequest *request, bool &need_disconnect){
+RC send_result(SessionRequest *request, bool &need_disconnect, const size_t &min_width){
   RC rc;
   need_disconnect = true;
 
@@ -123,7 +146,7 @@ RC send_result(SessionRequest *request, bool &need_disconnect){
   const TupleSchema &schema = sql_result->tuple_schema();
   const int cell_num = schema.cell_num();
 
-  rc = send_schema(schema, cell_num, communicator);
+  rc = send_schema(schema, cell_num, communicator, min_width);
   if(RC_FAIL(rc)){
     LOG_WARN("failed to send data to client. err=%s", strerror(errno));
     sql_result->close();
@@ -157,7 +180,7 @@ RC send_result(SessionRequest *request, bool &need_disconnect){
           sql_result->close();
           return rc;
         }
-        rc = communicator->write_result(value_str.data(), value_str.size());
+        rc = write_to_communicator(value_str.data(), value_str.size(), communicator, min_width);
         if(RC_FAIL(rc)){
           LOG_WARN("failed to send data to client. err=%s", strerror(errno));
           sql_result->close();
@@ -213,8 +236,9 @@ RC send_result(SessionRequest *request, bool &need_disconnect){
 RC Executor::execute(SessionRequest *request, QueryInfo *query_info, bool &need_disconnect)
 {
   RC rc;
+  min_width = 0;
   if(query_info->physical_operator() != nullptr){
-    set_operator_schema(query_info);
+    set_operator_schema(query_info, min_width);
   }else{
     // Query doesn't have physical operator, such as: insert, update
     Stmt *stmt = query_info->stmt();
@@ -227,7 +251,7 @@ RC Executor::execute(SessionRequest *request, QueryInfo *query_info, bool &need_
     }
   }
 
-  rc = send_result(request, need_disconnect);
+  rc = send_result(request, need_disconnect, min_width);
 
   request->get_communicator()->flush();
   return rc;
