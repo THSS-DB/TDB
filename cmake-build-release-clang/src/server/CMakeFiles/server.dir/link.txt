@@ -1,0 +1,1 @@
+/bin/clang++ -O3 -DNDEBUG CMakeFiles/server.dir/main.cpp.o -o ../../bin/server   -L/usr/local/lib  -Wl,-rpath,/usr/local/lib: ../../lib/libserver.a ../../lib/libcommon.a -lpthread -ldl /usr/local/lib/libevent_pthreads.a /usr/local/lib/libevent_core.a -Wl,-Bstatic -ljsoncpp -Wl,-Bdynamic 

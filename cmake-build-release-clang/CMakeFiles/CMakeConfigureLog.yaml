@@ -1,0 +1,477 @@
+
+---
+events:
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineSystem.cmake:204 (message)"
+      - "CMakeLists.txt:4 (project)"
+    message: |
+      The system is: Linux - 6.5.0-25-generic - x86_64
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:4 (project)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+      Compiler: /bin/clang 
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      0
+      
+      
+      Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+      
+      The C compiler identification is Clang, found in:
+        /home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/3.26.4/CompilerIdC/a.out
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCXXCompiler.cmake:126 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:4 (project)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+      Compiler: /bin/clang++ 
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      0
+      
+      
+      Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+      
+      The CXX compiler identification is Clang, found in:
+        /home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/3.26.4/CompilerIdCXX/a.out
+      
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCompilerABI.cmake:57 (try_compile)"
+      - "/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:4 (project)"
+    checks:
+      - "Detecting C compiler ABI info"
+    directories:
+      source: "/home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-vcK3kN"
+      binary: "/home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-vcK3kN"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "CMAKE_C_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: /home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-vcK3kN
+        
+        Run Build Command(s):/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_1f802/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_1f802.dir/build.make CMakeFiles/cmTC_1f802.dir/build
+        gmake[1]: Entering directory '/home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-vcK3kN'
+        Building C object CMakeFiles/cmTC_1f802.dir/CMakeCCompilerABI.c.o
+        /bin/clang   -fcolor-diagnostics   -v -MD -MT CMakeFiles/cmTC_1f802.dir/CMakeCCompilerABI.c.o -MF CMakeFiles/cmTC_1f802.dir/CMakeCCompilerABI.c.o.d -o CMakeFiles/cmTC_1f802.dir/CMakeCCompilerABI.c.o -c /home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeCCompilerABI.c
+        Ubuntu clang version 17.0.6 (++20231209124227+6009708b4367-1~exp1~20231209124336.77)
+        Target: x86_64-pc-linux-gnu
+        Thread model: posix
+        InstalledDir: /bin
+        Found candidate GCC installation: /bin/../lib/gcc/x86_64-linux-gnu/10
+        Found candidate GCC installation: /bin/../lib/gcc/x86_64-linux-gnu/11
+        Selected GCC installation: /bin/../lib/gcc/x86_64-linux-gnu/11
+        Candidate multilib: .;@m64
+        Selected multilib: .;@m64
+         (in-process)
+         "/usr/lib/llvm-17/bin/clang" -cc1 -triple x86_64-pc-linux-gnu -emit-obj -mrelax-all -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCCompilerABI.c -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -tune-cpu generic -debugger-tuning=gdb -v -fcoverage-compilation-dir=/home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-vcK3kN -resource-dir /usr/lib/llvm-17/lib/clang/17 -dependency-file CMakeFiles/cmTC_1f802.dir/CMakeCCompilerABI.c.o.d -MT CMakeFiles/cmTC_1f802.dir/CMakeCCompilerABI.c.o -sys-header-deps -internal-isystem /usr/lib/llvm-17/lib/clang/17/include -internal-isystem /usr/local/include -internal-isystem /bin/../lib/gcc/x86_64-linux-gnu/11/../../../../x86_64-linux-gnu/include -internal-externc-isystem /usr/include/x86_64-linux-gnu -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdebug-compilation-dir=/home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-vcK3kN -ferror-limit 19 -fgnuc-version=4.2.1 -fcolor-diagnostics -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_1f802.dir/CMakeCCompilerABI.c.o -x c /home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeCCompilerABI.c
+        clang -cc1 version 17.0.6 based upon LLVM 17.0.6 default target x86_64-pc-linux-gnu
+        ignoring nonexistent directory "/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../x86_64-linux-gnu/include"
+        ignoring nonexistent directory "/include"
+        #include "..." search starts here:
+        #include <...> search starts here:
+         /usr/lib/llvm-17/lib/clang/17/include
+         /usr/local/include
+         /usr/include/x86_64-linux-gnu
+         /usr/include
+        End of search list.
+        Linking C executable cmTC_1f802
+        /home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1f802.dir/link.txt --verbose=1
+        /bin/clang  -v CMakeFiles/cmTC_1f802.dir/CMakeCCompilerABI.c.o -o cmTC_1f802 
+        Ubuntu clang version 17.0.6 (++20231209124227+6009708b4367-1~exp1~20231209124336.77)
+        Target: x86_64-pc-linux-gnu
+        Thread model: posix
+        InstalledDir: /bin
+        Found candidate GCC installation: /bin/../lib/gcc/x86_64-linux-gnu/10
+        Found candidate GCC installation: /bin/../lib/gcc/x86_64-linux-gnu/11
+        Selected GCC installation: /bin/../lib/gcc/x86_64-linux-gnu/11
+        Candidate multilib: .;@m64
+        Selected multilib: .;@m64
+         "/bin/ld" -pie -z relro --hash-style=gnu --build-id --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_1f802 /lib/x86_64-linux-gnu/Scrt1.o /lib/x86_64-linux-gnu/crti.o /bin/../lib/gcc/x86_64-linux-gnu/11/crtbeginS.o -L/bin/../lib/gcc/x86_64-linux-gnu/11 -L/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../lib64 -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib64 -L/lib -L/usr/lib CMakeFiles/cmTC_1f802.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /bin/../lib/gcc/x86_64-linux-gnu/11/crtendS.o /lib/x86_64-linux-gnu/crtn.o
+        gmake[1]: Leaving directory '/home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-vcK3kN'
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCompilerABI.cmake:127 (message)"
+      - "/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:4 (project)"
+    message: |
+      Parsed C implicit include dir info: rv=done
+        found start of include info
+        found start of implicit include info
+          add: [/usr/lib/llvm-17/lib/clang/17/include]
+          add: [/usr/local/include]
+          add: [/usr/include/x86_64-linux-gnu]
+          add: [/usr/include]
+        end of search list found
+        collapse include dir [/usr/lib/llvm-17/lib/clang/17/include] ==> [/usr/lib/llvm-17/lib/clang/17/include]
+        collapse include dir [/usr/local/include] ==> [/usr/local/include]
+        collapse include dir [/usr/include/x86_64-linux-gnu] ==> [/usr/include/x86_64-linux-gnu]
+        collapse include dir [/usr/include] ==> [/usr/include]
+        implicit include dirs: [/usr/lib/llvm-17/lib/clang/17/include;/usr/local/include;/usr/include/x86_64-linux-gnu;/usr/include]
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCompilerABI.cmake:152 (message)"
+      - "/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:4 (project)"
+    message: |
+      Parsed C implicit link information:
+        link line regex: [^( *|.*[/\\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        ignore line: [Change Dir: /home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-vcK3kN]
+        ignore line: []
+        ignore line: [Run Build Command(s):/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_1f802/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_1f802.dir/build.make CMakeFiles/cmTC_1f802.dir/build]
+        ignore line: [gmake[1]: Entering directory '/home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-vcK3kN']
+        ignore line: [Building C object CMakeFiles/cmTC_1f802.dir/CMakeCCompilerABI.c.o]
+        ignore line: [/bin/clang   -fcolor-diagnostics   -v -MD -MT CMakeFiles/cmTC_1f802.dir/CMakeCCompilerABI.c.o -MF CMakeFiles/cmTC_1f802.dir/CMakeCCompilerABI.c.o.d -o CMakeFiles/cmTC_1f802.dir/CMakeCCompilerABI.c.o -c /home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeCCompilerABI.c]
+        ignore line: [Ubuntu clang version 17.0.6 (++20231209124227+6009708b4367-1~exp1~20231209124336.77)]
+        ignore line: [Target: x86_64-pc-linux-gnu]
+        ignore line: [Thread model: posix]
+        ignore line: [InstalledDir: /bin]
+        ignore line: [Found candidate GCC installation: /bin/../lib/gcc/x86_64-linux-gnu/10]
+        ignore line: [Found candidate GCC installation: /bin/../lib/gcc/x86_64-linux-gnu/11]
+        ignore line: [Selected GCC installation: /bin/../lib/gcc/x86_64-linux-gnu/11]
+        ignore line: [Candidate multilib: .]
+        ignore line: [@m64]
+        ignore line: [Selected multilib: .]
+        ignore line: [@m64]
+        ignore line: [ (in-process)]
+        ignore line: [ "/usr/lib/llvm-17/bin/clang" -cc1 -triple x86_64-pc-linux-gnu -emit-obj -mrelax-all -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCCompilerABI.c -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -tune-cpu generic -debugger-tuning=gdb -v -fcoverage-compilation-dir=/home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-vcK3kN -resource-dir /usr/lib/llvm-17/lib/clang/17 -dependency-file CMakeFiles/cmTC_1f802.dir/CMakeCCompilerABI.c.o.d -MT CMakeFiles/cmTC_1f802.dir/CMakeCCompilerABI.c.o -sys-header-deps -internal-isystem /usr/lib/llvm-17/lib/clang/17/include -internal-isystem /usr/local/include -internal-isystem /bin/../lib/gcc/x86_64-linux-gnu/11/../../../../x86_64-linux-gnu/include -internal-externc-isystem /usr/include/x86_64-linux-gnu -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdebug-compilation-dir=/home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-vcK3kN -ferror-limit 19 -fgnuc-version=4.2.1 -fcolor-diagnostics -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_1f802.dir/CMakeCCompilerABI.c.o -x c /home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeCCompilerABI.c]
+        ignore line: [clang -cc1 version 17.0.6 based upon LLVM 17.0.6 default target x86_64-pc-linux-gnu]
+        ignore line: [ignoring nonexistent directory "/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../x86_64-linux-gnu/include"]
+        ignore line: [ignoring nonexistent directory "/include"]
+        ignore line: [#include "..." search starts here:]
+        ignore line: [#include <...> search starts here:]
+        ignore line: [ /usr/lib/llvm-17/lib/clang/17/include]
+        ignore line: [ /usr/local/include]
+        ignore line: [ /usr/include/x86_64-linux-gnu]
+        ignore line: [ /usr/include]
+        ignore line: [End of search list.]
+        ignore line: [Linking C executable cmTC_1f802]
+        ignore line: [/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1f802.dir/link.txt --verbose=1]
+        ignore line: [/bin/clang  -v CMakeFiles/cmTC_1f802.dir/CMakeCCompilerABI.c.o -o cmTC_1f802 ]
+        ignore line: [Ubuntu clang version 17.0.6 (++20231209124227+6009708b4367-1~exp1~20231209124336.77)]
+        ignore line: [Target: x86_64-pc-linux-gnu]
+        ignore line: [Thread model: posix]
+        ignore line: [InstalledDir: /bin]
+        ignore line: [Found candidate GCC installation: /bin/../lib/gcc/x86_64-linux-gnu/10]
+        ignore line: [Found candidate GCC installation: /bin/../lib/gcc/x86_64-linux-gnu/11]
+        ignore line: [Selected GCC installation: /bin/../lib/gcc/x86_64-linux-gnu/11]
+        ignore line: [Candidate multilib: .]
+        ignore line: [@m64]
+        ignore line: [Selected multilib: .]
+        ignore line: [@m64]
+        link line: [ "/bin/ld" -pie -z relro --hash-style=gnu --build-id --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_1f802 /lib/x86_64-linux-gnu/Scrt1.o /lib/x86_64-linux-gnu/crti.o /bin/../lib/gcc/x86_64-linux-gnu/11/crtbeginS.o -L/bin/../lib/gcc/x86_64-linux-gnu/11 -L/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../lib64 -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib64 -L/lib -L/usr/lib CMakeFiles/cmTC_1f802.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /bin/../lib/gcc/x86_64-linux-gnu/11/crtendS.o /lib/x86_64-linux-gnu/crtn.o]
+          arg [/bin/ld] ==> ignore
+          arg [-pie] ==> ignore
+          arg [-zrelro] ==> ignore
+          arg [--hash-style=gnu] ==> ignore
+          arg [--build-id] ==> ignore
+          arg [--eh-frame-hdr] ==> ignore
+          arg [-m] ==> ignore
+          arg [elf_x86_64] ==> ignore
+          arg [-dynamic-linker] ==> ignore
+          arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+          arg [-o] ==> ignore
+          arg [cmTC_1f802] ==> ignore
+          arg [/lib/x86_64-linux-gnu/Scrt1.o] ==> obj [/lib/x86_64-linux-gnu/Scrt1.o]
+          arg [/lib/x86_64-linux-gnu/crti.o] ==> obj [/lib/x86_64-linux-gnu/crti.o]
+          arg [/bin/../lib/gcc/x86_64-linux-gnu/11/crtbeginS.o] ==> obj [/bin/../lib/gcc/x86_64-linux-gnu/11/crtbeginS.o]
+          arg [-L/bin/../lib/gcc/x86_64-linux-gnu/11] ==> dir [/bin/../lib/gcc/x86_64-linux-gnu/11]
+          arg [-L/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../lib64] ==> dir [/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../lib64]
+          arg [-L/lib/x86_64-linux-gnu] ==> dir [/lib/x86_64-linux-gnu]
+          arg [-L/lib/../lib64] ==> dir [/lib/../lib64]
+          arg [-L/usr/lib/x86_64-linux-gnu] ==> dir [/usr/lib/x86_64-linux-gnu]
+          arg [-L/usr/lib/../lib64] ==> dir [/usr/lib/../lib64]
+          arg [-L/lib] ==> dir [/lib]
+          arg [-L/usr/lib] ==> dir [/usr/lib]
+          arg [CMakeFiles/cmTC_1f802.dir/CMakeCCompilerABI.c.o] ==> ignore
+          arg [-lgcc] ==> lib [gcc]
+          arg [--as-needed] ==> ignore
+          arg [-lgcc_s] ==> lib [gcc_s]
+          arg [--no-as-needed] ==> ignore
+          arg [-lc] ==> lib [c]
+          arg [-lgcc] ==> lib [gcc]
+          arg [--as-needed] ==> ignore
+          arg [-lgcc_s] ==> lib [gcc_s]
+          arg [--no-as-needed] ==> ignore
+          arg [/bin/../lib/gcc/x86_64-linux-gnu/11/crtendS.o] ==> obj [/bin/../lib/gcc/x86_64-linux-gnu/11/crtendS.o]
+          arg [/lib/x86_64-linux-gnu/crtn.o] ==> obj [/lib/x86_64-linux-gnu/crtn.o]
+        collapse obj [/bin/../lib/gcc/x86_64-linux-gnu/11/crtbeginS.o] ==> [/lib/gcc/x86_64-linux-gnu/11/crtbeginS.o]
+        collapse obj [/bin/../lib/gcc/x86_64-linux-gnu/11/crtendS.o] ==> [/lib/gcc/x86_64-linux-gnu/11/crtendS.o]
+        collapse library dir [/bin/../lib/gcc/x86_64-linux-gnu/11] ==> [/lib/gcc/x86_64-linux-gnu/11]
+        collapse library dir [/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../lib64] ==> [/lib64]
+        collapse library dir [/lib/x86_64-linux-gnu] ==> [/lib/x86_64-linux-gnu]
+        collapse library dir [/lib/../lib64] ==> [/lib64]
+        collapse library dir [/usr/lib/x86_64-linux-gnu] ==> [/usr/lib/x86_64-linux-gnu]
+        collapse library dir [/usr/lib/../lib64] ==> [/usr/lib64]
+        collapse library dir [/lib] ==> [/lib]
+        collapse library dir [/usr/lib] ==> [/usr/lib]
+        implicit libs: [gcc;gcc_s;c;gcc;gcc_s]
+        implicit objs: [/lib/x86_64-linux-gnu/Scrt1.o;/lib/x86_64-linux-gnu/crti.o;/lib/gcc/x86_64-linux-gnu/11/crtbeginS.o;/lib/gcc/x86_64-linux-gnu/11/crtendS.o;/lib/x86_64-linux-gnu/crtn.o]
+        implicit dirs: [/lib/gcc/x86_64-linux-gnu/11;/lib64;/lib/x86_64-linux-gnu;/usr/lib/x86_64-linux-gnu;/usr/lib64;/lib;/usr/lib]
+        implicit fwks: []
+      
+      
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCompilerABI.cmake:57 (try_compile)"
+      - "/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:4 (project)"
+    checks:
+      - "Detecting CXX compiler ABI info"
+    directories:
+      source: "/home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-mrvLDJ"
+      binary: "/home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-mrvLDJ"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "CMAKE_CXX_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: /home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-mrvLDJ
+        
+        Run Build Command(s):/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_85bed/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_85bed.dir/build.make CMakeFiles/cmTC_85bed.dir/build
+        gmake[1]: Entering directory '/home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-mrvLDJ'
+        Building CXX object CMakeFiles/cmTC_85bed.dir/CMakeCXXCompilerABI.cpp.o
+        /bin/clang++   -std=gnu++20 -fcolor-diagnostics   -v -MD -MT CMakeFiles/cmTC_85bed.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_85bed.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_85bed.dir/CMakeCXXCompilerABI.cpp.o -c /home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeCXXCompilerABI.cpp
+        Ubuntu clang version 17.0.6 (++20231209124227+6009708b4367-1~exp1~20231209124336.77)
+        Target: x86_64-pc-linux-gnu
+        Thread model: posix
+        InstalledDir: /bin
+        Found candidate GCC installation: /bin/../lib/gcc/x86_64-linux-gnu/10
+        Found candidate GCC installation: /bin/../lib/gcc/x86_64-linux-gnu/11
+        Selected GCC installation: /bin/../lib/gcc/x86_64-linux-gnu/11
+        Candidate multilib: .;@m64
+        Selected multilib: .;@m64
+         (in-process)
+         "/usr/lib/llvm-17/bin/clang" -cc1 -triple x86_64-pc-linux-gnu -emit-obj -mrelax-all -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -tune-cpu generic -debugger-tuning=gdb -v -fcoverage-compilation-dir=/home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-mrvLDJ -resource-dir /usr/lib/llvm-17/lib/clang/17 -dependency-file CMakeFiles/cmTC_85bed.dir/CMakeCXXCompilerABI.cpp.o.d -MT CMakeFiles/cmTC_85bed.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -internal-isystem /bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11 -internal-isystem /bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/x86_64-linux-gnu/c++/11 -internal-isystem /bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11/backward -internal-isystem /usr/lib/llvm-17/lib/clang/17/include -internal-isystem /usr/local/include -internal-isystem /bin/../lib/gcc/x86_64-linux-gnu/11/../../../../x86_64-linux-gnu/include -internal-externc-isystem /usr/include/x86_64-linux-gnu -internal-externc-isystem /include -internal-externc-isystem /usr/include -std=gnu++20 -fdeprecated-macro -fdebug-compilation-dir=/home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-mrvLDJ -ferror-limit 19 -fgnuc-version=4.2.1 -fno-implicit-modules -fcxx-exceptions -fexceptions -fcolor-diagnostics -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_85bed.dir/CMakeCXXCompilerABI.cpp.o -x c++ /home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeCXXCompilerABI.cpp
+        clang -cc1 version 17.0.6 based upon LLVM 17.0.6 default target x86_64-pc-linux-gnu
+        ignoring nonexistent directory "/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../x86_64-linux-gnu/include"
+        ignoring nonexistent directory "/include"
+        #include "..." search starts here:
+        #include <...> search starts here:
+         /bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11
+         /bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/x86_64-linux-gnu/c++/11
+         /bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11/backward
+         /usr/lib/llvm-17/lib/clang/17/include
+         /usr/local/include
+         /usr/include/x86_64-linux-gnu
+         /usr/include
+        End of search list.
+        Linking CXX executable cmTC_85bed
+        /home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/bin/cmake -E cmake_link_script CMakeFiles/cmTC_85bed.dir/link.txt --verbose=1
+        /bin/clang++  -v CMakeFiles/cmTC_85bed.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_85bed 
+        Ubuntu clang version 17.0.6 (++20231209124227+6009708b4367-1~exp1~20231209124336.77)
+        Target: x86_64-pc-linux-gnu
+        Thread model: posix
+        InstalledDir: /bin
+        Found candidate GCC installation: /bin/../lib/gcc/x86_64-linux-gnu/10
+        Found candidate GCC installation: /bin/../lib/gcc/x86_64-linux-gnu/11
+        Selected GCC installation: /bin/../lib/gcc/x86_64-linux-gnu/11
+        Candidate multilib: .;@m64
+        Selected multilib: .;@m64
+         "/bin/ld" -pie -z relro --hash-style=gnu --build-id --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_85bed /lib/x86_64-linux-gnu/Scrt1.o /lib/x86_64-linux-gnu/crti.o /bin/../lib/gcc/x86_64-linux-gnu/11/crtbeginS.o -L/bin/../lib/gcc/x86_64-linux-gnu/11 -L/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../lib64 -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib64 -L/lib -L/usr/lib CMakeFiles/cmTC_85bed.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /bin/../lib/gcc/x86_64-linux-gnu/11/crtendS.o /lib/x86_64-linux-gnu/crtn.o
+        gmake[1]: Leaving directory '/home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-mrvLDJ'
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCompilerABI.cmake:127 (message)"
+      - "/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:4 (project)"
+    message: |
+      Parsed CXX implicit include dir info: rv=done
+        found start of include info
+        found start of implicit include info
+          add: [/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11]
+          add: [/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/x86_64-linux-gnu/c++/11]
+          add: [/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11/backward]
+          add: [/usr/lib/llvm-17/lib/clang/17/include]
+          add: [/usr/local/include]
+          add: [/usr/include/x86_64-linux-gnu]
+          add: [/usr/include]
+        end of search list found
+        collapse include dir [/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11] ==> [/include/c++/11]
+        collapse include dir [/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/x86_64-linux-gnu/c++/11] ==> [/include/x86_64-linux-gnu/c++/11]
+        collapse include dir [/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11/backward] ==> [/include/c++/11/backward]
+        collapse include dir [/usr/lib/llvm-17/lib/clang/17/include] ==> [/usr/lib/llvm-17/lib/clang/17/include]
+        collapse include dir [/usr/local/include] ==> [/usr/local/include]
+        collapse include dir [/usr/include/x86_64-linux-gnu] ==> [/usr/include/x86_64-linux-gnu]
+        collapse include dir [/usr/include] ==> [/usr/include]
+        implicit include dirs: [/include/c++/11;/include/x86_64-linux-gnu/c++/11;/include/c++/11/backward;/usr/lib/llvm-17/lib/clang/17/include;/usr/local/include;/usr/include/x86_64-linux-gnu;/usr/include]
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCompilerABI.cmake:152 (message)"
+      - "/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:4 (project)"
+    message: |
+      Parsed CXX implicit link information:
+        link line regex: [^( *|.*[/\\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        ignore line: [Change Dir: /home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-mrvLDJ]
+        ignore line: []
+        ignore line: [Run Build Command(s):/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_85bed/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_85bed.dir/build.make CMakeFiles/cmTC_85bed.dir/build]
+        ignore line: [gmake[1]: Entering directory '/home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-mrvLDJ']
+        ignore line: [Building CXX object CMakeFiles/cmTC_85bed.dir/CMakeCXXCompilerABI.cpp.o]
+        ignore line: [/bin/clang++   -std=gnu++20 -fcolor-diagnostics   -v -MD -MT CMakeFiles/cmTC_85bed.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_85bed.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_85bed.dir/CMakeCXXCompilerABI.cpp.o -c /home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeCXXCompilerABI.cpp]
+        ignore line: [Ubuntu clang version 17.0.6 (++20231209124227+6009708b4367-1~exp1~20231209124336.77)]
+        ignore line: [Target: x86_64-pc-linux-gnu]
+        ignore line: [Thread model: posix]
+        ignore line: [InstalledDir: /bin]
+        ignore line: [Found candidate GCC installation: /bin/../lib/gcc/x86_64-linux-gnu/10]
+        ignore line: [Found candidate GCC installation: /bin/../lib/gcc/x86_64-linux-gnu/11]
+        ignore line: [Selected GCC installation: /bin/../lib/gcc/x86_64-linux-gnu/11]
+        ignore line: [Candidate multilib: .]
+        ignore line: [@m64]
+        ignore line: [Selected multilib: .]
+        ignore line: [@m64]
+        ignore line: [ (in-process)]
+        ignore line: [ "/usr/lib/llvm-17/bin/clang" -cc1 -triple x86_64-pc-linux-gnu -emit-obj -mrelax-all -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -tune-cpu generic -debugger-tuning=gdb -v -fcoverage-compilation-dir=/home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-mrvLDJ -resource-dir /usr/lib/llvm-17/lib/clang/17 -dependency-file CMakeFiles/cmTC_85bed.dir/CMakeCXXCompilerABI.cpp.o.d -MT CMakeFiles/cmTC_85bed.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -internal-isystem /bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11 -internal-isystem /bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/x86_64-linux-gnu/c++/11 -internal-isystem /bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11/backward -internal-isystem /usr/lib/llvm-17/lib/clang/17/include -internal-isystem /usr/local/include -internal-isystem /bin/../lib/gcc/x86_64-linux-gnu/11/../../../../x86_64-linux-gnu/include -internal-externc-isystem /usr/include/x86_64-linux-gnu -internal-externc-isystem /include -internal-externc-isystem /usr/include -std=gnu++20 -fdeprecated-macro -fdebug-compilation-dir=/home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-mrvLDJ -ferror-limit 19 -fgnuc-version=4.2.1 -fno-implicit-modules -fcxx-exceptions -fexceptions -fcolor-diagnostics -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_85bed.dir/CMakeCXXCompilerABI.cpp.o -x c++ /home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeCXXCompilerABI.cpp]
+        ignore line: [clang -cc1 version 17.0.6 based upon LLVM 17.0.6 default target x86_64-pc-linux-gnu]
+        ignore line: [ignoring nonexistent directory "/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../x86_64-linux-gnu/include"]
+        ignore line: [ignoring nonexistent directory "/include"]
+        ignore line: [#include "..." search starts here:]
+        ignore line: [#include <...> search starts here:]
+        ignore line: [ /bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11]
+        ignore line: [ /bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/x86_64-linux-gnu/c++/11]
+        ignore line: [ /bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11/backward]
+        ignore line: [ /usr/lib/llvm-17/lib/clang/17/include]
+        ignore line: [ /usr/local/include]
+        ignore line: [ /usr/include/x86_64-linux-gnu]
+        ignore line: [ /usr/include]
+        ignore line: [End of search list.]
+        ignore line: [Linking CXX executable cmTC_85bed]
+        ignore line: [/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/bin/cmake -E cmake_link_script CMakeFiles/cmTC_85bed.dir/link.txt --verbose=1]
+        ignore line: [/bin/clang++  -v CMakeFiles/cmTC_85bed.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_85bed ]
+        ignore line: [Ubuntu clang version 17.0.6 (++20231209124227+6009708b4367-1~exp1~20231209124336.77)]
+        ignore line: [Target: x86_64-pc-linux-gnu]
+        ignore line: [Thread model: posix]
+        ignore line: [InstalledDir: /bin]
+        ignore line: [Found candidate GCC installation: /bin/../lib/gcc/x86_64-linux-gnu/10]
+        ignore line: [Found candidate GCC installation: /bin/../lib/gcc/x86_64-linux-gnu/11]
+        ignore line: [Selected GCC installation: /bin/../lib/gcc/x86_64-linux-gnu/11]
+        ignore line: [Candidate multilib: .]
+        ignore line: [@m64]
+        ignore line: [Selected multilib: .]
+        ignore line: [@m64]
+        link line: [ "/bin/ld" -pie -z relro --hash-style=gnu --build-id --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_85bed /lib/x86_64-linux-gnu/Scrt1.o /lib/x86_64-linux-gnu/crti.o /bin/../lib/gcc/x86_64-linux-gnu/11/crtbeginS.o -L/bin/../lib/gcc/x86_64-linux-gnu/11 -L/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../lib64 -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib64 -L/lib -L/usr/lib CMakeFiles/cmTC_85bed.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /bin/../lib/gcc/x86_64-linux-gnu/11/crtendS.o /lib/x86_64-linux-gnu/crtn.o]
+          arg [/bin/ld] ==> ignore
+          arg [-pie] ==> ignore
+          arg [-zrelro] ==> ignore
+          arg [--hash-style=gnu] ==> ignore
+          arg [--build-id] ==> ignore
+          arg [--eh-frame-hdr] ==> ignore
+          arg [-m] ==> ignore
+          arg [elf_x86_64] ==> ignore
+          arg [-dynamic-linker] ==> ignore
+          arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+          arg [-o] ==> ignore
+          arg [cmTC_85bed] ==> ignore
+          arg [/lib/x86_64-linux-gnu/Scrt1.o] ==> obj [/lib/x86_64-linux-gnu/Scrt1.o]
+          arg [/lib/x86_64-linux-gnu/crti.o] ==> obj [/lib/x86_64-linux-gnu/crti.o]
+          arg [/bin/../lib/gcc/x86_64-linux-gnu/11/crtbeginS.o] ==> obj [/bin/../lib/gcc/x86_64-linux-gnu/11/crtbeginS.o]
+          arg [-L/bin/../lib/gcc/x86_64-linux-gnu/11] ==> dir [/bin/../lib/gcc/x86_64-linux-gnu/11]
+          arg [-L/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../lib64] ==> dir [/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../lib64]
+          arg [-L/lib/x86_64-linux-gnu] ==> dir [/lib/x86_64-linux-gnu]
+          arg [-L/lib/../lib64] ==> dir [/lib/../lib64]
+          arg [-L/usr/lib/x86_64-linux-gnu] ==> dir [/usr/lib/x86_64-linux-gnu]
+          arg [-L/usr/lib/../lib64] ==> dir [/usr/lib/../lib64]
+          arg [-L/lib] ==> dir [/lib]
+          arg [-L/usr/lib] ==> dir [/usr/lib]
+          arg [CMakeFiles/cmTC_85bed.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+          arg [-lstdc++] ==> lib [stdc++]
+          arg [-lm] ==> lib [m]
+          arg [-lgcc_s] ==> lib [gcc_s]
+          arg [-lgcc] ==> lib [gcc]
+          arg [-lc] ==> lib [c]
+          arg [-lgcc_s] ==> lib [gcc_s]
+          arg [-lgcc] ==> lib [gcc]
+          arg [/bin/../lib/gcc/x86_64-linux-gnu/11/crtendS.o] ==> obj [/bin/../lib/gcc/x86_64-linux-gnu/11/crtendS.o]
+          arg [/lib/x86_64-linux-gnu/crtn.o] ==> obj [/lib/x86_64-linux-gnu/crtn.o]
+        collapse obj [/bin/../lib/gcc/x86_64-linux-gnu/11/crtbeginS.o] ==> [/lib/gcc/x86_64-linux-gnu/11/crtbeginS.o]
+        collapse obj [/bin/../lib/gcc/x86_64-linux-gnu/11/crtendS.o] ==> [/lib/gcc/x86_64-linux-gnu/11/crtendS.o]
+        collapse library dir [/bin/../lib/gcc/x86_64-linux-gnu/11] ==> [/lib/gcc/x86_64-linux-gnu/11]
+        collapse library dir [/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../lib64] ==> [/lib64]
+        collapse library dir [/lib/x86_64-linux-gnu] ==> [/lib/x86_64-linux-gnu]
+        collapse library dir [/lib/../lib64] ==> [/lib64]
+        collapse library dir [/usr/lib/x86_64-linux-gnu] ==> [/usr/lib/x86_64-linux-gnu]
+        collapse library dir [/usr/lib/../lib64] ==> [/usr/lib64]
+        collapse library dir [/lib] ==> [/lib]
+        collapse library dir [/usr/lib] ==> [/usr/lib]
+        implicit libs: [stdc++;m;gcc_s;gcc;c;gcc_s;gcc]
+        implicit objs: [/lib/x86_64-linux-gnu/Scrt1.o;/lib/x86_64-linux-gnu/crti.o;/lib/gcc/x86_64-linux-gnu/11/crtbeginS.o;/lib/gcc/x86_64-linux-gnu/11/crtendS.o;/lib/x86_64-linux-gnu/crtn.o]
+        implicit dirs: [/lib/gcc/x86_64-linux-gnu/11;/lib64;/lib/x86_64-linux-gnu;/usr/lib/x86_64-linux-gnu;/usr/lib64;/lib;/usr/lib]
+        implicit fwks: []
+      
+      
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CheckCSourceCompiles.cmake:76 (cmake_check_source_compiles)"
+      - "/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/FindThreads.cmake:97 (CHECK_C_SOURCE_COMPILES)"
+      - "/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/FindThreads.cmake:163 (_threads_check_libc)"
+      - "/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeFindDependencyMacro.cmake:76 (find_package)"
+      - "/usr/local/lib/cmake/GTest/GTestConfig.cmake:29 (find_dependency)"
+      - "test/unittest/CMakeLists.txt:6 (find_package)"
+    checks:
+      - "Performing Test CMAKE_HAVE_LIBC_PTHREAD"
+    directories:
+      source: "/home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-KpQtwh"
+      binary: "/home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-KpQtwh"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/ycycse/workSpace/test/TDB/cmake"
+    buildResult:
+      variable: "CMAKE_HAVE_LIBC_PTHREAD"
+      cached: true
+      stdout: |
+        Change Dir: /home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-KpQtwh
+        
+        Run Build Command(s):/home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_725a5/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_725a5.dir/build.make CMakeFiles/cmTC_725a5.dir/build
+        gmake[1]: Entering directory '/home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-KpQtwh'
+        Building C object CMakeFiles/cmTC_725a5.dir/src.c.o
+        /bin/clang -DCMAKE_HAVE_LIBC_PTHREAD  -fcolor-diagnostics -MD -MT CMakeFiles/cmTC_725a5.dir/src.c.o -MF CMakeFiles/cmTC_725a5.dir/src.c.o.d -o CMakeFiles/cmTC_725a5.dir/src.c.o -c /home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-KpQtwh/src.c
+        Linking C executable cmTC_725a5
+        /home/ycycse/Downloads/clion-2023.2.2/bin/cmake/linux/x64/bin/cmake -E cmake_link_script CMakeFiles/cmTC_725a5.dir/link.txt --verbose=1
+        /bin/clang CMakeFiles/cmTC_725a5.dir/src.c.o -o cmTC_725a5 
+        gmake[1]: Leaving directory '/home/ycycse/workSpace/test/TDB/cmake-build-release-clang/CMakeFiles/CMakeScratch/TryCompile-KpQtwh'
+        
+      exitCode: 0
+...

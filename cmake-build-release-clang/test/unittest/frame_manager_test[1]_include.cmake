@@ -1,0 +1,5 @@
+if(EXISTS "/home/ycycse/workSpace/test/TDB/cmake-build-release-clang/test/unittest/frame_manager_test[1]_tests.cmake")
+  include("/home/ycycse/workSpace/test/TDB/cmake-build-release-clang/test/unittest/frame_manager_test[1]_tests.cmake")
+else()
+  add_test(frame_manager_test_NOT_BUILT frame_manager_test_NOT_BUILT)
+endif()

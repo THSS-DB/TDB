@@ -250,7 +250,7 @@ RC SelectStmt::create(Db *db, const SelectSqlNode &select_sql, Stmt *&stmt)
     project->getFields(query_fields);
   }
 
-  LOG_INFO("got %d tables in from stmt and %d fields in query stmt", tables.size(), projects.size());
+  LOG_DEBUG("got %d tables in from stmt and %d fields in query stmt", tables.size(), projects.size());
 
   Table *default_table = nullptr;
   if (tables.size() == 1) {

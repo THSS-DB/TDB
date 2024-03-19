@@ -1,0 +1,40 @@
+{
+	"fields" : 
+	[
+		{
+			"len" : 4,
+			"name" : "int_value",
+			"nullable" : true,
+			"offset" : 0,
+			"type" : "ints",
+			"visible" : true
+		},
+		{
+			"len" : 4,
+			"name" : "str_value",
+			"nullable" : true,
+			"offset" : 4,
+			"type" : "chars",
+			"visible" : true
+		},
+		{
+			"len" : 4,
+			"name" : "float_value",
+			"nullable" : true,
+			"offset" : 8,
+			"type" : "floats",
+			"visible" : true
+		},
+		{
+			"len" : 1,
+			"name" : "null_field",
+			"nullable" : false,
+			"offset" : 12,
+			"type" : "chars",
+			"visible" : false
+		}
+	],
+	"indexes" : null,
+	"table_id" : 0,
+	"table_name" : "storage_lab"
+}

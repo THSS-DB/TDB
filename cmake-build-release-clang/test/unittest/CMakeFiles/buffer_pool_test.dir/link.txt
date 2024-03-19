@@ -1,0 +1,1 @@
+/bin/clang++ -O3 -DNDEBUG CMakeFiles/buffer_pool_test.dir/buffer_pool_test.cpp.o -o ../../bin/buffer_pool_test   -L/usr/local/lib  -Wl,-rpath,/usr/local/lib ../../lib/libcommon.a -lpthread -ldl -lgtest -lgtest_main ../../lib/libserver.a ../../lib/libcommon.a -lpthread -ldl /usr/local/lib/libevent_pthreads.a /usr/local/lib/libevent_core.a -Wl,-Bstatic -ljsoncpp -Wl,-Bdynamic 
