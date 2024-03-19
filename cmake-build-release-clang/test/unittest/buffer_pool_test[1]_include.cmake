@@ -1,5 +1,0 @@
-if(EXISTS "/home/ycycse/workSpace/test/TDB/cmake-build-release-clang/test/unittest/buffer_pool_test[1]_tests.cmake")
-  include("/home/ycycse/workSpace/test/TDB/cmake-build-release-clang/test/unittest/buffer_pool_test[1]_tests.cmake")
-else()
-  add_test(buffer_pool_test_NOT_BUILT buffer_pool_test_NOT_BUILT)
-endif()
