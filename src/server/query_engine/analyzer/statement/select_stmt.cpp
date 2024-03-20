@@ -118,7 +118,7 @@ RC _process_attribute_expression(Db *db, const Expression *expr, const char *tab
         }
         auto *field_expr = new FieldExpr(table, field_meta);
         std::string alias = table->name();
-        if (alias_map.contains(table)) {
+        if (alias_map.find(table) != alias_map.end()) {
           alias = alias_map[table];
         }
         field_expr->set_field_table_alias(alias);
@@ -290,28 +290,10 @@ RC SelectStmt::create(Db *db, const SelectSqlNode &select_sql, Stmt *&stmt)
 
   // TODO [Lab3] Create Group By statement in `group by` statement
   GroupByStmt *group_by_stmt = nullptr;
-  OrderByStmt *group_by_order_stmt = nullptr;
   if (select_sql.group_by_attributes.size() > 0) {
     rc = GroupByStmt::create(db, default_table, &table_map, select_sql.group_by_attributes, group_by_stmt);
     if (rc != RC::SUCCESS) {
       LOG_WARN("cannot construct group by stmt");
-      return rc;
-    }
-
-    std::vector<OrderByNode> group_by_orders;
-    for (auto &group_by_attribute : select_sql.group_by_attributes) {
-      OrderByNode order_by_node;
-      order_by_node.sort_attr = group_by_attribute;
-      group_by_orders.emplace_back(order_by_node);
-    }
-    rc = OrderByStmt::create(db,
-        default_table,
-        &table_map,
-        group_by_orders,
-        static_cast<int>(group_by_orders.size()),
-        group_by_order_stmt);
-    if (rc != RC::SUCCESS) {
-      LOG_WARN("cannot construct order by stmt");
       return rc;
     }
   }
@@ -383,7 +365,6 @@ RC SelectStmt::create(Db *db, const SelectSqlNode &select_sql, Stmt *&stmt)
   select_stmt->table_alias_.swap(table_alias);
   select_stmt->filter_stmt_ = filter_stmt;
   select_stmt->group_by_stmt_ = group_by_stmt;
-  select_stmt->group_by_order_stmt_ = group_by_order_stmt;
   select_stmt->having_stmt_ = having_stmt;
   select_stmt->order_stmt_ = order_stmt;
   select_stmt->join_filter_stmts_ = join_filter_stmts;

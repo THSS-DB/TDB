@@ -1,4 +1,4 @@
-# THSS TDB
+# THSS TDB 
 TDB是面向清华大学软件学院的数据库原理课程开发的一款关系型数据库管理系统。实现了关系型数据增删改查的基本功能，支持多种SQL语句，架构逻辑清晰，适合初学者用于入门数据库内核的设计与实现。
 
 ## 架构介绍
@@ -75,7 +75,7 @@ SELECT max(price) FROM TDB;
 SELECT min(num),max(num),avg(num) FROM TDB;
 
 SHOW TABLES;
-DROP TABLE hello;
+DROP TABLE TDB;
 SHOW TABLES;
 
 bye

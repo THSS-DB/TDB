@@ -1,15 +1,10 @@
 #pragma once
 
 #include <vector>
-#include <memory>
-#include <iostream>
-#include <iomanip>
-#include <sstream>
 #include "include/common/rc.h"
 #include "stmt.h"
 #include "include/query_engine/structor/expression/expression.h"
 #include "include/storage_engine/recorder/field.h"
-#include "include/query_engine/structor/expression/analyze_expression.h"
 
 class FieldMeta;
 class FilterStmt;
@@ -60,10 +55,6 @@ public:
     return group_by_stmt_;
   }
 
-  OrderByStmt *group_by_order_stmt() const {
-    return group_by_order_stmt_;
-  }
-
   FilterStmt *having_stmt() const {
     return having_stmt_;
   }
@@ -97,7 +88,6 @@ private:
   std::vector<FilterStmt *> join_filter_stmts_;
   FilterStmt *filter_stmt_ = nullptr;
   GroupByStmt *group_by_stmt_ = nullptr;
-  OrderByStmt *group_by_order_stmt_ = nullptr;
   FilterStmt *having_stmt_ = nullptr;
   OrderByStmt *order_stmt_ = nullptr;
   std::vector<FuncResult> function_results_;

@@ -73,13 +73,11 @@ char *my_readline(const char *prompt)
 {
   char *buffer = (char *)malloc(MAX_MEM_BUFFER_SIZE);
   if (nullptr == buffer) {
-    fprintf(stderr, "failed to alloc line buffer");
     return nullptr;
   }
   fprintf(stdout, "%s", prompt);
   char *s = fgets(buffer, MAX_MEM_BUFFER_SIZE, stdin);
   if (nullptr == s) {
-    fprintf(stderr, "failed to read message from console");
     free(buffer);
     return nullptr;
   }
