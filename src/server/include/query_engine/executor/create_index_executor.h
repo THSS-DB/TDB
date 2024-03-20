@@ -4,8 +4,9 @@
 
 class QueryInfo;
 
-class CreateIndexExecutor {
- public:
+class CreateIndexExecutor
+{
+public:
   CreateIndexExecutor() = default;
   virtual ~CreateIndexExecutor() = default;
 

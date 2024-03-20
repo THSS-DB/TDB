@@ -1,20 +1,22 @@
 #include "include/query_engine/structor/expression/arithmetic_expression.h"
 
-AttrType ArithmeticExpr::value_type() const {
+AttrType ArithmeticExpr::value_type() const
+{
   if (!right_) {
     return left_->value_type();
   }
 
   if (left_->value_type() == AttrType::INTS &&
-      right_->value_type() == AttrType::INTS && arithmetic_type_ != Type::DIV) {
+      right_->value_type() == AttrType::INTS &&
+      arithmetic_type_ != Type::DIV) {
     return AttrType::INTS;
   }
 
   return AttrType::FLOATS;
 }
 
-RC ArithmeticExpr::calc_value(const Value &left_value, const Value &right_value,
-                              Value &value) const {
+RC ArithmeticExpr::calc_value(const Value &left_value, const Value &right_value, Value &value) const
+{
   RC rc = RC::SUCCESS;
   if (left_value.is_null() || right_value.is_null()) {
     value.set_null();
@@ -55,8 +57,7 @@ RC ArithmeticExpr::calc_value(const Value &left_value, const Value &right_value,
           value.set_int(left_value.get_int() / right_value.get_int());
         }
       } else {
-        if (-EPSILON < right_value.get_float() &&
-            right_value.get_float() < EPSILON) {
+        if (-EPSILON < right_value.get_float() && right_value.get_float() < EPSILON) {
           value.set_null();
         } else {
           value.set_float(left_value.get_float() / right_value.get_float());
@@ -80,7 +81,8 @@ RC ArithmeticExpr::calc_value(const Value &left_value, const Value &right_value,
   return rc;
 }
 
-RC ArithmeticExpr::get_value(const Tuple &tuple, Value &value) const {
+RC ArithmeticExpr::get_value(const Tuple &tuple, Value &value) const
+{
   RC rc;
   Value left_value;
   Value right_value;
@@ -102,7 +104,8 @@ RC ArithmeticExpr::get_value(const Tuple &tuple, Value &value) const {
   return calc_value(left_value, right_value, value);
 }
 
-RC ArithmeticExpr::try_get_value(Value &value) const {
+RC ArithmeticExpr::try_get_value(Value &value) const
+{
   RC rc;
   Value left_value;
   Value right_value;

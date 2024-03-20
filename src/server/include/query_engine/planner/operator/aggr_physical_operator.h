@@ -1,11 +1,12 @@
 #pragma once
 
+#include "physical_operator.h"
 #include "include/query_engine/planner/node/aggr_logical_node.h"
 #include "include/query_engine/structor/tuple/aggregation_tuple.h"
-#include "physical_operator.h"
 
-class AggrPhysicalOperator : public PhysicalOperator {
- public:
+class AggrPhysicalOperator : public PhysicalOperator
+{
+public:
   AggrPhysicalOperator(AggrLogicalNode *logical_operator) {
     for (int i = 0; i < logical_operator->_alias_().size(); i++) {
       alias_.emplace_back(logical_operator->_alias_()[i]);
@@ -14,9 +15,11 @@ class AggrPhysicalOperator : public PhysicalOperator {
     }
   }
 
+
   ~AggrPhysicalOperator() override = default;
 
-  PhysicalOperatorType type() const override {
+  PhysicalOperatorType type() const override
+  {
     return PhysicalOperatorType::AGGREGATION;
   }
 
@@ -24,11 +27,14 @@ class AggrPhysicalOperator : public PhysicalOperator {
   RC next() override;
   RC close() override;
 
-  int cell_num() const { return tuple_.cell_num(); }
+  int cell_num() const
+  {
+    return tuple_.cell_num();
+  }
 
   Tuple *current_tuple() override;
 
- private:
+private:
   std::vector<std::string> alias_;
   std::vector<AggrType> aggr_types_;
   std::vector<Field> aggr_fields_;
@@ -39,6 +45,6 @@ class AggrPhysicalOperator : public PhysicalOperator {
   bool is_first_called_;
   AggrTuple tuple_;
   void aggr_init();
-  void aggr_update(AggrType aggr_type, Value &aggr_result, Value &value);
+  void aggr_update(AggrType aggr_type, Value& aggr_result, Value& value);
   void aggr_done();
 };

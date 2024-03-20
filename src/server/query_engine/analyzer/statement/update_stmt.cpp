@@ -1,21 +1,18 @@
 #include "include/query_engine/analyzer/statement/update_stmt.h"
 
 #include <utility>
-
-#include "common/log/log.h"
 #include "include/query_engine/analyzer/statement/filter_stmt.h"
-#include "include/storage_engine/recorder/table.h"
+#include "common/log/log.h"
 #include "include/storage_engine/schema/database.h"
+#include "include/storage_engine/recorder/table.h"
 
-UpdateStmt::UpdateStmt(Table *table, std::vector<UpdateUnit> update_units,
-                       FilterStmt *filter_stmt)
-    : table_(table),
-      update_units_(std::move(update_units)),
-      filter_stmt_(filter_stmt) {}
+UpdateStmt::UpdateStmt(Table *table, std::vector<UpdateUnit> update_units, FilterStmt *filter_stmt) : table_(table), update_units_(std::move(update_units)), filter_stmt_(filter_stmt)
+{}
 
-RC UpdateStmt::create(Db *db, const UpdateSqlNode &update, Stmt *&stmt) {
+RC UpdateStmt::create(Db *db, const UpdateSqlNode &update, Stmt *&stmt)
+{
   const char *table_name = update.relation_name.c_str();
-  if (nullptr == db || nullptr == table_name || update.update_units.empty()) {
+  if(nullptr == db || nullptr == table_name || update.update_units.empty()) {
     LOG_WARN("invalid argument. db=%p, table_name=%p", db, table_name);
     return RC::INVALID_ARGUMENT;
   }
@@ -38,8 +35,7 @@ RC UpdateStmt::create(Db *db, const UpdateSqlNode &update, Stmt *&stmt) {
   // check attribute
   std::vector<UpdateUnit> update_units;
   const TableMeta &table_meta = table->table_meta();
-  const int field_num = table_meta.field_num() - table_meta.sys_field_num() -
-                        table_meta.null_filed_num();
+  const int field_num = table_meta.field_num() - table_meta.sys_field_num() - table_meta.null_filed_num();
   const int sys_field_num = table_meta.sys_field_num();
   for (int v = 0; v < update.update_units.size(); v++) {
     bool field_exist = false;
@@ -50,8 +46,8 @@ RC UpdateStmt::create(Db *db, const UpdateSqlNode &update, Stmt *&stmt) {
       if (attribute_name == field_meta->name()) {
         field_exist = true;
         Expression *expression = nullptr;
-        const std::unordered_map<std::string, Table *> table_map;
-        const std::vector<Table *> tables;
+        const std::unordered_map <std::string, Table *> table_map;
+        const std::vector <Table *>                     tables;
         if (expr->type() == ExprType::VALUE) {
           RC rc = analyze_expression(expr, db, table_map, tables, expression);
           if (RC::SUCCESS != rc) {
@@ -75,13 +71,10 @@ RC UpdateStmt::create(Db *db, const UpdateSqlNode &update, Stmt *&stmt) {
   }
 
   std::unordered_map<std::string, Table *> table_map;
-  table_map.insert(
-      std::pair<std::string, Table *>(std::string(table_name), table));
+  table_map.insert(std::pair<std::string, Table *>(std::string(table_name), table));
 
   FilterStmt *filter_stmt = nullptr;
-  RC rc = FilterStmt::create(db, table, &table_map, update.conditions.data(),
-                             static_cast<int>(update.conditions.size()),
-                             filter_stmt);
+  RC rc = FilterStmt::create(db, table, &table_map, update.conditions.data(), static_cast<int>(update.conditions.size()), filter_stmt);
   if (rc != RC::SUCCESS) {
     LOG_WARN("failed to create filter statement. rc=%d:%s", rc, strrc(rc));
     return rc;

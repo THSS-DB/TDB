@@ -1,8 +1,8 @@
 #include "include/query_engine/structor/expression/conjunction_expression.h"
-
 #include "include/query_engine/structor/expression/comparison_expression.h"
 
-RC ConjunctionExpr::get_value(const Tuple &tuple, Value &value) const {
+RC ConjunctionExpr::get_value(const Tuple &tuple, Value &value) const
+{
   RC rc = RC::SUCCESS;
   if (children_.empty()) {
     value.set_boolean(true);
@@ -17,8 +17,7 @@ RC ConjunctionExpr::get_value(const Tuple &tuple, Value &value) const {
       return rc;
     }
     bool bool_value = tmp_value.get_boolean();
-    if ((conjunction_type_ == ConjunctionType::AND && !bool_value) ||
-        (conjunction_type_ == ConjunctionType::OR && bool_value)) {
+    if ((conjunction_type_ == ConjunctionType::AND && !bool_value) || (conjunction_type_ == ConjunctionType::OR && bool_value)) {
       value.set_boolean(bool_value);
       return rc;
     }

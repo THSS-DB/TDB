@@ -1,9 +1,9 @@
-#include "include/query_engine/planner/operator/aggr_physical_operator.h"
-
 #include "common/log/log.h"
+#include "include/query_engine/planner/operator/aggr_physical_operator.h"
 #include "include/storage_engine/recorder/table.h"
 
-RC AggrPhysicalOperator::open(Trx *trx) {
+RC AggrPhysicalOperator::open(Trx *trx)
+{
   if (children_.empty()) {
     return RC::SUCCESS;
   }
@@ -20,7 +20,8 @@ RC AggrPhysicalOperator::open(Trx *trx) {
   return RC::SUCCESS;
 }
 
-RC AggrPhysicalOperator::next() {
+RC AggrPhysicalOperator::next()
+{
   RC rc;
   if (children_.empty()) {
     return RC::RECORD_EOF;
@@ -36,26 +37,25 @@ RC AggrPhysicalOperator::next() {
       return rc;
     }
 
-    for (int i = 0; i < aggr_fields_.size(); i++) {
-      const auto &aggr_field = aggr_fields_[i];
+    for (int i = 0; i < aggr_fields_.size(); i ++) {
+      const auto& aggr_field = aggr_fields_[i];
       if (0 == strcmp(aggr_field.field_name(), "*")) {
         all_null_[i] = false;
-        counts_[i]++;
+        counts_[i] ++;
         continue;
       }
       Value value;
       const TupleCellSpec *spec =
-          new TupleCellSpec(aggr_field.table_name(), aggr_field.field_name(),
-                            aggr_field.table_alias());
+          new TupleCellSpec(aggr_field.table_name(), aggr_field.field_name(), aggr_field.table_alias());
       rc = tuple->find_cell(*spec, value);
-      if (rc != RC::SUCCESS) {
+      if(rc != RC::SUCCESS) {
         return rc;
       }
       if (value.is_null()) {
         continue;
       }
       all_null_[i] = false;
-      counts_[i]++;
+      counts_[i] ++;
       aggr_update(aggr_types_[i], aggr_results_[i], value);
     }
     is_first_called_ = false;
@@ -67,16 +67,21 @@ RC AggrPhysicalOperator::next() {
   } else {
     return RC::RECORD_EOF;
   }
+
 }
 
-RC AggrPhysicalOperator::close() {
+RC AggrPhysicalOperator::close()
+{
   if (!children_.empty()) {
     children_[0]->close();
   }
   return RC::SUCCESS;
 }
 
-Tuple *AggrPhysicalOperator::current_tuple() { return &tuple_; }
+Tuple *AggrPhysicalOperator::current_tuple()
+{
+  return &tuple_;
+}
 
 void AggrPhysicalOperator::aggr_init() {
   is_first_called_ = true;
@@ -85,13 +90,12 @@ void AggrPhysicalOperator::aggr_init() {
   aggr_results_.resize(aggr_fields_.size());
   for (size_t i = 0; i < all_null_.size(); ++i) {
     all_null_[i] = true;
-    counts_[i] = 0;
+    counts_[i]   = 0;
     aggr_results_[i].set_null();
   }
 }
-void AggrPhysicalOperator::aggr_update(AggrType aggr_type, Value &aggr_result,
-                                       Value &value) {
-  if (aggr_result.is_null()) {
+void AggrPhysicalOperator::aggr_update(AggrType aggr_type, Value& aggr_result, Value& value) {
+  if(aggr_result.is_null()) {
     aggr_result = value;
     return;
   }
@@ -111,7 +115,7 @@ void AggrPhysicalOperator::aggr_update(AggrType aggr_type, Value &aggr_result,
       break;
     }
     case AGGR_AVG:
-    case AGGR_SUM: {
+    case AGGR_SUM:{
       switch (value.attr_type()) {
         case INTS: {
           aggr_result.set_int(aggr_result.get_int() + value.get_int());
@@ -121,22 +125,22 @@ void AggrPhysicalOperator::aggr_update(AggrType aggr_type, Value &aggr_result,
           aggr_result.set_float(aggr_result.get_float() + value.get_float());
           break;
         }
-        default:
-          break;
+        default: break;
       }
     } break;
     default:
       LOG_ERROR("Unsupported AggrFuncType");
   }
+
 }
 void AggrPhysicalOperator::aggr_done() {
-  for (int i = 0; i < aggr_fields_.size(); i++) {
+  for (int i = 0; i < aggr_fields_.size(); i ++) {
     if (all_null_[i] && AGGR_COUNT != aggr_types_[i]) {
       aggr_results_[i].set_null();
       continue;
     }
     switch (aggr_types_[i]) {
-      case AGGR_COUNT: {
+      case AGGR_COUNT:{
         aggr_results_[i].set_type(AttrType::INTS);
         aggr_results_[i].set_int(counts_[i]);
       } break;
@@ -147,8 +151,7 @@ void AggrPhysicalOperator::aggr_done() {
         }
         break;
       }
-      default:
-        break;
+      default: break;
     }
   }
   tuple_.set_tuple(alias_, aggr_results_);

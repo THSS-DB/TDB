@@ -1,12 +1,12 @@
-#include "include/query_engine/planner/operator/delete_physical_operator.h"
-
 #include "common/log/log.h"
+#include "include/query_engine/planner/operator/delete_physical_operator.h"
+#include "include/storage_engine/transaction/trx.h"
+#include "include/storage_engine/recorder/record.h"
 #include "include/query_engine/analyzer/statement/delete_stmt.h"
 #include "include/query_engine/structor/tuple/row_tuple.h"
-#include "include/storage_engine/recorder/record.h"
-#include "include/storage_engine/transaction/trx.h"
 
-RC DeletePhysicalOperator::open(Trx *trx) {
+RC DeletePhysicalOperator::open(Trx *trx)
+{
   if (children_.empty()) {
     return RC::SUCCESS;
   }
@@ -23,7 +23,8 @@ RC DeletePhysicalOperator::open(Trx *trx) {
   return RC::SUCCESS;
 }
 
-RC DeletePhysicalOperator::next() {
+RC DeletePhysicalOperator::next()
+{
   RC rc;
   if (children_.empty()) {
     return RC::RECORD_EOF;
@@ -49,7 +50,8 @@ RC DeletePhysicalOperator::next() {
   return RC::RECORD_EOF;
 }
 
-RC DeletePhysicalOperator::close() {
+RC DeletePhysicalOperator::close()
+{
   if (!children_.empty()) {
     children_[0]->close();
   }

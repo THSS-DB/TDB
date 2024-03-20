@@ -1,6 +1,7 @@
 #include "include/query_engine/planner/operator/physical_operator.h"
 
-std::string physical_operator_type_name(PhysicalOperatorType type) {
+std::string physical_operator_type_name(PhysicalOperatorType type)
+{
   switch (type) {
     case PhysicalOperatorType::TABLE_SCAN:
       return "TABLE_SCAN";
@@ -31,10 +32,15 @@ std::string physical_operator_type_name(PhysicalOperatorType type) {
   }
 }
 
-PhysicalOperator::~PhysicalOperator() {}
+PhysicalOperator::~PhysicalOperator()
+{}
 
-std::string PhysicalOperator::name() const {
+std::string PhysicalOperator::name() const
+{
   return physical_operator_type_name(type());
 }
 
-std::string PhysicalOperator::param() const { return ""; }
+std::string PhysicalOperator::param() const
+{
+  return "";
+}

@@ -1,17 +1,18 @@
 #include "include/query_engine/optimizer/rewriter.h"
-
 #include "include/query_engine/optimizer/expression_rewriter.h"
-#include "include/query_engine/optimizer/predicate_pushdown_rewriter.h"
 #include "include/query_engine/optimizer/predicate_rewrite.h"
+#include "include/query_engine/optimizer/predicate_pushdown_rewriter.h"
 #include "include/query_engine/planner/node/logical_node.h"
 
-Rewriter::Rewriter() {
+Rewriter::Rewriter()
+{
   rewrite_rules_.emplace_back(new ExpressionRewriter);
   rewrite_rules_.emplace_back(new PredicateRewriteRule);
   rewrite_rules_.emplace_back(new PredicatePushdownRewriter);
 }
 
-RC Rewriter::rewrite(std::unique_ptr<LogicalNode> &oper, bool &change_made) {
+RC Rewriter::rewrite(std::unique_ptr<LogicalNode> &oper, bool &change_made)
+{
   RC rc = RC::SUCCESS;
 
   change_made = false;

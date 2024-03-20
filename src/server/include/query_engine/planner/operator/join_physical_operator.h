@@ -1,14 +1,16 @@
 #pragma once
 
-#include "include/query_engine/structor/tuple/join_tuple.h"
 #include "physical_operator.h"
+#include "include/query_engine/structor/tuple/join_tuple.h"
 
-class NestedLoopJoinPhysicalOperator : public PhysicalOperator {
- public:
+class NestedLoopJoinPhysicalOperator : public PhysicalOperator
+{
+public:
   NestedLoopJoinPhysicalOperator();
   ~NestedLoopJoinPhysicalOperator() override = default;
 
-  PhysicalOperatorType type() const override {
+  PhysicalOperatorType type() const override
+  {
     return PhysicalOperatorType::NESTED_LOOP_JOIN;
   }
 
@@ -17,7 +19,7 @@ class NestedLoopJoinPhysicalOperator : public PhysicalOperator {
   RC close() override;
   Tuple *current_tuple() override;
 
- private:
+private:
   Trx *trx_ = nullptr;
 
   //! 左表右表的真实对象是在PhysicalOperator::children_中，这里是为了写的时候更简单

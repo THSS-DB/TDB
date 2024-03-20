@@ -1,14 +1,14 @@
 #include "include/query_engine/executor/load_data_executor.h"
-
-#include "common/lang/string.h"
-#include "include/query_engine/analyzer/statement/load_data_stmt.h"
-#include "include/query_engine/executor/sql_result.h"
 #include "include/query_engine/structor/query_info.h"
 #include "include/session/session_request.h"
+#include "include/query_engine/executor/sql_result.h"
+#include "common/lang/string.h"
+#include "include/query_engine/analyzer/statement/load_data_stmt.h"
 
 using namespace common;
 
-RC LoadDataExecutor::execute(QueryInfo *query_info) {
+RC LoadDataExecutor::execute(QueryInfo *query_info)
+{
   RC rc = RC::SUCCESS;
   SqlResult *sql_result = query_info->session_event()->sql_result();
   LoadDataStmt *stmt = static_cast<LoadDataStmt *>(query_info->stmt());
@@ -26,9 +26,12 @@ RC LoadDataExecutor::execute(QueryInfo *query_info) {
  * @param errmsg 如果出现错误，通过这个参数返回错误信息
  * @return 成功返回RC::SUCCESS
  */
-RC insert_record_from_file(Table *table, std::vector<std::string> &file_values,
-                           std::vector<Value> &record_values,
-                           std::stringstream &errmsg) {
+RC insert_record_from_file(Table *table, 
+    std::vector<std::string> &file_values,
+    std::vector<Value> &record_values,
+    std::stringstream &errmsg)
+{
+
   const int field_num = record_values.size();
   const int sys_field_num = table->table_meta().sys_field_num();
 
@@ -56,8 +59,7 @@ RC insert_record_from_file(Table *table, std::vector<std::string> &file_values,
         int int_value;
         deserialize_stream >> int_value;
         if (!deserialize_stream || !deserialize_stream.eof()) {
-          errmsg << "need an integer but got '" << file_values[i]
-                 << "' (field index:" << i << ")";
+          errmsg << "need an integer but got '" << file_values[i] << "' (field index:" << i << ")";
 
           rc = RC::SCHEMA_FIELD_TYPE_MISMATCH;
         } else {
@@ -73,8 +75,7 @@ RC insert_record_from_file(Table *table, std::vector<std::string> &file_values,
         float float_value;
         deserialize_stream >> float_value;
         if (!deserialize_stream || !deserialize_stream.eof()) {
-          errmsg << "need a float number but got '" << file_values[i]
-                 << "'(field index:" << i << ")";
+          errmsg << "need a float number but got '" << file_values[i] << "'(field index:" << i << ")";
           rc = RC::SCHEMA_FIELD_TYPE_MISMATCH;
         } else {
           record_values[i].set_float(float_value);
@@ -105,15 +106,14 @@ RC insert_record_from_file(Table *table, std::vector<std::string> &file_values,
   return rc;
 }
 
-void LoadDataExecutor::load_data(Table *table, const char *file_name,
-                                 SqlResult *sql_result) {
+void LoadDataExecutor::load_data(Table *table, const char *file_name, SqlResult *sql_result)
+{
   std::stringstream result_string;
 
   std::fstream fs;
   fs.open(file_name, std::ios_base::in | std::ios_base::binary);
   if (!fs.is_open()) {
-    result_string << "Failed to init file: " << file_name
-                  << ". system error=" << strerror(errno) << std::endl;
+    result_string << "Failed to init file: " << file_name << ". system error=" << strerror(errno) << std::endl;
     sql_result->set_return_code(RC::FILE_NOT_EXIST);
     sql_result->set_state_string(result_string.str());
     return;
@@ -143,9 +143,8 @@ void LoadDataExecutor::load_data(Table *table, const char *file_name,
     std::stringstream errmsg;
     rc = insert_record_from_file(table, file_values, record_values, errmsg);
     if (rc != RC::SUCCESS) {
-      result_string << "Line:" << line_num
-                    << " insert record failed:" << errmsg.str()
-                    << ". error:" << strrc(rc) << std::endl;
+      result_string << "Line:" << line_num << " insert record failed:" << errmsg.str() << ". error:" << strrc(rc)
+                    << std::endl;
     } else {
       insertion_count++;
     }
@@ -154,13 +153,10 @@ void LoadDataExecutor::load_data(Table *table, const char *file_name,
 
   struct timespec end_time;
   clock_gettime(CLOCK_MONOTONIC, &end_time);
-  long cost_nano = (end_time.tv_sec - begin_time.tv_sec) * 1000000000L +
-                   (end_time.tv_nsec - begin_time.tv_nsec);
+  long cost_nano = (end_time.tv_sec - begin_time.tv_sec) * 1000000000L + (end_time.tv_nsec - begin_time.tv_nsec);
   if (RC::SUCCESS == rc) {
-    result_string << strrc(rc) << ". total " << line_num
-                  << " line(s) handled and " << insertion_count
-                  << " record(s) loaded, total cost "
-                  << cost_nano / 1000000000.0 << " second(s)" << std::endl;
+    result_string << strrc(rc) << ". total " << line_num << " line(s) handled and " << insertion_count
+                  << " record(s) loaded, total cost " << cost_nano / 1000000000.0 << " second(s)" << std::endl;
   }
   sql_result->set_return_code(RC::SUCCESS);
   sql_result->set_state_string(result_string.str());

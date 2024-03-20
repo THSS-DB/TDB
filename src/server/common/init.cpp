@@ -1,34 +1,40 @@
 #include "include/common/init.h"
 
+#include "include/common/setting.h"
 #include "common/conf/ini.h"
 #include "common/lang/string.h"
 #include "common/log/log.h"
 #include "common/os/path.h"
 #include "common/os/pidfile.h"
 #include "common/os/process.h"
-#include "include/common/global_context.h"
-#include "include/common/setting.h"
 #include "include/session/session.h"
 #include "include/storage_engine/buffer/buffer_pool.h"
 #include "include/storage_engine/schema/default_handler.h"
 #include "include/storage_engine/transaction/trx.h"
+#include "include/common/global_context.h"
 
 using namespace common;
 
-bool *&_get_init() {
+bool *&_get_init()
+{
   static bool util_init = false;
   static bool *util_init_p = &util_init;
   return util_init_p;
 }
 
-bool get_init() { return *_get_init(); }
+bool get_init()
+{
+  return *_get_init();
+}
 
-void set_init(bool value) {
+void set_init(bool value)
+{
   *_get_init() = value;
   return;
 }
 
-void sig_handler(int sig) {
+void sig_handler(int sig)
+{
   // Signal handler will be add in the next step.
   //  Add action to shutdown
 
@@ -37,7 +43,8 @@ void sig_handler(int sig) {
   return;
 }
 
-int init_log(ProcessParam *process_cfg, Ini &properties) {
+int init_log(ProcessParam *process_cfg, Ini &properties)
+{
   const std::string &proc_name = process_cfg->get_process_name();
   try {
     // we had better alloc one lock to do so, but simplify the logic
@@ -45,13 +52,10 @@ int init_log(ProcessParam *process_cfg, Ini &properties) {
       return 0;
     }
 
-    auto log_context_getter = []() {
-      return reinterpret_cast<intptr_t>(Session::current_session());
-    };
+    auto log_context_getter = []() { return reinterpret_cast<intptr_t>(Session::current_session()); };
 
     const std::string log_section_name = "LOG";
-    std::map<std::string, std::string> log_section =
-        properties.get(log_section_name);
+    std::map<std::string, std::string> log_section = properties.get(log_section_name);
 
     std::string log_file_name;
 
@@ -60,8 +64,7 @@ int init_log(ProcessParam *process_cfg, Ini &properties) {
     std::map<std::string, std::string>::iterator it = log_section.find(key);
     if (it == log_section.end()) {
       log_file_name = proc_name + ".log";
-      std::cout << "Not set log file name, use default " << log_file_name
-                << std::endl;
+      std::cout << "Not set log file name, use default " << log_file_name << std::endl;
     } else {
       log_file_name = it->second;
     }
@@ -101,15 +104,16 @@ int init_log(ProcessParam *process_cfg, Ini &properties) {
 
     return 0;
   } catch (std::exception &e) {
-    std::cerr << "Failed to init log for " << proc_name << SYS_OUTPUT_FILE_POS
-              << SYS_OUTPUT_ERROR << std::endl;
+    std::cerr << "Failed to init log for " << proc_name << SYS_OUTPUT_FILE_POS << SYS_OUTPUT_ERROR << std::endl;
     return errno;
   }
 
   return 0;
 }
 
-void cleanup_log() {
+void cleanup_log()
+{
+
   if (g_log) {
     delete g_log;
     g_log = nullptr;
@@ -117,12 +121,13 @@ void cleanup_log() {
   return;
 }
 
-int init_global_objects(ProcessParam *process_param, Ini &properties) {
+int init_global_objects(ProcessParam *process_param, Ini &properties)
+{
   GCTX.buffer_pool_manager_ = new BufferPoolManager();
   BufferPoolManager::set_instance(GCTX.buffer_pool_manager_);
 
   GCTX.handler_ = new DefaultHandler();
-
+  
   DefaultHandler::set_default(GCTX.handler_);
 
   int ret = 0;
@@ -141,7 +146,8 @@ int init_global_objects(ProcessParam *process_param, Ini &properties) {
   return ret;
 }
 
-int uninit_global_objects() {
+int uninit_global_objects()
+{
   // TODO use global context
   DefaultHandler *default_handler = &DefaultHandler::get_default();
   if (default_handler != nullptr) {
@@ -157,8 +163,10 @@ int uninit_global_objects() {
   return 0;
 }
 
-int init(ProcessParam *process_param) {
+int init(ProcessParam *process_param)
+{
   if (get_init()) {
+
     return 0;
   }
 
@@ -167,11 +175,9 @@ int init(ProcessParam *process_param) {
   // Run as daemon if daemonization requested
   int rc = STATUS_SUCCESS;
   if (process_param->is_demon()) {
-    rc = daemonize_service(process_param->get_std_out().c_str(),
-                           process_param->get_std_err().c_str());
+    rc = daemonize_service(process_param->get_std_out().c_str(), process_param->get_std_err().c_str());
     if (rc != 0) {
-      std::cerr << "Shutdown due to failed to daemon current process!"
-                << std::endl;
+      std::cerr << "Shutdown due to failed to daemon current process!" << std::endl;
       return rc;
     }
   }
@@ -217,9 +223,10 @@ int init(ProcessParam *process_param) {
   return STATUS_SUCCESS;
 }
 
-void cleanup_util() {
+void cleanup_util()
+{
   uninit_global_objects();
-
+  
   if (nullptr != get_properties()) {
     delete get_properties();
     get_properties() = nullptr;
@@ -234,4 +241,7 @@ void cleanup_util() {
   return;
 }
 
-void cleanup() { cleanup_util(); }
+void cleanup()
+{
+  cleanup_util();
+}

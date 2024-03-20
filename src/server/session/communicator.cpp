@@ -1,12 +1,13 @@
 #include "include/session/communicator.h"
-
-#include "common/lang/mutex.h"
-#include "include/session/buffered_writer.h"
-#include "include/session/cli_communicator.h"
 #include "include/session/plain_communicator.h"
+#include "include/session/cli_communicator.h"
+#include "include/session/buffered_writer.h"
 #include "include/session/session.h"
 
-RC Communicator::init(int fd, Session *session, const std::string &addr) {
+#include "common/lang/mutex.h"
+
+RC Communicator::init(int fd, Session *session, const std::string &addr)
+{
   fd_ = fd;
   session_ = session;
   addr_ = addr;
@@ -14,7 +15,8 @@ RC Communicator::init(int fd, Session *session, const std::string &addr) {
   return RC::SUCCESS;
 }
 
-Communicator::~Communicator() {
+Communicator::~Communicator()
+{
   if (fd_ >= 0) {
     close(fd_);
     fd_ = -1;
@@ -32,7 +34,8 @@ Communicator::~Communicator() {
 
 /////////////////////////////////////////////////////////////////////////////////
 
-Communicator *CommunicatorFactory::create(CommunicateProtocol protocol) {
+Communicator *CommunicatorFactory::create(CommunicateProtocol protocol)
+{
   switch (protocol) {
     case CommunicateProtocol::PLAIN: {
       return new PlainCommunicator;

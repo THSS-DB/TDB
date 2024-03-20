@@ -1,23 +1,23 @@
 #pragma once
 
 #include <memory>
-#include <string>
 #include <utility>
 #include <vector>
+#include <string>
 
 #include "common/lang/bitmap.h"
 #include "common/log/log.h"
+#include "tuple_cell.h"
 #include "include/query_engine/parser/value.h"
 #include "include/query_engine/structor/expression/field_expression.h"
 #include "include/storage_engine/recorder/record.h"
-#include "tuple_cell.h"
 
 class Table;
 
 /**
  * @defgroup Tuple
  * @brief Tuple 元组，表示一行数据，当前返回客户端时使用
- * @details
+ * @details 
  * tuple是一种可以嵌套的数据结构。
  * 比如select t1.a+t2.b from t1, t2;
  * 需要使用下面的结构表示：
@@ -28,10 +28,11 @@ class Table;
  *      /     \
  *   Row(t1) Row(t2)
  * @endcode
- *
+ * 
  */
 
-enum TupleType {
+enum TupleType
+{
   RowTuple_Type,
   ProjectTuple_Type,
   AggrTuple_Type,
@@ -43,17 +44,31 @@ enum TupleType {
  * @brief The basic schema of tuple containing the field(cell) it has.
  * @ingroup Tuple
  */
-class TupleSchema {
- public:
-  void append_cell(const TupleCellSpec &cell) { cells_.push_back(cell); }
+class TupleSchema 
+{
+public:
 
-  void append_cell(const char *alias) { append_cell(TupleCellSpec(alias)); }
+  void append_cell(const TupleCellSpec &cell)
+  {
+    cells_.push_back(cell);
+  }
 
-  int cell_num() const { return static_cast<int>(cells_.size()); }
+  void append_cell(const char *alias)
+  {
+    append_cell(TupleCellSpec(alias));
+  }
 
-  const TupleCellSpec &cell_at(int i) const { return cells_[i]; }
+  int cell_num() const
+  {
+    return static_cast<int>(cells_.size());
+  }
 
- private:
+  const TupleCellSpec &cell_at(int i) const
+  {
+    return cells_[i];
+  }
+
+private:
   std::vector<TupleCellSpec> cells_;
 };
 
@@ -61,8 +76,9 @@ class TupleSchema {
  * @brief The abstract description of tuple
  * @ingroup Tuple
  */
-class Tuple {
- public:
+class Tuple 
+{
+public:
   Tuple() = default;
   virtual ~Tuple() = default;
 
@@ -94,7 +110,8 @@ class Tuple {
    */
   virtual void set_record(std::vector<Record *> &records) = 0;
 
-  virtual std::string to_string() const {
+  virtual std::string to_string() const
+  {
     std::string str;
     const int cell_num = this->cell_num();
     for (int i = 0; i < cell_num - 1; i++) {
@@ -112,3 +129,8 @@ class Tuple {
     return str;
   }
 };
+
+
+
+
+

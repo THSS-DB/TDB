@@ -1,15 +1,14 @@
 #pragma once
-#include <fcntl.h>
-#include <sys/stat.h>
 #include <sys/types.h>
-
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <cstdio>
 #include <cstdlib>
 
-#include "common/io/io.h"
 #include "common/lang/bitmap.h"
 #include "common/lang/mutex.h"
 #include "common/log/log.h"
+#include "common/io/io.h"
 #include "include/common/rc.h"
 #include "include/storage_engine/buffer/frame_manager.h"
 
@@ -24,8 +23,9 @@ class BufferPoolManager;
  * @brief BufferPool的实现，负责实际与磁盘交互
  * 每个 FileBufferPool 对象对应一个物理文件
  */
-class FileBufferPool {
- public:
+class FileBufferPool
+{
+public:
   FileBufferPool(BufferPoolManager &bp_manager, FrameManager &frame_manager);
   ~FileBufferPool();
 
@@ -60,7 +60,7 @@ class FileBufferPool {
 
   RC recover_page(PageNum page_num);
 
- protected:
+protected:
   RC allocate_frame(PageNum page_num, Frame **buf);
   RC flush_page_internal(Frame &frame);
   /**
@@ -68,27 +68,27 @@ class FileBufferPool {
    */
   RC load_page(PageNum page_num, Frame *frame);
 
- private:
-  BufferPoolManager &bp_manager_;
-  FrameManager &frame_manager_;
+private:
+  BufferPoolManager &  bp_manager_;
+  FrameManager &     frame_manager_;
 
-  std::string file_name_;
-  int file_desc_ = -1;
-  Frame *hdr_frame_ = nullptr;         // 文件头所在的frame
-  FileHeader *file_header_ = nullptr;  // 文件头
-  std::set<PageNum> disposed_pages_;   // 已经释放的页面
+  std::string          file_name_;
+  int                  file_desc_ = -1;
+  Frame *              hdr_frame_ = nullptr;  // 文件头所在的frame
+  FileHeader *       file_header_ = nullptr;  // 文件头
+  std::set<PageNum>    disposed_pages_;  // 已经释放的页面
 
-  common::Mutex lock_;
-
- private:
+  common::Mutex        lock_;
+private:
   friend class BufferPoolIterator;
 };
 
 /**
  * @brief 用于遍历BufferPool中的所有页面
  */
-class BufferPoolIterator {
- public:
+class BufferPoolIterator
+{
+public:
   BufferPoolIterator();
   ~BufferPoolIterator();
 
@@ -97,7 +97,7 @@ class BufferPoolIterator {
   PageNum next();
   RC reset();
 
- private:
+private:
   common::Bitmap bitmap_;
   PageNum current_page_num_ = -1;
 };
@@ -105,8 +105,9 @@ class BufferPoolIterator {
 /**
  * @brief BufferPool的管理类，对上层可见的接口
  */
-class BufferPoolManager {
- public:
+class BufferPoolManager
+{
+public:
   BufferPoolManager(int memory_size = 0);
   ~BufferPoolManager();
 
@@ -116,14 +117,13 @@ class BufferPoolManager {
 
   RC flush_page(Frame &frame);
 
- public:
+public:
   static void set_instance(BufferPoolManager *bpm);
   static BufferPoolManager &instance();
 
- private:
+private:
   FrameManager frame_manager_{"BufPool"};
-  common::Mutex lock_;
-  std::unordered_map<std::string, FileBufferPool *>
-      buffer_pools_;  // 已经打开的文件
+  common::Mutex  lock_;
+  std::unordered_map<std::string, FileBufferPool *> buffer_pools_;  // 已经打开的文件
   std::unordered_map<int, FileBufferPool *> fd_buffer_pools_;
 };

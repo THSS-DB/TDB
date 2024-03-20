@@ -1,9 +1,8 @@
+#include <sstream>
 #include "include/query_engine/structor/tuple/tuple_cell.h"
 
-#include <sstream>
-
-TupleCellSpec::TupleCellSpec(const char *table_name, const char *field_name,
-                             const char *alias) {
+TupleCellSpec::TupleCellSpec(const char *table_name, const char *field_name, const char *alias)
+{
   if (table_name) {
     table_name_ = table_name;
   }
@@ -21,7 +20,8 @@ TupleCellSpec::TupleCellSpec(const char *table_name, const char *field_name,
   }
 }
 
-TupleCellSpec::TupleCellSpec(const char *alias) {
+TupleCellSpec::TupleCellSpec(const char *alias)
+{
   if (alias) {
     alias_ = alias;
   }

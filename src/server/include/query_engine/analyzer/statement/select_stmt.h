@@ -1,11 +1,10 @@
 #pragma once
 
 #include <vector>
-
 #include "include/common/rc.h"
+#include "stmt.h"
 #include "include/query_engine/structor/expression/expression.h"
 #include "include/storage_engine/recorder/field.h"
-#include "stmt.h"
 
 class FieldMeta;
 class FilterStmt;
@@ -20,31 +19,49 @@ class Expression;
  * @ingroup Statement
  */
 class SelectStmt : public Stmt {
- public:
+public:
   SelectStmt() = default;
   ~SelectStmt() override;
 
-  StmtType type() const override { return StmtType::SELECT; }
+  StmtType type() const override {
+    return StmtType::SELECT;
+  }
 
- public:
+public:
   static RC create(Db *db, const SelectSqlNode &select_sql, Stmt *&stmt);
 
- public:
-  const std::vector<Field *> &query_fields() const { return query_fields_; }
+public:
+  const std::vector<Field *> &query_fields() const {
+    return query_fields_;
+  }
 
-  const std::vector<Expression *> &projects() const { return projects_; }
+  const std::vector<Expression *> &projects() const {
+    return projects_;
+  }
 
-  const std::vector<Table *> &tables() const { return tables_; }
+  const std::vector<Table *> &tables() const {
+    return tables_;
+  }
 
-  const std::vector<std::string> &table_alias() const { return table_alias_; }
+  const std::vector<std::string> &table_alias() const {
+    return table_alias_;
+  }
 
-  FilterStmt *filter_stmt() const { return filter_stmt_; }
+  FilterStmt *filter_stmt() const {
+    return filter_stmt_;
+  }
 
-  GroupByStmt *group_by_stmt() const { return group_by_stmt_; }
+  GroupByStmt *group_by_stmt() const {
+    return group_by_stmt_;
+  }
 
-  FilterStmt *having_stmt() const { return having_stmt_; }
+  FilterStmt *having_stmt() const {
+    return having_stmt_;
+  }
 
-  OrderByStmt *order_stmt() const { return order_stmt_; }
+  OrderByStmt *order_stmt() const {
+    return order_stmt_;
+  }
 
   std::vector<FilterStmt *> join_filter_stmts() const {
     return join_filter_stmts_;
@@ -54,9 +71,12 @@ class SelectStmt : public Stmt {
     return function_results_;
   }
 
- private:
+private:
+
   static RC analyze_tables_and_projects(
-      Db *db, const SelectSqlNode &select_sql, std::vector<Table *> &tables,
+      Db *db,
+      const SelectSqlNode &select_sql,
+      std::vector<Table *> &tables,
       std::vector<std::string> &table_alias,
       std::unordered_map<std::string, Table *> &table_map,
       std::vector<Expression *> &projects);

@@ -4,8 +4,9 @@
 
 class QueryInfo;
 
-class CommandExecutor {
- public:
+class CommandExecutor
+{
+public:
   CommandExecutor() = default;
   virtual ~CommandExecutor() = default;
 

@@ -1,19 +1,17 @@
-#include "include/query_engine/planner/operator/predicate_physical_operator.h"
-
 #include "common/log/log.h"
-#include "include/query_engine/structor/expression/comparison_expression.h"
-#include "include/query_engine/structor/expression/conjunction_expression.h"
-#include "include/query_engine/structor/tuple/join_tuple.h"
+#include "include/query_engine/planner/operator/predicate_physical_operator.h"
 #include "include/storage_engine/recorder/record.h"
+#include "include/query_engine/structor/expression/conjunction_expression.h"
+#include "include/query_engine/structor/expression/comparison_expression.h"
+#include "include/query_engine/structor/tuple/join_tuple.h"
 
-PredicatePhysicalOperator::PredicatePhysicalOperator(
-    std::unique_ptr<Expression> expr)
-    : expression_(std::move(expr)) {
-  ASSERT(expression_->value_type() == BOOLEANS,
-         "predicate's expression should be BOOLEAN type");
+PredicatePhysicalOperator::PredicatePhysicalOperator(std::unique_ptr<Expression> expr) : expression_(std::move(expr))
+{
+  ASSERT(expression_->value_type() == BOOLEANS, "predicate's expression should be BOOLEAN type");
 }
 
-RC PredicatePhysicalOperator::open(Trx *trx) {
+RC PredicatePhysicalOperator::open(Trx *trx)
+{
   RC rc = RC::SUCCESS;
   if (expression_->type() == ExprType::CONJUNCTION) {
     rc = dynamic_cast<ConjunctionExpr *>(expression_.get())->set_trx(trx);
@@ -34,7 +32,8 @@ RC PredicatePhysicalOperator::open(Trx *trx) {
   return children_[0]->open(trx);
 }
 
-RC PredicatePhysicalOperator::next() {
+RC PredicatePhysicalOperator::next()
+{
   RC rc;
   PhysicalOperator *oper = children_.front().get();
 
@@ -66,11 +65,13 @@ RC PredicatePhysicalOperator::next() {
   return rc;
 }
 
-RC PredicatePhysicalOperator::close() {
+RC PredicatePhysicalOperator::close()
+{
   children_[0]->close();
   return RC::SUCCESS;
 }
 
-Tuple *PredicatePhysicalOperator::current_tuple() {
+Tuple *PredicatePhysicalOperator::current_tuple()
+{
   return children_[0]->current_tuple();
 }

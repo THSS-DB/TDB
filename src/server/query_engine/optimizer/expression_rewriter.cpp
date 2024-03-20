@@ -1,18 +1,18 @@
 #include "include/query_engine/optimizer/expression_rewriter.h"
-
-#include "common/log/log.h"
 #include "include/query_engine/optimizer/comparison_simplification_rule.h"
 #include "include/query_engine/optimizer/conjunction_simplification_rule.h"
 #include "include/query_engine/structor/expression/comparison_expression.h"
 #include "include/query_engine/structor/expression/conjunction_expression.h"
+#include "common/log/log.h"
 
-ExpressionRewriter::ExpressionRewriter() {
+ExpressionRewriter::ExpressionRewriter()
+{
   expr_rewrite_rules_.emplace_back(new ComparisonSimplificationRule);
   expr_rewrite_rules_.emplace_back(new ConjunctionSimplificationRule);
 }
 
-RC ExpressionRewriter::rewrite(std::unique_ptr<LogicalNode> &oper,
-                               bool &change_made) {
+RC ExpressionRewriter::rewrite(std::unique_ptr<LogicalNode> &oper, bool &change_made)
+{
   RC rc = RC::SUCCESS;
 
   bool sub_change_made = false;
@@ -46,8 +46,8 @@ RC ExpressionRewriter::rewrite(std::unique_ptr<LogicalNode> &oper,
   return rc;
 }
 
-RC ExpressionRewriter::rewrite_expression(std::unique_ptr<Expression> &expr,
-                                          bool &change_made) {
+RC ExpressionRewriter::rewrite_expression(std::unique_ptr<Expression> &expr, bool &change_made)
+{
   RC rc = RC::SUCCESS;
 
   change_made = false;
@@ -98,14 +98,13 @@ RC ExpressionRewriter::rewrite_expression(std::unique_ptr<Expression> &expr,
 
     case ExprType::CONJUNCTION: {
       auto conjunction_expr = static_cast<ConjunctionExpr *>(expr.get());
-      std::vector<std::unique_ptr<Expression>> &children =
-          conjunction_expr->children();
+      std::vector<std::unique_ptr<Expression>> &children = conjunction_expr->children();
       for (std::unique_ptr<Expression> &child_expr : children) {
         bool sub_change_made = false;
         rc = rewrite_expression(child_expr, sub_change_made);
         if (rc != RC::SUCCESS) {
-          LOG_WARN("failed to rewriter conjunction sub expression. rc=%s",
-                   strrc(rc));
+
+          LOG_WARN("failed to rewriter conjunction sub expression. rc=%s", strrc(rc));
           return rc;
         }
 

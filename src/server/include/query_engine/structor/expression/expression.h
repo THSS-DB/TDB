@@ -1,14 +1,13 @@
 #pragma once
 
-#include <cmath>
 #include <cstring>
 #include <memory>
 #include <string>
 #include <utility>
-
-#include "common/log/log.h"
-#include "include/query_engine/parser/value.h"
+#include <cmath>
 #include "include/storage_engine/recorder/field.h"
+#include "include/query_engine/parser/value.h"
+#include "common/log/log.h"
 
 class Tuple;
 class SelectStmt;
@@ -26,9 +25,10 @@ extern std::string transform_date_formation(int date, std::string format);
  * @brief 表达式类型
  * @ingroup Expression
  */
-enum class ExprType {
+enum class ExprType 
+{
   NONE,
-  FIELD,  ///< 字段。在实际执行时，根据行数据内容提取对应字段的值
+  FIELD,        ///< 字段。在实际执行时，根据行数据内容提取对应字段的值
   VALUE,        ///< 常量值
   VALUES,       ///< 很多常量值
   COMPARISON,   ///< 需要做比较的表达式
@@ -49,29 +49,33 @@ enum class ExprType {
  * 才能计算出来真实的值。但是有些表达式可能就表示某一个固定的
  * 值，比如ValueExpr。
  */
-class Expression {
- public:
+class Expression 
+{
+public:
   Expression() = default;
   virtual ~Expression() = default;
 
   /**
-   * @brief
-   * 根据具体的tuple，来计算当前表达式的值。tuple有可能是一个具体某个表的行数据
+   * @brief 根据具体的tuple，来计算当前表达式的值。tuple有可能是一个具体某个表的行数据
    */
   virtual RC get_value(const Tuple &tuple, Value &value) const = 0;
 
   /**
-   * @brief
-   * 在没有实际运行的情况下，也就是无法获取tuple的情况下，尝试获取表达式的值
+   * @brief 在没有实际运行的情况下，也就是无法获取tuple的情况下，尝试获取表达式的值
    * @details 有些表达式的值是固定的，比如ValueExpr，这种情况下可以直接获取值
    */
-  virtual RC try_get_value(Value &value) const { return RC::UNIMPLENMENT; }
+  virtual RC try_get_value(Value &value) const
+  {
+    return RC::UNIMPLENMENT;
+  }
 
   /**
    * @brief 表达式的类型
    * 可以根据表达式类型来转换为具体的子类
    */
-  ExprType type() const { return type_; };
+  ExprType type() const {
+    return type_;
+  };
 
   /**
    * @brief 表达式值的类型
@@ -85,19 +89,28 @@ class Expression {
    * @brief 表达式的名字，比如是字段名称，或者用户在执行SQL语句时输入的内容
    */
   std::string name() const { return name_; }
-  void set_name(std::string name) { name_ = std::move(name); }
+  void set_name(std::string name) {
+    name_ = std::move(name);
+  }
 
   std::string alias() const { return alias_; }
-  void set_alias(std::string alias) { alias_ = std::move(alias); }
+  void set_alias(std::string alias) {
+    alias_ = std::move(alias);
+  }
 
   virtual void getFields(std::vector<Field *> &query_fields) const {}
 
-  virtual Expression *copy() const { return nullptr; }
+  virtual Expression* copy() const {
+    return nullptr;
+  }
 
- protected:
+protected:
   ExprType type_ = ExprType::NONE;
 
- private:
+private:
   std::string name_;
   std::string alias_;
 };
+
+
+

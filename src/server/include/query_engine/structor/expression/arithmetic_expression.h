@@ -2,8 +2,9 @@
 
 #include "expression.h"
 
-class ArithmeticExpr : public Expression {
- public:
+class ArithmeticExpr : public Expression
+{
+public:
   enum class Type {
     ADD,
     SUB,
@@ -12,17 +13,14 @@ class ArithmeticExpr : public Expression {
     NEGATIVE,
   };
 
- public:
+public:
   ArithmeticExpr(Type type, Expression *left, Expression *right)
       : arithmetic_type_(type), left_(left), right_(right) {
     this->type_ = ExprType::ARITHMETIC;
   }
 
-  ArithmeticExpr(Type type, std::unique_ptr<Expression> left,
-                 std::unique_ptr<Expression> right)
-      : arithmetic_type_(type),
-        left_(std::move(left)),
-        right_(std::move(right)) {
+  ArithmeticExpr(Type type, std::unique_ptr<Expression> left, std::unique_ptr<Expression> right)
+      : arithmetic_type_(type), left_(std::move(left)), right_(std::move(right)) {
     this->type_ = ExprType::ARITHMETIC;
   }
 
@@ -30,9 +28,13 @@ class ArithmeticExpr : public Expression {
 
   AttrType value_type() const override;
 
-  int len() override { return left_->len(); }
+  int len() override {
+    return left_->len();
+  }
 
-  bool nullable() override { return left_->nullable(); }
+  bool nullable() override {
+    return left_->nullable();
+  }
 
   RC get_value(const Tuple &tuple, Value &value) const override;
   RC try_get_value(Value &value) const override;
@@ -46,8 +48,8 @@ class ArithmeticExpr : public Expression {
 
   void getFields(std::vector<Field *> &query_fields) const override;
 
-  ArithmeticExpr *copy() const override {
-    Expression *right_copy = nullptr;
+  ArithmeticExpr* copy() const override {
+    Expression* right_copy = nullptr;
     if (arithmetic_type_ != Type::NEGATIVE) {
       right_copy = right_->copy();
     }
@@ -60,10 +62,9 @@ class ArithmeticExpr : public Expression {
     return res;
   }
 
-  RC calc_value(const Value &left_value, const Value &right_value,
-                Value &value) const;
+  RC calc_value(const Value &left_value, const Value &right_value, Value &value) const;
 
- private:
+private:
   Type arithmetic_type_;
   std::unique_ptr<Expression> left_ = nullptr;
   std::unique_ptr<Expression> right_ = nullptr;

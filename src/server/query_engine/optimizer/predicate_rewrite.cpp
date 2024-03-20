@@ -1,10 +1,9 @@
 #include "include/query_engine/optimizer/predicate_rewrite.h"
-
 #include "include/query_engine/planner/node/logical_node.h"
 #include "include/query_engine/structor/expression/value_expression.h"
 
-RC PredicateRewriteRule::rewrite(std::unique_ptr<LogicalNode> &oper,
-                                 bool &change_made) {
+RC PredicateRewriteRule::rewrite(std::unique_ptr<LogicalNode> &oper, bool &change_made)
+{
   std::vector<std::unique_ptr<LogicalNode>> &child_opers = oper->children();
   if (child_opers.size() != 1) {
     return RC::SUCCESS;
@@ -15,8 +14,7 @@ RC PredicateRewriteRule::rewrite(std::unique_ptr<LogicalNode> &oper,
     return RC::SUCCESS;
   }
 
-  std::vector<std::unique_ptr<Expression>> &expressions =
-      child_oper->expressions();
+  std::vector<std::unique_ptr<Expression>> &expressions = child_oper->expressions();
   if (expressions.size() != 1) {
     return RC::SUCCESS;
   }

@@ -1,13 +1,15 @@
+#include "physical_operator.h"
 #include "include/query_engine/planner/node/group_by_logical_node.h"
 #include "include/query_engine/structor/tuple/aggregation_tuple.h"
 #include "include/query_engine/structor/tuple/join_tuple.h"
-#include "physical_operator.h"
 
 /**
  * TODO [Lab3] GroupBy算子的具体实现
  */
 class GroupByPhysicalOperator : public PhysicalOperator {
- public:
+
+public:
+
   GroupByPhysicalOperator(GroupByLogicalNode *logical_oper);
   virtual ~GroupByPhysicalOperator() = default;
 

@@ -1,15 +1,16 @@
 #include "include/query_engine/structor/expression/field_expression.h"
-
 #include "include/query_engine/structor/expression/value_expression.h"
 #include "include/query_engine/structor/tuple/tuple.h"
 
-RC FieldExpr::get_value(const Tuple &tuple, Value &value) const {
+RC FieldExpr::get_value(const Tuple &tuple, Value &value) const
+{
   TupleCellSpec tmp(table_name(), field_name(), field_.table_alias());
   RC rc = tuple.find_cell(tmp, value);
   return rc;
 }
 
-RC ValueExpr::get_value(const Tuple &tuple, Value &value) const {
+RC ValueExpr::get_value(const Tuple &tuple, Value &value) const
+{
   value = value_;
   return RC::SUCCESS;
 }
