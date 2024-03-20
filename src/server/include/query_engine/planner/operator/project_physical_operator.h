@@ -2,23 +2,24 @@
 
 #include <vector>
 
-#include "physical_operator.h"
 #include "include/query_engine/planner/node/project_logical_node.h"
 #include "include/query_engine/structor/tuple/project_tuple.h"
+#include "physical_operator.h"
 
 /**
  * @brief 选择/投影物理算子
  * @ingroup PhysicalOperator
  */
-class ProjectPhysicalOperator : public PhysicalOperator
-{
-public:
-  ProjectPhysicalOperator(ProjectLogicalNode * logical_operator) {
+class ProjectPhysicalOperator : public PhysicalOperator {
+ public:
+  ProjectPhysicalOperator(ProjectLogicalNode *logical_operator) {
     for (int i = 0; i < logical_operator->expressions().size(); i++) {
-      expressions_.emplace_back(logical_operator->expressions()[i].get()->copy());
+      expressions_.emplace_back(
+          logical_operator->expressions()[i].get()->copy());
     }
   }
-  ProjectPhysicalOperator(std::vector<std::unique_ptr<Expression>> &expressions) {
+  ProjectPhysicalOperator(
+      std::vector<std::unique_ptr<Expression>> &expressions) {
     for (int i = 0; i < expressions.size(); i++) {
       expressions_.emplace_back(expressions[i].get()->copy());
     }
@@ -36,9 +37,7 @@ public:
   RC next() override;
   RC close() override;
 
-  int cell_num() const {
-    return tuple_.cell_num();
-  }
+  int cell_num() const { return tuple_.cell_num(); }
 
   Tuple *current_tuple() override;
 
@@ -51,7 +50,7 @@ public:
     return res_oper;
   }
 
-private:
+ private:
   ProjectTuple tuple_;
   std::vector<std::unique_ptr<Expression>> expressions_;
 };

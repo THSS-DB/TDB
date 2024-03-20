@@ -1,7 +1,8 @@
 #pragma once
 
-#include <vector>
 #include <cstring>
+#include <vector>
+
 #include "communicator.h"
 
 /**
@@ -9,9 +10,8 @@
  * @ingroup Communicator
  * @details 使用简单的文本通讯协议，每个消息使用'\0'结尾
  */
-class PlainCommunicator : public Communicator 
-{
-public:
+class PlainCommunicator : public Communicator {
+ public:
   PlainCommunicator();
   ~PlainCommunicator() override = default;
 

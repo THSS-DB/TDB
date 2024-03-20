@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string.h>
+
 #include <string>
 
 #include "include/query_engine/executor/sql_result.h"
@@ -11,9 +12,8 @@ class Communicator;
 /**
  * @brief 表示一个SQL请求
  */
-class SessionRequest
-{
-public:
+class SessionRequest {
+ public:
   SessionRequest(Communicator *client);
   virtual ~SessionRequest();
 
@@ -26,8 +26,8 @@ public:
 
   SqlResult *sql_result() { return &sql_result_; }
 
-private:
+ private:
   Communicator *communicator_ = nullptr;  ///< 与客户端通讯的对象
-  SqlResult     sql_result_;              ///< SQL执行结果
-  std::string   query_;                   ///< SQL语句
+  SqlResult sql_result_;                  ///< SQL执行结果
+  std::string query_;                     ///< SQL语句
 };

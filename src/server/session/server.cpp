@@ -1,33 +1,27 @@
 #include "include/session/server.h"
+
 #include "include/query_engine/query_engine.h"
 
 QueryEngine Server::query_engine_ = QueryEngine();
 
-ServerParam::ServerParam()
-{
+ServerParam::ServerParam() {
   listen_addr = INADDR_ANY;
   max_connection_num = MAX_CONNECTION_NUM_DEFAULT;
   port = PORT_DEFAULT;
 }
 
-Server::Server(ServerParam input_server_param) : server_param_(input_server_param)
-{
-}
+Server::Server(ServerParam input_server_param)
+    : server_param_(input_server_param) {}
 
-Server::~Server()
-{
+Server::~Server() {
   if (started_) {
     shutdown();
   }
 }
 
-void Server::init()
-{
+void Server::init() {}
 
-}
-
-int Server::set_non_block(int fd)
-{
+int Server::set_non_block(int fd) {
   int flags = fcntl(fd, F_GETFL);
   if (flags == -1) {
     LOG_INFO("Failed to get flags of fd :%d. ", fd);
@@ -42,15 +36,13 @@ int Server::set_non_block(int fd)
   return 0;
 }
 
-void Server::close_connection(Communicator *communicator)
-{
+void Server::close_connection(Communicator *communicator) {
   LOG_INFO("Close connection of %s.", communicator->addr());
   event_del(&communicator->read_event());
   delete communicator;
 }
 
-void Server::recv(int fd, short ev, void *arg)
-{
+void Server::recv(int fd, short ev, void *arg) {
   Communicator *comm = (Communicator *)arg;
 
   SessionRequest *event = nullptr;
@@ -67,8 +59,7 @@ void Server::recv(int fd, short ev, void *arg)
   query_engine_.process_session_request(event);
 }
 
-void Server::accept(int fd, short ev, void *arg)
-{
+void Server::accept(int fd, short ev, void *arg) {
   Server *instance = (Server *)arg;
   struct sockaddr_in addr;
   socklen_t addrlen = sizeof(addr);
@@ -93,7 +84,8 @@ void Server::accept(int fd, short ev, void *arg)
 
   ret = instance->set_non_block(client_fd);
   if (ret < 0) {
-    LOG_ERROR("Failed to set socket of %s as non blocking, %s", addr_str.c_str(), strerror(errno));
+    LOG_ERROR("Failed to set socket of %s as non blocking, %s",
+              addr_str.c_str(), strerror(errno));
     ::close(client_fd);
     return;
   }
@@ -103,33 +95,39 @@ void Server::accept(int fd, short ev, void *arg)
     int yes = 1;
     ret = setsockopt(client_fd, IPPROTO_TCP, TCP_NODELAY, &yes, sizeof(yes));
     if (ret < 0) {
-      LOG_ERROR("Failed to set socket of %s option as : TCP_NODELAY %s\n", addr_str.c_str(), strerror(errno));
+      LOG_ERROR("Failed to set socket of %s option as : TCP_NODELAY %s\n",
+                addr_str.c_str(), strerror(errno));
       ::close(client_fd);
       return;
     }
   }
 
-  Communicator *communicator = instance->communicator_factory_.create(instance->server_param_.protocol);
-  RC rc = communicator->init(client_fd, new Session(Session::default_session()), addr_str);
+  Communicator *communicator =
+      instance->communicator_factory_.create(instance->server_param_.protocol);
+  RC rc = communicator->init(client_fd, new Session(Session::default_session()),
+                             addr_str);
   if (rc != RC::SUCCESS) {
     LOG_WARN("failed to init communicator. rc=%s", strrc(rc));
     delete communicator;
     return;
   }
 
-  event_set(&communicator->read_event(), client_fd, EV_READ | EV_PERSIST, recv, communicator);
+  event_set(&communicator->read_event(), client_fd, EV_READ | EV_PERSIST, recv,
+            communicator);
 
   ret = event_base_set(instance->event_base_, &communicator->read_event());
   if (ret < 0) {
-    LOG_ERROR("Failed to do event_base_set for read event of %s into libevent, %s", 
-              communicator->addr(), strerror(errno));
+    LOG_ERROR(
+        "Failed to do event_base_set for read event of %s into libevent, %s",
+        communicator->addr(), strerror(errno));
     delete communicator;
     return;
   }
 
   ret = event_add(&communicator->read_event(), nullptr);
   if (ret < 0) {
-    LOG_ERROR("Failed to event_add for read event of %s into libevent, %s", communicator->addr(), strerror(errno));
+    LOG_ERROR("Failed to event_add for read event of %s into libevent, %s",
+              communicator->addr(), strerror(errno));
     delete communicator;
     return;
   }
@@ -137,8 +135,7 @@ void Server::accept(int fd, short ev, void *arg)
   LOG_INFO("Accepted connection from %s\n", communicator->addr());
 }
 
-int Server::start()
-{
+int Server::start() {
   if (server_param_.use_std_io) {
     return start_stdin_server();
   } else if (server_param_.use_unix_socket) {
@@ -148,8 +145,7 @@ int Server::start()
   }
 }
 
-int Server::start_tcp_server()
-{
+int Server::start_tcp_server() {
   int ret = 0;
   struct sockaddr_in sa;
 
@@ -160,11 +156,13 @@ int Server::start_tcp_server()
   }
 
   int yes = 1;
-  int recvBufferSize = 65535*2;
+  int recvBufferSize = 65535 * 2;
   ret = setsockopt(server_socket_, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
-  ret = setsockopt(server_socket_, SOL_SOCKET, SO_RCVBUF, &recvBufferSize, sizeof(recvBufferSize));
+  ret = setsockopt(server_socket_, SOL_SOCKET, SO_RCVBUF, &recvBufferSize,
+                   sizeof(recvBufferSize));
   if (ret < 0) {
-    LOG_ERROR("Failed to set socket option of reuse address: %s.", strerror(errno));
+    LOG_ERROR("Failed to set socket option of reuse address: %s.",
+              strerror(errno));
     ::close(server_socket_);
     return -1;
   }
@@ -196,7 +194,8 @@ int Server::start_tcp_server()
   }
   LOG_INFO("Listen on port %d", server_param_.port);
 
-  listen_ev_ = event_new(event_base_, server_socket_, EV_READ | EV_PERSIST, accept, this);
+  listen_ev_ = event_new(event_base_, server_socket_, EV_READ | EV_PERSIST,
+                         accept, this);
   if (listen_ev_ == nullptr) {
     LOG_ERROR("Failed to create listen event, %s.", strerror(errno));
     ::close(server_socket_);
@@ -205,7 +204,8 @@ int Server::start_tcp_server()
 
   ret = event_add(listen_ev_, nullptr);
   if (ret < 0) {
-    LOG_ERROR("event_add(): can not add accept event into libevent, %s", strerror(errno));
+    LOG_ERROR("event_add(): can not add accept event into libevent, %s",
+              strerror(errno));
     ::close(server_socket_);
     return -1;
   }
@@ -215,8 +215,7 @@ int Server::start_tcp_server()
   return 0;
 }
 
-int Server::start_unix_socket_server()
-{
+int Server::start_unix_socket_server() {
   int ret = 0;
   server_socket_ = socket(PF_UNIX, SOCK_STREAM, 0);
   if (server_socket_ < 0) {
@@ -231,16 +230,19 @@ int Server::start_unix_socket_server()
     return -1;
   }
 
-  unlink(server_param_.unix_socket_path.c_str());  /// 如果不删除源文件，可能会导致bind失败
+  unlink(server_param_.unix_socket_path
+             .c_str());  /// 如果不删除源文件，可能会导致bind失败
 
   struct sockaddr_un sockaddr;
   memset(&sockaddr, 0, sizeof(sockaddr));
   sockaddr.sun_family = PF_UNIX;
-  snprintf(sockaddr.sun_path, sizeof(sockaddr.sun_path), "%s", server_param_.unix_socket_path.c_str());
+  snprintf(sockaddr.sun_path, sizeof(sockaddr.sun_path), "%s",
+           server_param_.unix_socket_path.c_str());
 
   ret = ::bind(server_socket_, (struct sockaddr *)&sockaddr, sizeof(sockaddr));
   if (ret < 0) {
-    LOG_ERROR("bind(): can not bind server socket(path=%s), %s", sockaddr.sun_path, strerror(errno));
+    LOG_ERROR("bind(): can not bind server socket(path=%s), %s",
+              sockaddr.sun_path, strerror(errno));
     ::close(server_socket_);
     return -1;
   }
@@ -253,7 +255,8 @@ int Server::start_unix_socket_server()
   }
   LOG_INFO("Listen on unix socket: %s", sockaddr.sun_path);
 
-  listen_ev_ = event_new(event_base_, server_socket_, EV_READ | EV_PERSIST, accept, this);
+  listen_ev_ = event_new(event_base_, server_socket_, EV_READ | EV_PERSIST,
+                         accept, this);
   if (listen_ev_ == nullptr) {
     LOG_ERROR("Failed to create listen event, %s.", strerror(errno));
     ::close(server_socket_);
@@ -262,7 +265,8 @@ int Server::start_unix_socket_server()
 
   ret = event_add(listen_ev_, nullptr);
   if (ret < 0) {
-    LOG_ERROR("event_add(): can not add accept event into libevent, %s", strerror(errno));
+    LOG_ERROR("event_add(): can not add accept event into libevent, %s",
+              strerror(errno));
     ::close(server_socket_);
     return -1;
   }
@@ -272,10 +276,11 @@ int Server::start_unix_socket_server()
   return 0;
 }
 
-int Server::start_stdin_server()
-{
-  Communicator *communicator = communicator_factory_.create(server_param_.protocol);
-  RC rc = communicator->init(STDIN_FILENO, new Session(Session::default_session()), "stdin");
+int Server::start_stdin_server() {
+  Communicator *communicator =
+      communicator_factory_.create(server_param_.protocol);
+  RC rc = communicator->init(STDIN_FILENO,
+                             new Session(Session::default_session()), "stdin");
   if (RC_FAIL(rc)) {
     LOG_WARN("failed to init cli communicator. rc=%s", strrc(rc));
     return -1;
@@ -297,7 +302,7 @@ int Server::start_stdin_server()
 
     /// 在当前线程立即处理对应的事件
     bool need_disconnect = query_engine_.process_session_request(event);
-    if(need_disconnect){
+    if (need_disconnect) {
       Server::close_connection(communicator);
     }
   }
@@ -307,8 +312,7 @@ int Server::start_stdin_server()
   return 0;
 }
 
-int Server::serve()
-{
+int Server::serve() {
   evthread_use_pthreads();
   event_base_ = event_base_new();
   if (event_base_ == nullptr) {
@@ -342,8 +346,7 @@ int Server::serve()
   return 0;
 }
 
-void Server::shutdown()
-{
+void Server::shutdown() {
   LOG_INFO("Server shutting down");
 
   // cleanup

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <vector>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "include/common/rc.h"
 #include "include/query_engine/structor/tuple/tuple.h"
@@ -11,8 +11,7 @@ class Record;
 class TupleCellSpec;
 class Trx;
 
-enum class PhysicalOperatorType
-{
+enum class PhysicalOperatorType {
   TABLE_SCAN,
   EXPLAIN,
   PREDICATE,
@@ -29,9 +28,8 @@ enum class PhysicalOperatorType
   NESTED_LOOP_JOIN,
 };
 
-class PhysicalOperator
-{
-public:
+class PhysicalOperator {
+ public:
   PhysicalOperator() = default;
 
   virtual ~PhysicalOperator();
@@ -66,10 +64,10 @@ public:
     }
   }
 
-public:
+ public:
   bool isdelete_ = false;
 
-protected:
+ protected:
   const Tuple *father_tuple_ = nullptr;
   std::vector<std::unique_ptr<PhysicalOperator>> children_;
 };

@@ -10,43 +10,29 @@ class Db;
  * @brief 插入语句
  * @ingroup Statement
  */
-class InsertStmt : public Stmt 
-{
-public:
+class InsertStmt : public Stmt {
+ public:
   InsertStmt() = default;
-  InsertStmt(Table *table, const std::vector<std::vector<Value>> &multi_values_, int record_amount_, int value_amount);
+  InsertStmt(Table *table, const std::vector<std::vector<Value>> &multi_values_,
+             int record_amount_, int value_amount);
 
-  StmtType type() const override
-  {
-    return StmtType::INSERT;
-  }
+  StmtType type() const override { return StmtType::INSERT; }
 
-public:
+ public:
   static RC create(Db *db, const InsertSqlNode &insert_sql, Stmt *&stmt);
 
-public:
-  Table *table() const
-  {
-    return table_;
-  }
-  const std::vector<std::vector<Value>> & multi_values()
-  {
+ public:
+  Table *table() const { return table_; }
+  const std::vector<std::vector<Value>> &multi_values() {
     return multi_values_;
   }
-  const Value *values(int record_idx)
-  {
+  const Value *values(int record_idx) {
     return multi_values_[record_idx].data();
   }
-  int record_amount()
-  {
-    return record_amount_;
-  }
-  int value_amount()
-  {
-    return value_amount_;
-  }
+  int record_amount() { return record_amount_; }
+  int value_amount() { return value_amount_; }
 
-private:
+ private:
   Table *table_ = nullptr;
   const std::vector<std::vector<Value>> multi_values_;
   int record_amount_ = 0;

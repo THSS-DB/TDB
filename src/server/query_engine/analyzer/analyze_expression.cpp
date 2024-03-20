@@ -1,39 +1,45 @@
 #include "include/query_engine/structor/expression/analyze_expression.h"
-#include "include/query_engine/structor/expression/field_expression.h"
-#include "include/query_engine/structor/expression/aggregation_expression.h"
-#include "include/query_engine/structor/expression/attribute_expression.h"
-#include "include/query_engine/structor/expression/arithmetic_expression.h"
-#include "include/query_engine/structor/expression/value_expression.h"
+
 #include "include/query_engine/analyzer/statement/select_stmt.h"
+#include "include/query_engine/structor/expression/aggregation_expression.h"
+#include "include/query_engine/structor/expression/arithmetic_expression.h"
+#include "include/query_engine/structor/expression/attribute_expression.h"
+#include "include/query_engine/structor/expression/field_expression.h"
+#include "include/query_engine/structor/expression/value_expression.h"
 
-RC analyze_expression(
-    const Expression* expr,
-    Db *db,
-    const std::unordered_map<std::string, Table *> &table_map,
-    const std::vector<Table *> &tables,
-    Expression *&res_expr,
-    bool is_create_table_select) {
-
+RC analyze_expression(const Expression *expr, Db *db,
+                      const std::unordered_map<std::string, Table *> &table_map,
+                      const std::vector<Table *> &tables, Expression *&res_expr,
+                      bool is_create_table_select) {
   if (expr->type() == ExprType::AGGR) {
     const auto *aggr_expr = dynamic_cast<const AggrExpr *>(expr);
     Expression *field_expr = nullptr;
 
     if (aggr_expr->_aggr_type_() == AggrType::AGGR_COUNT &&
-        strcmp(((RelAttrExpr *)aggr_expr->_expr_().get())->rel_attr_sql_node().relation_name.c_str(), "") == 0 &&
-        strcmp(((RelAttrExpr *)aggr_expr->_expr_().get())->rel_attr_sql_node().attribute_name.c_str(), "*") == 0) {
-      field_expr = new FieldExpr(tables.front(), new FieldMeta("*", AttrType::INTS, 0, 1, true));
+        strcmp(((RelAttrExpr *)aggr_expr->_expr_().get())
+                   ->rel_attr_sql_node()
+                   .relation_name.c_str(),
+               "") == 0 &&
+        strcmp(((RelAttrExpr *)aggr_expr->_expr_().get())
+                   ->rel_attr_sql_node()
+                   .attribute_name.c_str(),
+               "*") == 0) {
+      field_expr = new FieldExpr(
+          tables.front(), new FieldMeta("*", AttrType::INTS, 0, 1, true));
       field_expr->set_name("*");
       field_expr->set_alias("*");
-      ((FieldExpr *) field_expr)->set_field_table_alias(tables.front()->name());
+      ((FieldExpr *)field_expr)->set_field_table_alias(tables.front()->name());
       res_expr = new AggrExpr(aggr_expr->_aggr_type_(), field_expr);
       res_expr->set_name(expr->name());
       res_expr->set_alias(expr->alias());
       return RC::SUCCESS;
     }
 
-    RC rc = analyze_expression(aggr_expr->_expr_().get(), db, table_map, tables, field_expr, is_create_table_select);
+    RC rc = analyze_expression(aggr_expr->_expr_().get(), db, table_map, tables,
+                               field_expr, is_create_table_select);
     if (rc != RC::SUCCESS) {
-      LOG_ERROR("Parse AggrExpr inner expression failed. RC = %d:%s", rc, strrc(rc));
+      LOG_ERROR("Parse AggrExpr inner expression failed. RC = %d:%s", rc,
+                strrc(rc));
       return rc;
     }
 
@@ -52,21 +58,26 @@ RC analyze_expression(
     Expression *left_expr = nullptr;
     Expression *right_expr = nullptr;
 
-    RC rc = analyze_expression(arithmetic_expr->_left_().get(), db, table_map, tables, left_expr, is_create_table_select);
+    RC rc = analyze_expression(arithmetic_expr->_left_().get(), db, table_map,
+                               tables, left_expr, is_create_table_select);
     if (rc != RC::SUCCESS) {
-      LOG_ERROR("Parse ArithmeticExpr left expression failed. RC = %d:%s", rc, strrc(rc));
+      LOG_ERROR("Parse ArithmeticExpr left expression failed. RC = %d:%s", rc,
+                strrc(rc));
       return rc;
     }
 
     if (arithmetic_expr->_right_() != nullptr) {
-      rc = analyze_expression(arithmetic_expr->_right_().get(), db, table_map, tables, right_expr, is_create_table_select);
+      rc = analyze_expression(arithmetic_expr->_right_().get(), db, table_map,
+                              tables, right_expr, is_create_table_select);
       if (rc != RC::SUCCESS) {
-        LOG_ERROR("Parse ArithmeticExpr right expression failed. RC = %d:%s", rc, strrc(rc));
+        LOG_ERROR("Parse ArithmeticExpr right expression failed. RC = %d:%s",
+                  rc, strrc(rc));
         return rc;
       }
     }
 
-    if (left_expr->type() == ExprType::VALUE && (right_expr == nullptr || right_expr->type() == ExprType::VALUE)) {
+    if (left_expr->type() == ExprType::VALUE &&
+        (right_expr == nullptr || right_expr->type() == ExprType::VALUE)) {
       // Simplify expression
       Value left_value;
       Value right_value;
@@ -84,10 +95,9 @@ RC analyze_expression(
     }
 
     // Create new expression
-    res_expr = new ArithmeticExpr(
-      arithmetic_expr->arithmetic_type(),
-      std::unique_ptr<Expression>(left_expr),
-      std::unique_ptr<Expression>(right_expr));
+    res_expr = new ArithmeticExpr(arithmetic_expr->arithmetic_type(),
+                                  std::unique_ptr<Expression>(left_expr),
+                                  std::unique_ptr<Expression>(right_expr));
     res_expr->set_name(expr->name());
     res_expr->set_alias(expr->alias());
     return RC::SUCCESS;
@@ -98,9 +108,10 @@ RC analyze_expression(
     const char *table_name = rel_attr_sql_node.relation_name.c_str();
     const char *field_name = rel_attr_sql_node.attribute_name.c_str();
 
-    if (common::is_blank(table_name)) { // Select from only one table
+    if (common::is_blank(table_name)) {  // Select from only one table
       if (tables.size() != 1) {
-        LOG_WARN("invalid. I do not know the attr's table. attr=%s", field_name);
+        LOG_WARN("invalid. I do not know the attr's table. attr=%s",
+                 field_name);
         return RC::SCHEMA_FIELD_MISSING;
       }
       Table *table = tables[0];
@@ -124,12 +135,12 @@ RC analyze_expression(
           break;
         }
       }
-      ((FieldExpr *) res_expr)->set_field_table_alias(alias);
+      ((FieldExpr *)res_expr)->set_field_table_alias(alias);
       res_expr->set_name(expr->name());
       res_expr->set_alias(expr->alias());
       return RC::SUCCESS;
 
-    } else { // Select from specified table
+    } else {  // Select from specified table
       auto iter = table_map.find(table_name);
       if (iter == table_map.end()) {
         LOG_WARN("no such table in from list: %s", table_name);
@@ -144,19 +155,22 @@ RC analyze_expression(
       }
 
       res_expr = new FieldExpr(table, field_meta);
-      ((FieldExpr *) res_expr)->set_field_table_alias(rel_attr_sql_node.relation_name);
+      ((FieldExpr *)res_expr)
+          ->set_field_table_alias(rel_attr_sql_node.relation_name);
       res_expr->set_name(expr->name());
       res_expr->set_alias(expr->alias());
       if (std::string(table_name) != std::string(table->name())) {
         if (tables.size() != 1) {
-          res_expr->set_alias(std::string(table_name) + "." + std::string(field_name));
+          res_expr->set_alias(std::string(table_name) + "." +
+                              std::string(field_name));
         }
       }
       return RC::SUCCESS;
     }
 
   } else if (expr->type() == ExprType::VALUE) {
-    res_expr = new ValueExpr(dynamic_cast<const ValueExpr *>(expr)->get_value());
+    res_expr =
+        new ValueExpr(dynamic_cast<const ValueExpr *>(expr)->get_value());
     res_expr->set_name(expr->name());
     res_expr->set_alias(expr->alias());
     return RC::SUCCESS;

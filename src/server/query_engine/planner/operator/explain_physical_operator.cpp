@@ -1,25 +1,24 @@
-#include <sstream>
 #include "include/query_engine/planner/operator/explain_physical_operator.h"
+
+#include <sstream>
+
 #include "common/log/log.h"
 
 using namespace std;
 
-RC ExplainPhysicalOperator::open(Trx *trx)
-{
+RC ExplainPhysicalOperator::open(Trx *trx) {
   ASSERT(children_.size() == 1, "explain must has 1 child");
   return children_[0]->open(trx);
 }
 
-RC ExplainPhysicalOperator::close()
-{
+RC ExplainPhysicalOperator::close() {
   for (std::unique_ptr<PhysicalOperator> &child_operator : children_) {
     child_operator->close();
   }
   return RC::SUCCESS;
 }
 
-RC ExplainPhysicalOperator::next()
-{
+RC ExplainPhysicalOperator::next() {
   if (!physical_plan_.empty()) {
     return RC::RECORD_EOF;
   }
@@ -35,7 +34,8 @@ RC ExplainPhysicalOperator::next()
     to_string(ss, children_[i].get(), level, false /*last_child*/, ends);
   }
   if (children_size > 0) {
-    to_string(ss, children_[children_size - 1].get(), level, true /*last_child*/, ends);
+    to_string(ss, children_[children_size - 1].get(), level,
+              true /*last_child*/, ends);
   }
 
   physical_plan_ = ss.str();
@@ -48,14 +48,12 @@ RC ExplainPhysicalOperator::next()
   return RC::SUCCESS;
 }
 
-Tuple *ExplainPhysicalOperator::current_tuple()
-{
-  return &tuple_;
-}
+Tuple *ExplainPhysicalOperator::current_tuple() { return &tuple_; }
 
-void ExplainPhysicalOperator::to_string(
-    std::ostream &os, PhysicalOperator *oper, int level, bool last_child, std::vector<bool> &ends)
-{
+void ExplainPhysicalOperator::to_string(std::ostream &os,
+                                        PhysicalOperator *oper, int level,
+                                        bool last_child,
+                                        std::vector<bool> &ends) {
   for (int i = 0; i < level - 1; i++) {
     if (ends[i]) {
       os << "  ";
@@ -90,6 +88,7 @@ void ExplainPhysicalOperator::to_string(
     to_string(os, children[i].get(), level + 1, false /*last_child*/, ends);
   }
   if (size > 0) {
-    to_string(os, children[size - 1].get(), level + 1, true /*last_child*/, ends);
+    to_string(os, children[size - 1].get(), level + 1, true /*last_child*/,
+              ends);
   }
 }

@@ -2,13 +2,9 @@
 
 #include "expression.h"
 
-
-class FieldExpr : public Expression
-{
-public:
-  FieldExpr() {
-    type_ = ExprType::FIELD;
-  }
+class FieldExpr : public Expression {
+ public:
+  FieldExpr() { type_ = ExprType::FIELD; }
 
   explicit FieldExpr(const Field &field) : field_(field) {
     type_ = ExprType::FIELD;
@@ -33,25 +29,21 @@ public:
     field_.set_table_alias(s);
   }
 
-  int len() override {
-    return field_.len();
-  }
+  int len() override { return field_.len(); }
 
-  bool nullable() override {
-    return field_.nullable();
-  }
+  bool nullable() override { return field_.nullable(); }
 
   RC get_value(const Tuple &tuple, Value &value) const override;
 
   void getFields(std::vector<Field *> &query_fields) const override;
 
-  FieldExpr* copy() const override {
+  FieldExpr *copy() const override {
     auto *res = new FieldExpr(field_);
     res->set_name(name());
     res->set_alias(alias());
     return res;
   }
 
-private:
+ private:
   Field field_;
 };

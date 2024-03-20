@@ -1,4 +1,5 @@
 #include "include/query_engine/structor/expression/aggregation_expression.h"
+
 #include "include/query_engine/structor/expression/arithmetic_expression.h"
 #include "include/query_engine/structor/tuple/tuple.h"
 
@@ -12,7 +13,8 @@ void AggrExpr::getFields(std::vector<Field *> &query_fields) const {
   expr_->getFields(query_fields);
 }
 
-RC AggrExpr::getAggrExprs(Expression *expr, std::vector<AggrExpr *> &aggr_exprs) {
+RC AggrExpr::getAggrExprs(Expression *expr,
+                          std::vector<AggrExpr *> &aggr_exprs) {
   if (expr->type() == ExprType::ARITHMETIC) {
     auto *arithmetic_expr = dynamic_cast<ArithmeticExpr *>(expr);
     getAggrExprs(arithmetic_expr->left().get(), aggr_exprs);

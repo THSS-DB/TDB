@@ -7,9 +7,8 @@
  * @ingroup Tuple
  * @details 一般在select语句中使用。
  */
-class ProjectTuple : public Tuple
-{
-public:
+class ProjectTuple : public Tuple {
+ public:
   ProjectTuple() = default;
 
   virtual ~ProjectTuple() {
@@ -21,31 +20,21 @@ public:
 
   const TupleType tuple_type() const override { return ProjectTuple_Type; }
 
-  void set_tuple(Tuple *tuple) {
-    this->tuple_ = tuple;
-  }
+  void set_tuple(Tuple *tuple) { this->tuple_ = tuple; }
 
-  void get_record(std::vector<Record *> &records) const override
-  {
+  void get_record(std::vector<Record *> &records) const override {
     tuple_->get_record(records);
   }
 
-  void set_record(std::vector<Record *> &records) override
-  {
+  void set_record(std::vector<Record *> &records) override {
     tuple_->set_record(records);
   }
 
-  std::vector<TupleCellSpec *> get_species() const {
-    return species_;
-  }
+  std::vector<TupleCellSpec *> get_species() const { return species_; }
 
-  void add_cell_spec(TupleCellSpec *spec) {
-    species_.push_back(spec);
-  }
+  void add_cell_spec(TupleCellSpec *spec) { species_.push_back(spec); }
 
-  int cell_num() const override {
-    return species_.size();
-  }
+  int cell_num() const override { return species_.size(); }
 
   RC cell_at(int index, Value &cell) const override {
     RC rc = RC::SUCCESS;
@@ -60,7 +49,7 @@ public:
     return tuple_->find_cell(spec, cell);
   }
 
-private:
+ private:
   std::vector<TupleCellSpec *> species_;
   Tuple *tuple_ = nullptr;
 };

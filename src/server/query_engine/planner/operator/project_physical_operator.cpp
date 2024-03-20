@@ -1,10 +1,10 @@
-#include "common/log/log.h"
 #include "include/query_engine/planner/operator/project_physical_operator.h"
+
+#include "common/log/log.h"
 #include "include/storage_engine/recorder/record.h"
 #include "include/storage_engine/recorder/table.h"
 
-RC ProjectPhysicalOperator::open(Trx *trx)
-{
+RC ProjectPhysicalOperator::open(Trx *trx) {
   if (children_.empty()) {
     return RC::SUCCESS;
   }
@@ -19,24 +19,21 @@ RC ProjectPhysicalOperator::open(Trx *trx)
   return RC::SUCCESS;
 }
 
-RC ProjectPhysicalOperator::next()
-{
+RC ProjectPhysicalOperator::next() {
   if (children_.empty()) {
     return RC::RECORD_EOF;
   }
   return children_[0]->next();
 }
 
-RC ProjectPhysicalOperator::close()
-{
+RC ProjectPhysicalOperator::close() {
   if (!children_.empty()) {
     children_[0]->close();
   }
   return RC::SUCCESS;
 }
 
-Tuple *ProjectPhysicalOperator::current_tuple()
-{
+Tuple *ProjectPhysicalOperator::current_tuple() {
   tuple_.set_tuple(children_[0]->current_tuple());
   return &tuple_;
 }

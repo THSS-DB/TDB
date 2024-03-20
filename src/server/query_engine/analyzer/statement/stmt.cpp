@@ -1,21 +1,21 @@
-#include "common/log/log.h"
 #include "include/query_engine/analyzer/statement/stmt.h"
-#include "include/query_engine/analyzer/statement/insert_stmt.h"
-#include "include/query_engine/analyzer/statement/update_stmt.h"
-#include "include/query_engine/analyzer/statement/delete_stmt.h"
-#include "include/query_engine/analyzer/statement/select_stmt.h"
-#include "include/query_engine/analyzer/statement/explain_stmt.h"
+
+#include "common/log/log.h"
 #include "include/query_engine/analyzer/statement/create_index_stmt.h"
 #include "include/query_engine/analyzer/statement/create_table_stmt.h"
-#include "include/query_engine/analyzer/statement/drop_table_stmt.h"
+#include "include/query_engine/analyzer/statement/delete_stmt.h"
 #include "include/query_engine/analyzer/statement/desc_table_stmt.h"
-#include "include/query_engine/analyzer/statement/help_stmt.h"
-#include "include/query_engine/analyzer/statement/show_tables_stmt.h"
+#include "include/query_engine/analyzer/statement/drop_table_stmt.h"
 #include "include/query_engine/analyzer/statement/exit_stmt.h"
+#include "include/query_engine/analyzer/statement/explain_stmt.h"
+#include "include/query_engine/analyzer/statement/help_stmt.h"
+#include "include/query_engine/analyzer/statement/insert_stmt.h"
 #include "include/query_engine/analyzer/statement/load_data_stmt.h"
+#include "include/query_engine/analyzer/statement/select_stmt.h"
+#include "include/query_engine/analyzer/statement/show_tables_stmt.h"
+#include "include/query_engine/analyzer/statement/update_stmt.h"
 
-RC Stmt::create_stmt(Db *db, ParsedSqlNode &sql_node, Stmt *&stmt)
-{
+RC Stmt::create_stmt(Db *db, ParsedSqlNode &sql_node, Stmt *&stmt) {
   stmt = nullptr;
 
   switch (sql_node.flag) {
@@ -26,7 +26,7 @@ RC Stmt::create_stmt(Db *db, ParsedSqlNode &sql_node, Stmt *&stmt)
       return DeleteStmt::create(db, sql_node.deletion, stmt);
     }
     case SCF_UPDATE: {
-      return UpdateStmt::create(db, sql_node.update,stmt);
+      return UpdateStmt::create(db, sql_node.update, stmt);
     }
     case SCF_SELECT: {
       return SelectStmt::create(db, sql_node.selection, stmt);
@@ -63,7 +63,8 @@ RC Stmt::create_stmt(Db *db, ParsedSqlNode &sql_node, Stmt *&stmt)
     }
 
     default: {
-      LOG_INFO("Command::type %d doesn't need to create statement.", sql_node.flag);
+      LOG_INFO("Command::type %d doesn't need to create statement.",
+               sql_node.flag);
     } break;
   }
   return RC::UNIMPLENMENT;

@@ -1,9 +1,10 @@
 #pragma once
 
 #include <memory>
-#include "physical_operator.h"
-#include "include/query_engine/structor/expression/expression.h"
+
 #include "include/query_engine/analyzer/statement/orderby_stmt.h"
+#include "include/query_engine/structor/expression/expression.h"
+#include "physical_operator.h"
 
 class OrderByStmt;
 
@@ -11,15 +12,13 @@ class OrderByStmt;
  * @brief 排序物理算子
  * @ingroup PhysicalOperator
  */
-class OrderPhysicalOperator : public PhysicalOperator
-{
-public:
+class OrderPhysicalOperator : public PhysicalOperator {
+ public:
   OrderPhysicalOperator(std::vector<OrderByUnit *> order_units);
 
   virtual ~OrderPhysicalOperator() = default;
 
-  PhysicalOperatorType type() const override
-  {
+  PhysicalOperatorType type() const override {
     return PhysicalOperatorType::ORDER_BY;
   }
 
@@ -28,10 +27,11 @@ public:
   RC close() override;
 
   Tuple *current_tuple() override;
-private:
+
+ private:
   RC sort_table();
 
-private:
+ private:
   std::vector<OrderByUnit *> order_units_;
   bool is_init_ = true;
   std::vector<std::vector<Record *>> st_;  // sort table

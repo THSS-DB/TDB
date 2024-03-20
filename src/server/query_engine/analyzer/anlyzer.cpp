@@ -1,8 +1,7 @@
 #include "include/query_engine/analyzer/analyzer.h"
 #include "include/query_engine/analyzer/statement/stmt.h"
 
-RC Analyzer::analyze(QueryInfo *query_info)
-{
+RC Analyzer::analyze(QueryInfo *query_info) {
   RC rc;
   SessionRequest *session_event = query_info->session_event();
   SqlResult *sql_result = session_event->sql_result();

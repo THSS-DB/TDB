@@ -1,22 +1,24 @@
-#include <sstream>
 #include "include/query_engine/parser/value.h"
-#include "common/log/log.h"
+
+#include <cmath>
+#include <sstream>
+
 #include "common/lang/comparator.h"
 #include "common/lang/string.h"
-#include <cmath>
+#include "common/log/log.h"
 
-const char *ATTR_TYPE_NAME[] = {"undefined", "chars", "ints", "dates","nulls","floats", "booleans", "texts"};
+const char *ATTR_TYPE_NAME[] = {"undefined", "chars",  "ints",     "dates",
+                                "nulls",     "floats", "booleans", "texts"};
 
-const char *attr_type_to_string(AttrType type)
-{
+const char *attr_type_to_string(AttrType type) {
   if (type >= UNDEFINED && type <= TEXTS) {
     return ATTR_TYPE_NAME[type];
   }
   return "unknown";
 }
-AttrType attr_type_from_string(const char *s)
-{
-  for (unsigned int i = 0; i < sizeof(ATTR_TYPE_NAME) / sizeof(ATTR_TYPE_NAME[0]); i++) {
+AttrType attr_type_from_string(const char *s) {
+  for (unsigned int i = 0;
+       i < sizeof(ATTR_TYPE_NAME) / sizeof(ATTR_TYPE_NAME[0]); i++) {
     if (0 == strcmp(ATTR_TYPE_NAME[i], s)) {
       return (AttrType)i;
     }
@@ -24,47 +26,34 @@ AttrType attr_type_from_string(const char *s)
   return UNDEFINED;
 }
 
-Value::Value(int val)
-{
-  set_int(val);
-}
+Value::Value(int val) { set_int(val); }
 
-Value::Value(float val)
-{
-  set_float(val);
-}
+Value::Value(float val) { set_float(val); }
 
-Value::Value(bool val)
-{
-  set_boolean(val);
-}
+Value::Value(bool val) { set_boolean(val); }
 
-Value::Value(const char *s, int len /*= 0*/)
-{
-  set_string(s, len);
-}
-Value::Value(AttrType attrType)
-{
+Value::Value(const char *s, int len /*= 0*/) { set_string(s, len); }
+Value::Value(AttrType attrType) {
   switch (attrType) {
-    case INTS:{
+    case INTS: {
       set_int(0);
     } break;
-    case DATES:{
+    case DATES: {
       set_date(0);
     } break;
-    case FLOATS:{
+    case FLOATS: {
       set_float(0);
     } break;
-    case CHARS:{
+    case CHARS: {
       set_string("");
     } break;
-    case TEXTS:{
+    case TEXTS: {
       set_text("");
     } break;
-    case BOOLEANS:{
+    case BOOLEANS: {
       set_boolean(0);
     } break;
-    case NULLS:{
+    case NULLS: {
       set_null();
     } break;
     default:
@@ -72,8 +61,7 @@ Value::Value(AttrType attrType)
   }
 }
 
-void Value::set_data(char *data, int length, bool isInit)
-{
+void Value::set_data(char *data, int length, bool isInit) {
   switch (attr_type_) {
     case TEXTS: {
       set_text(data, length);
@@ -93,7 +81,7 @@ void Value::set_data(char *data, int length, bool isInit)
       num_value_.bool_value_ = *(int *)data != 0;
       length_ = length;
     } break;
-    case DATES:{
+    case DATES: {
       if (isInit) {
         set_date_string(data, length);
       } else {
@@ -106,34 +94,29 @@ void Value::set_data(char *data, int length, bool isInit)
     } break;
   }
 }
-void Value::set_int(int val)
-{
+void Value::set_int(int val) {
   attr_type_ = INTS;
   num_value_.int_value_ = val;
   length_ = sizeof(val);
 }
 
-void Value::set_date(int val)
-{
+void Value::set_date(int val) {
   attr_type_ = DATES;
   num_value_.date_value_ = val;
   length_ = sizeof(val);
 }
 
-void Value::set_float(float val)
-{
+void Value::set_float(float val) {
   attr_type_ = FLOATS;
   num_value_.float_value_ = val;
   length_ = sizeof(val);
 }
-void Value::set_boolean(bool val)
-{
+void Value::set_boolean(bool val) {
   attr_type_ = BOOLEANS;
   num_value_.bool_value_ = val;
   length_ = sizeof(val);
 }
-void Value::set_string(const char *s, int len /*= 0*/)
-{
+void Value::set_string(const char *s, int len /*= 0*/) {
   attr_type_ = CHARS;
   if (len > 0) {
     len = strnlen(s, len);
@@ -143,8 +126,7 @@ void Value::set_string(const char *s, int len /*= 0*/)
   }
   length_ = str_value_.length();
 }
-void Value::set_text(const char *s, int len)
-{
+void Value::set_text(const char *s, int len) {
   attr_type_ = TEXTS;
   if (len > 0) {
     len = strnlen(s, len);
@@ -155,8 +137,7 @@ void Value::set_text(const char *s, int len)
   length_ = text_value_.length();
 }
 
-void Value::set_value(const Value &value)
-{
+void Value::set_value(const Value &value) {
   switch (value.attr_type_) {
     case INTS: {
       set_int(value.get_int());
@@ -187,7 +168,7 @@ void Value::set_date_string(const char *s, int len) {
   str_value_ = s;
   int y, m, d;
   sscanf(s, "%d-%d-%d", &y, &m, &d);
-  if(check_date(y, m, d)) {
+  if (check_date(y, m, d)) {
     num_value_.date_value_ = y * 10000 + m * 100 + d;
   } else {
     num_value_.date_value_ = -1;
@@ -195,8 +176,7 @@ void Value::set_date_string(const char *s, int len) {
   length_ = len;
 }
 
-const char *Value::data() const
-{
+const char *Value::data() const {
   switch (attr_type_) {
     case TEXTS: {
       return text_value_.c_str();
@@ -210,8 +190,7 @@ const char *Value::data() const
   }
 }
 
-std::string Value::to_string() const
-{
+std::string Value::to_string() const {
   std::stringstream os;
   switch (attr_type_) {
     case INTS: {
@@ -223,7 +202,7 @@ std::string Value::to_string() const
     case BOOLEANS: {
       os << num_value_.bool_value_;
     } break;
-    case TEXTS:{
+    case TEXTS: {
       os << text_value_;
     } break;
     case CHARS: {
@@ -231,7 +210,9 @@ std::string Value::to_string() const
     } break;
     case DATES: {
       char buf[16] = {0};
-      snprintf(buf,sizeof(buf),"%04d-%02d-%02d",num_value_.date_value_/10000,(num_value_.date_value_%10000)/100,num_value_.date_value_%100);
+      snprintf(
+          buf, sizeof(buf), "%04d-%02d-%02d", num_value_.date_value_ / 10000,
+          (num_value_.date_value_ % 10000) / 100, num_value_.date_value_ % 100);
       os << buf;
     } break;
     case NULLS: {
@@ -244,33 +225,34 @@ std::string Value::to_string() const
   return os.str();
 }
 
-int Value::compare(const Value &other) const
-{
+int Value::compare(const Value &other) const {
   if (this->attr_type_ == other.attr_type_) {
     switch (this->attr_type_) {
       case INTS: {
-        return common::compare_int((void *)&this->num_value_.int_value_, (void *)&other.num_value_.int_value_);
+        return common::compare_int((void *)&this->num_value_.int_value_,
+                                   (void *)&other.num_value_.int_value_);
       }
       case FLOATS: {
-        return common::compare_float((void *)&this->num_value_.float_value_, (void *)&other.num_value_.float_value_);
+        return common::compare_float((void *)&this->num_value_.float_value_,
+                                     (void *)&other.num_value_.float_value_);
       }
       case CHARS: {
-        return common::compare_string((void *)this->str_value_.c_str(),
-            this->str_value_.length(),
-            (void *)other.str_value_.c_str(),
-            other.str_value_.length());
+        return common::compare_string(
+            (void *)this->str_value_.c_str(), this->str_value_.length(),
+            (void *)other.str_value_.c_str(), other.str_value_.length());
       }
       case TEXTS: {
-        return common::compare_string((void *)this->text_value_.c_str(),
-            this->text_value_.length(),
-            (void *)other.text_value_.c_str(),
-            other.text_value_.length());
+        return common::compare_string(
+            (void *)this->text_value_.c_str(), this->text_value_.length(),
+            (void *)other.text_value_.c_str(), other.text_value_.length());
       }
       case BOOLEANS: {
-        return common::compare_int((void *)&this->num_value_.bool_value_, (void *)&other.num_value_.bool_value_);
+        return common::compare_int((void *)&this->num_value_.bool_value_,
+                                   (void *)&other.num_value_.bool_value_);
       }
       case DATES: {
-        return common::compare_int((void *)&this->num_value_.date_value_, (void *)&other.num_value_.date_value_);
+        return common::compare_int((void *)&this->num_value_.date_value_,
+                                   (void *)&other.num_value_.date_value_);
       }
       case NULLS:
       default: {
@@ -279,10 +261,12 @@ int Value::compare(const Value &other) const
     }
   } else if (this->attr_type_ == INTS && other.attr_type_ == FLOATS) {
     float this_data = this->num_value_.int_value_;
-    return common::compare_float((void *)&this_data, (void *)&other.num_value_.float_value_);
+    return common::compare_float((void *)&this_data,
+                                 (void *)&other.num_value_.float_value_);
   } else if (this->attr_type_ == FLOATS && other.attr_type_ == INTS) {
     float other_data = other.num_value_.int_value_;
-    return common::compare_float((void *)&this->num_value_.float_value_, (void *)&other_data);
+    return common::compare_float((void *)&this->num_value_.float_value_,
+                                 (void *)&other_data);
   } else {
     float left = this->get_float();
     float right = other.get_float();
@@ -292,14 +276,14 @@ int Value::compare(const Value &other) const
   return -1;  // TODO return rc?
 }
 
-int Value::get_int() const
-{
+int Value::get_int() const {
   switch (attr_type_) {
     case CHARS: {
       try {
         return (int)(std::stol(str_value_));
       } catch (std::exception const &ex) {
-        LOG_TRACE("failed to convert string to number. s=%s, ex=%s", str_value_.c_str(), ex.what());
+        LOG_TRACE("failed to convert string to number. s=%s, ex=%s",
+                  str_value_.c_str(), ex.what());
         return 0;
       }
     }
@@ -322,14 +306,14 @@ int Value::get_int() const
   }
 }
 
-float Value::get_float() const
-{
+float Value::get_float() const {
   switch (attr_type_) {
     case CHARS: {
       try {
         return std::stof(str_value_);
       } catch (std::exception const &ex) {
-        LOG_TRACE("failed to convert string to float. s=%s, ex=%s", str_value_.c_str(), ex.what());
+        LOG_TRACE("failed to convert string to float. s=%s, ex=%s",
+                  str_value_.c_str(), ex.what());
         return 0.0;
       }
     }
@@ -353,13 +337,9 @@ float Value::get_float() const
   return 0;
 }
 
-std::string Value::get_string() const
-{
-  return this->to_string();
-}
+std::string Value::get_string() const { return this->to_string(); }
 
-bool Value::get_boolean() const
-{
+bool Value::get_boolean() const {
   switch (attr_type_) {
     case CHARS: {
       try {
@@ -375,7 +355,8 @@ bool Value::get_boolean() const
 
         return !str_value_.empty();
       } catch (std::exception const &ex) {
-        LOG_TRACE("failed to convert string to float or integer. s=%s, ex=%s", str_value_.c_str(), ex.what());
+        LOG_TRACE("failed to convert string to float or integer. s=%s, ex=%s",
+                  str_value_.c_str(), ex.what());
         return !str_value_.empty();
       }
     }
@@ -401,68 +382,64 @@ bool Value::get_boolean() const
 bool Value::check_date(int y, int m, int d) {
   static int mon[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
   bool leap = (y % 400 == 0 || (y % 100 && y % 4 == 0));
-  return y > 0 && (m > 0) &&(m <= 12)
-         && (d > 0) && (d <= ((m ==2 && leap ) ? 1 : 0) + mon[m]);
+  return y > 0 && (m > 0) && (m <= 12) && (d > 0) &&
+         (d <= ((m == 2 && leap) ? 1 : 0) + mon[m]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool cast_to[AttrType::FLOATS + 1][AttrType::FLOATS + 1] = {
-    {
-        // UNDEFINED
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-    },
-    {
-        // CHARS
-        false,
-        true,
-        true,
-        false,
-        false,
-        true,
-    },
-    {
-        // INTS
-        false,
-        true,
-        true,
-        false,
-        false,
-        true,
-    },
-    {
-        // DATES
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-    },
-    {
-        // NULLS
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-    },
-    {
-        // FLOATS
-        false,
-        true,
-        true,
-        false,
-        false,
-        true,
-    }};
-bool type_cast_not_support(AttrType i, AttrType j)
-{
-  return ! cast_to[i][j];
-}
+bool cast_to[AttrType::FLOATS + 1][AttrType::FLOATS + 1] = {{
+                                                                // UNDEFINED
+                                                                false,
+                                                                false,
+                                                                false,
+                                                                false,
+                                                                false,
+                                                                false,
+                                                            },
+                                                            {
+                                                                // CHARS
+                                                                false,
+                                                                true,
+                                                                true,
+                                                                false,
+                                                                false,
+                                                                true,
+                                                            },
+                                                            {
+                                                                // INTS
+                                                                false,
+                                                                true,
+                                                                true,
+                                                                false,
+                                                                false,
+                                                                true,
+                                                            },
+                                                            {
+                                                                // DATES
+                                                                false,
+                                                                false,
+                                                                false,
+                                                                false,
+                                                                false,
+                                                                false,
+                                                            },
+                                                            {
+                                                                // NULLS
+                                                                false,
+                                                                false,
+                                                                false,
+                                                                false,
+                                                                false,
+                                                                false,
+                                                            },
+                                                            {
+                                                                // FLOATS
+                                                                false,
+                                                                true,
+                                                                true,
+                                                                false,
+                                                                false,
+                                                                true,
+                                                            }};
+bool type_cast_not_support(AttrType i, AttrType j) { return !cast_to[i][j]; }

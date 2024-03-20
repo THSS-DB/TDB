@@ -1,10 +1,10 @@
 #include "include/query_engine/planner/operator/table_scan_physical_operator.h"
+
 #include "include/storage_engine/recorder/table.h"
 
 using namespace std;
 
-RC TableScanPhysicalOperator::open(Trx *trx)
-{
+RC TableScanPhysicalOperator::open(Trx *trx) {
   RC rc = table_->get_record_scanner(record_scanner_, trx, readonly_);
   if (rc == RC::SUCCESS) {
     tuple_.set_schema(table_, table_alias_, table_->table_meta().field_metas());
@@ -13,8 +13,7 @@ RC TableScanPhysicalOperator::open(Trx *trx)
   return rc;
 }
 
-RC TableScanPhysicalOperator::next()
-{
+RC TableScanPhysicalOperator::next() {
   if (!record_scanner_.has_next()) {
     return RC::RECORD_EOF;
   }
@@ -42,13 +41,9 @@ RC TableScanPhysicalOperator::next()
   return rc;
 }
 
-RC TableScanPhysicalOperator::close()
-{
-  return record_scanner_.close_scan();
-}
+RC TableScanPhysicalOperator::close() { return record_scanner_.close_scan(); }
 
-Tuple *TableScanPhysicalOperator::current_tuple()
-{
+Tuple *TableScanPhysicalOperator::current_tuple() {
   if (tuple_.order_set()) {
     tuple_.remove_order_set();
     return &tuple_;
@@ -57,18 +52,14 @@ Tuple *TableScanPhysicalOperator::current_tuple()
   return &tuple_;
 }
 
-string TableScanPhysicalOperator::param() const
-{
-  return table_->name();
-}
+string TableScanPhysicalOperator::param() const { return table_->name(); }
 
-void TableScanPhysicalOperator::set_predicates(vector<unique_ptr<Expression>> &&exprs)
-{
+void TableScanPhysicalOperator::set_predicates(
+    vector<unique_ptr<Expression>> &&exprs) {
   predicates_ = std::move(exprs);
 }
 
-RC TableScanPhysicalOperator::filter(RowTuple &tuple, bool &result)
-{
+RC TableScanPhysicalOperator::filter(RowTuple &tuple, bool &result) {
   RC rc = RC::SUCCESS;
   Value value;
   for (unique_ptr<Expression> &expr : predicates_) {

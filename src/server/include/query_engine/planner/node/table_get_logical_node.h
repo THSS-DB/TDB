@@ -1,30 +1,24 @@
 #pragma once
 
-#include "logical_node.h"
 #include "include/storage_engine/recorder/field.h"
+#include "logical_node.h"
 
-class TableGetLogicalNode : public LogicalNode
-{
-public:
-  TableGetLogicalNode(Table *table, const std::string &table_alias, const std::vector<Field> &fields, bool readonly);
+class TableGetLogicalNode : public LogicalNode {
+ public:
+  TableGetLogicalNode(Table *table, const std::string &table_alias,
+                      const std::vector<Field> &fields, bool readonly);
   ~TableGetLogicalNode() override = default;
 
-  LogicalNodeType type() const override
-  {
-    return LogicalNodeType::TABLE_GET;
-  }
+  LogicalNodeType type() const override { return LogicalNodeType::TABLE_GET; }
 
-  Table *table() const  { return table_; }
+  Table *table() const { return table_; }
   std::string table_alias() const { return table_alias_; }
   bool readonly() const { return readonly_; }
 
   void set_predicates(std::vector<std::unique_ptr<Expression>> &&exprs);
-  std::vector<std::unique_ptr<Expression>> &predicates()
-  {
-    return predicates_;
-  }
+  std::vector<std::unique_ptr<Expression>> &predicates() { return predicates_; }
 
-private:
+ private:
   Table *table_ = nullptr;
   std::string table_alias_;
   std::vector<Field> fields_;

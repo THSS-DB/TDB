@@ -1,24 +1,23 @@
 #include "include/query_engine/executor/sql_result.h"
-#include "include/session/session.h"
-#include "include/storage_engine/transaction/trx.h"
+
 #include "common/log/log.h"
 #include "include/query_engine/structor/tuple/tuple.h"
+#include "include/session/session.h"
+#include "include/storage_engine/transaction/trx.h"
 
 /**
- * The head of operator tree, it's the interface between diver and the operator tree.
- * Query result can be fetched from init(), next() methods in a volcano structure.
+ * The head of operator tree, it's the interface between diver and the operator
+ * tree. Query result can be fetched from init(), next() methods in a volcano
+ * structure.
  * @param session
  */
-SqlResult::SqlResult(Session *session) : session_(session)
-{}
+SqlResult::SqlResult(Session *session) : session_(session) {}
 
-void SqlResult::set_tuple_schema(const TupleSchema &schema)
-{
+void SqlResult::set_tuple_schema(const TupleSchema &schema) {
   tuple_schema_ = schema;
 }
 
-RC SqlResult::init()
-{
+RC SqlResult::init() {
   if (nullptr == operator_) {
     return RC::INVALID_ARGUMENT;
   }
@@ -28,8 +27,7 @@ RC SqlResult::init()
   return operator_->open(trx);
 }
 
-RC SqlResult::close()
-{
+RC SqlResult::close() {
   if (nullptr == operator_) {
     return RC::INVALID_ARGUMENT;
   }
@@ -53,8 +51,7 @@ RC SqlResult::close()
   return rc;
 }
 
-RC SqlResult::next_tuple(Tuple *&tuple)
-{
+RC SqlResult::next_tuple(Tuple *&tuple) {
   RC rc = operator_->next();
   if (rc != RC::SUCCESS) {
     return rc;
@@ -64,8 +61,8 @@ RC SqlResult::next_tuple(Tuple *&tuple)
   return rc;
 }
 
-void SqlResult::set_operator(std::unique_ptr<PhysicalOperator> oper)
-{
-  ASSERT(operator_ == nullptr, "current operator is not null. Result is not closed?");
+void SqlResult::set_operator(std::unique_ptr<PhysicalOperator> oper) {
+  ASSERT(operator_ == nullptr,
+         "current operator is not null. Result is not closed?");
   operator_ = std::move(oper);
 }

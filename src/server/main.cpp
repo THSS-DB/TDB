@@ -1,12 +1,13 @@
 #include <netinet/in.h>
 #include <unistd.h>
+
 #include <iostream>
 
-#include "include/common/init.h"
-#include "include/common/setting.h"
+#include "common/lang/string.h"
 #include "common/os/process.h"
 #include "common/os/signal.h"
-#include "common/lang/string.h"
+#include "include/common/init.h"
+#include "include/common/setting.h"
 #include "include/session/server.h"
 #include "include/session/server_param.h"
 
@@ -16,19 +17,20 @@ using namespace common;
 
 static Server *g_server = nullptr;
 
-void usage()
-{
+void usage() {
   std::cout << "Useage " << std::endl;
-  std::cout << "-p: server port. if not specified, the item in the config file will be used" << std::endl;
+  std::cout << "-p: server port. if not specified, the item in the config file "
+               "will be used"
+            << std::endl;
   std::cout << "-f: path of config file." << std::endl;
-  std::cout << "-s: use unix socket and the argument is socket address" << std::endl;
+  std::cout << "-s: use unix socket and the argument is socket address"
+            << std::endl;
   std::cout << "-P: protocol. {plain(default), mysql, cli}." << std::endl;
   std::cout << "-t: transaction model. {vacuous(default), mvcc}." << std::endl;
   std::cout << "-n: buffer pool memory size in byte" << std::endl;
 }
 
-void parse_parameter(int argc, char **argv)
-{
+void parse_parameter(int argc, char **argv) {
   std::string process_name = get_process_name(argv[0]);
 
   ProcessParam *process_param = the_process_param();
@@ -69,14 +71,14 @@ void parse_parameter(int argc, char **argv)
         exit(0);
         return;
       default:
-        std::cout << "Unknown option: " << static_cast<char>(opt) << ", ignored" << std::endl;
+        std::cout << "Unknown option: " << static_cast<char>(opt) << ", ignored"
+                  << std::endl;
         break;
     }
   }
 }
 
-Server *init_server()
-{
+Server *init_server() {
   std::map<std::string, std::string> net_section = get_properties()->get(NET);
 
   ProcessParam *process_param = the_process_param();
@@ -85,7 +87,8 @@ Server *init_server()
   long max_connection_num = MAX_CONNECTION_NUM_DEFAULT;
   int port = PORT_DEFAULT;
 
-  std::map<std::string, std::string>::iterator it = net_section.find(CLIENT_ADDRESS);
+  std::map<std::string, std::string>::iterator it =
+      net_section.find(CLIENT_ADDRESS);
   if (it != net_section.end()) {
     std::string str = it->second;
     str_to_val(str, listen_addr);
@@ -121,7 +124,8 @@ Server *init_server()
     server_param.protocol = CommunicateProtocol::PLAIN;
   }
 
-  if (process_param->get_unix_socket_path().size() > 0 && !server_param.use_std_io) {
+  if (process_param->get_unix_socket_path().size() > 0 &&
+      !server_param.use_std_io) {
     server_param.use_unix_socket = true;
     server_param.unix_socket_path = process_param->get_unix_socket_path();
   }
@@ -135,8 +139,7 @@ Server *init_server()
  * 那么直接在signal_handler里面处理的话，可能会导致死锁
  * 所以这里单独创建一个线程
  */
-void *quit_thread_func(void *_signum)
-{
+void *quit_thread_func(void *_signum) {
   intptr_t signum = (intptr_t)_signum;
   LOG_INFO("Receive signal: %ld", signum);
   if (g_server) {
@@ -144,14 +147,12 @@ void *quit_thread_func(void *_signum)
   }
   return nullptr;
 }
-void quit_signal_handle(int signum)
-{
+void quit_signal_handle(int signum) {
   pthread_t tid;
   pthread_create(&tid, nullptr, quit_thread_func, (void *)(intptr_t)signum);
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   int rc = STATUS_SUCCESS;
 
   setSignalHandler(quit_signal_handle);

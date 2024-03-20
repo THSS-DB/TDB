@@ -7,11 +7,10 @@
 
 class Table;
 
-class LoadDataStmt : public Stmt
-{
-public:
-  LoadDataStmt(Table *table, const char *filename) : table_(table), filename_(filename)
-  {}
+class LoadDataStmt : public Stmt {
+ public:
+  LoadDataStmt(Table *table, const char *filename)
+      : table_(table), filename_(filename) {}
   virtual ~LoadDataStmt() = default;
 
   StmtType type() const override { return StmtType::LOAD_DATA; }
@@ -21,7 +20,7 @@ public:
 
   static RC create(Db *db, const LoadDataSqlNode &load_data, Stmt *&stmt);
 
-private:
+ private:
   Table *table_ = nullptr;
   std::string filename_;
 };

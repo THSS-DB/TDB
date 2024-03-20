@@ -1,12 +1,12 @@
 #include "include/session/plain_communicator.h"
-#include "include/session/buffered_writer.h"
-#include "include/session/session_request.h"
-#include "include/session/session.h"
+
 #include "common/io/io.h"
 #include "common/log/log.h"
+#include "include/session/buffered_writer.h"
+#include "include/session/session.h"
+#include "include/session/session_request.h"
 
-RC PlainCommunicator::read_event(SessionRequest *&event)
-{
+RC PlainCommunicator::read_event(SessionRequest *&event) {
   RC rc = RC::SUCCESS;
 
   event = nullptr;
@@ -14,7 +14,7 @@ RC PlainCommunicator::read_event(SessionRequest *&event)
   int data_len = 0;
   int read_len = 0;
 
-  const int max_packet_size = 65535*2;
+  const int max_packet_size = 65535 * 2;
   std::vector<char> buf(max_packet_size);
 
   // 持续接收消息，直到遇到'\0'。将'\0'遇到的后续数据直接丢弃没有处理，因为目前仅支持一收一发的模式
@@ -69,19 +69,21 @@ RC PlainCommunicator::read_event(SessionRequest *&event)
   return rc;
 }
 
-RC PlainCommunicator::write_state(SqlResult *sql_result, bool &need_disconnect)
-{
+RC PlainCommunicator::write_state(SqlResult *sql_result,
+                                  bool &need_disconnect) {
   const int buf_size = 2048;
   char *buf = new char[buf_size];
   const std::string &state_string = sql_result->state_string();
   if (state_string.empty()) {
-    if(RC::SUCCESS == sql_result->return_code()){
+    if (RC::SUCCESS == sql_result->return_code()) {
       snprintf(buf, buf_size, "%s\n", "SUCCESS");
-    }else{
-      snprintf(buf, buf_size, "%s : %s\n","Failure", strrc(sql_result->return_code()));
+    } else {
+      snprintf(buf, buf_size, "%s : %s\n", "Failure",
+               strrc(sql_result->return_code()));
     }
   } else {
-    snprintf(buf, buf_size, "%s > %s\n", strrc(sql_result->return_code()), state_string.c_str());
+    snprintf(buf, buf_size, "%s > %s\n", strrc(sql_result->return_code()),
+             state_string.c_str());
   }
 
   RC rc = writer_->writen(buf, strlen(buf));
@@ -100,8 +102,7 @@ RC PlainCommunicator::write_state(SqlResult *sql_result, bool &need_disconnect)
   return RC::SUCCESS;
 }
 
-RC PlainCommunicator::write_result(const char *data, int32_t size)
-{
+RC PlainCommunicator::write_result(const char *data, int32_t size) {
   return writer_->writen(data, size);
 }
 PlainCommunicator::PlainCommunicator() {

@@ -1,16 +1,14 @@
 #pragma once
 
-#include <vector>
 #include <memory>
+#include <vector>
 
-#include "logical_node.h"
 #include "include/query_engine/structor/expression/expression.h"
 #include "include/storage_engine/recorder/field.h"
+#include "logical_node.h"
 
-class ProjectLogicalNode : public LogicalNode
-{
-public:
-
+class ProjectLogicalNode : public LogicalNode {
+ public:
   explicit ProjectLogicalNode(const std::vector<Expression *> &exprs) {
     for (auto expr : exprs) {
       expressions_.emplace_back(expr->copy());
@@ -19,9 +17,7 @@ public:
 
   ~ProjectLogicalNode() override = default;
 
-  LogicalNodeType type() const override {
-    return LogicalNodeType::PROJECTION;
-  }
+  LogicalNodeType type() const override { return LogicalNodeType::PROJECTION; }
 
   const std::vector<std::unique_ptr<Expression>> &expressions() const {
     return expressions_;

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "include/query_engine/structor/query_info.h"
 #include "include/common/rc.h"
+#include "include/query_engine/structor/query_info.h"
 
 namespace Analyzer {
-    RC analyze(QueryInfo *query_info);
+RC analyze(QueryInfo *query_info);
 }

@@ -1,10 +1,11 @@
+#include "include/query_engine/structor/expression/comparison_expression.h"
+
 #include <regex>
 
-#include "include/query_engine/structor/expression/comparison_expression.h"
 #include "include/query_engine/structor/expression/value_expression.h"
 
-static void replace_all(std::string &str, const std::string &from, const std::string &to)
-{
+static void replace_all(std::string &str, const std::string &from,
+                        const std::string &to) {
   if (from.empty()) {
     return;
   }
@@ -15,12 +16,10 @@ static void replace_all(std::string &str, const std::string &from, const std::st
   }
 }
 
-RC ComparisonExpr::set_trx(Trx *trx) const {
-  return RC::SUCCESS;
-}
+RC ComparisonExpr::set_trx(Trx *trx) const { return RC::SUCCESS; }
 
-RC ComparisonExpr::compare_value(const Value &left, const Value &right, bool &result) const
-{
+RC ComparisonExpr::compare_value(const Value &left, const Value &right,
+                                 bool &result) const {
   RC rc = RC::SUCCESS;
   // (NOT) EXISTS
   if (comp_ == CompOp::EXISTS || comp_ == CompOp::NOT_EXISTS) {
@@ -37,7 +36,8 @@ RC ComparisonExpr::compare_value(const Value &left, const Value &right, bool &re
       LOG_WARN("failed to get value from sub query. rc=%s", strrc(rc));
       return rc;
     }
-    result = CompOp::EXISTS == comp_ ? exists.get_boolean() : !exists.get_boolean();
+    result =
+        CompOp::EXISTS == comp_ ? exists.get_boolean() : !exists.get_boolean();
     return RC::SUCCESS;
   }
 
@@ -60,13 +60,13 @@ RC ComparisonExpr::compare_value(const Value &left, const Value &right, bool &re
   }
 
   if (comp_ == CompOp::IS_NULL) {
-    //assert(right.is_null());
+    // assert(right.is_null());
     result = left.is_null();
     return RC::SUCCESS;
   }
 
   if (comp_ == CompOp::IS_NOT_NULL) {
-    //assert(right.is_null());
+    // assert(right.is_null());
     result = !left.is_null();
     return RC::SUCCESS;
   }
@@ -102,7 +102,8 @@ RC ComparisonExpr::compare_value(const Value &left, const Value &right, bool &re
       std::string raw_reg((const char *)right.data());
       replace_all(raw_reg, "_", "[^']");
       replace_all(raw_reg, "%", "[^']*");
-      std::regex reg(raw_reg.c_str(), std::regex_constants::ECMAScript | std::regex_constants::icase);
+      std::regex reg(raw_reg.c_str(), std::regex_constants::ECMAScript |
+                                          std::regex_constants::icase);
       result = std::regex_match((const char *)left.data(), reg);
       if (NOT_LIKE_OP == comp_) {
         result = !result;
@@ -117,10 +118,9 @@ RC ComparisonExpr::compare_value(const Value &left, const Value &right, bool &re
   return rc;
 }
 
-RC ComparisonExpr::try_get_value(Value &cell) const
-{
-  if (left_->type() == ExprType::VALUE &&
-      right_ != nullptr && right_->type() == ExprType::VALUE) {
+RC ComparisonExpr::try_get_value(Value &cell) const {
+  if (left_->type() == ExprType::VALUE && right_ != nullptr &&
+      right_->type() == ExprType::VALUE) {
     auto *left_value_expr = dynamic_cast<ValueExpr *>(left_.get());
     auto *right_value_expr = dynamic_cast<ValueExpr *>(right_.get());
     const Value &left_cell = left_value_expr->get_value();
@@ -139,8 +139,7 @@ RC ComparisonExpr::try_get_value(Value &cell) const
   return RC::INVALID_ARGUMENT;
 }
 
-RC ComparisonExpr::get_value(const Tuple &tuple, Value &value) const
-{
+RC ComparisonExpr::get_value(const Tuple &tuple, Value &value) const {
   Value left_value;
   Value right_value;
 

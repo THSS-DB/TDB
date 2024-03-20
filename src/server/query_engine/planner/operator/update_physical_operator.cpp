@@ -1,16 +1,15 @@
 #include "include/query_engine/planner/operator/update_physical_operator.h"
 
 #include "common/log/log.h"
+#include "include/query_engine/analyzer/statement/update_stmt.h"
+#include "include/query_engine/parser/value.h"
+#include "include/query_engine/structor/expression/value_expression.h"
+#include "include/query_engine/structor/tuple/row_tuple.h"
 #include "include/storage_engine/recorder/record.h"
 #include "include/storage_engine/recorder/table.h"
 #include "include/storage_engine/transaction/trx.h"
-#include "include/query_engine/parser/value.h"
-#include "include/query_engine/analyzer/statement/update_stmt.h"
-#include "include/query_engine/structor/expression/value_expression.h"
-#include "include/query_engine/structor/tuple/row_tuple.h"
 
-RC UpdatePhysicalOperator::open(Trx *trx)
-{
+RC UpdatePhysicalOperator::open(Trx *trx) {
   if (children_.empty()) {
     return RC::SUCCESS;
   }
@@ -26,17 +25,18 @@ RC UpdatePhysicalOperator::open(Trx *trx)
 
   Tuple *tuple = nullptr;
   const TableMeta &table_meta = table_->table_meta();
-  const int field_num = table_meta.field_num() - table_meta.sys_field_num() - table_meta.null_filed_num();
+  const int field_num = table_meta.field_num() - table_meta.sys_field_num() -
+                        table_meta.null_filed_num();
   const int sys_field_num = table_meta.sys_field_num();
   std::vector<UpdateUnit> processed_update_units;
-  for (const UpdateUnit& update_unit : update_units_) {
-    Expression* expr = update_unit.value;
+  for (const UpdateUnit &update_unit : update_units_) {
+    Expression *expr = update_unit.value;
     Value value;
     expr->try_get_value(value);
     bool check = false;
     for (int i = 0; i < field_num; i++) {
       const FieldMeta *field_meta = table_meta.field(i + sys_field_num);
-      if(update_unit.attribute_name == field_meta->name()) {
+      if (update_unit.attribute_name == field_meta->name()) {
         const AttrType field_type = field_meta->type();
         const AttrType value_type = value.attr_type();
         if (field_type == TEXTS && value_type == CHARS) {
@@ -45,7 +45,9 @@ RC UpdatePhysicalOperator::open(Trx *trx)
           }
           std::hash<std::string> hashFunction;
           std::size_t hashValue = hashFunction(value.get_string());
-          std::string value_search_for_text = std::string(table_->dir()) + "/" + std::string(table_->name()) + std::to_string(hashValue) + ".text";
+          std::string value_search_for_text =
+              std::string(table_->dir()) + "/" + std::string(table_->name()) +
+              std::to_string(hashValue) + ".text";
           std::string value_stored_in_file = value.get_string();
           std::ofstream outputFile(value_search_for_text);
           if (outputFile.is_open()) {
@@ -54,20 +56,28 @@ RC UpdatePhysicalOperator::open(Trx *trx)
           } else {
             LOG_ERROR(" failed to write text value to file!");
           }
-          value.set_text(value_search_for_text.c_str(), value_search_for_text.size());
+          value.set_text(value_search_for_text.c_str(),
+                         value_search_for_text.size());
           check = true;
           break;
         }
         if (AttrType::NULLS == value_type) {
-          if ( !field_meta->nullable()) {
-            LOG_WARN("field type mismatch. table=%s, field=%s, field type=%d, value_type=%d",
-            table_->name(), field_meta->name(), field_type, value_type);
+          if (!field_meta->nullable()) {
+            LOG_WARN(
+                "field type mismatch. table=%s, field=%s, field type=%d, "
+                "value_type=%d",
+                table_->name(), field_meta->name(), field_type, value_type);
             return RC::SCHEMA_FIELD_TYPE_MISMATCH;
           }
         } else {
-          if (field_type != value_type && type_cast_not_support(value_type, field_type)) {  // TODO try to convert the value type to field type
-            LOG_WARN("field type mismatch. table=%s, field=%s, field type=%d, value_type=%d",
-            table_->name(), field_meta->name(), field_type, value_type);
+          if (field_type != value_type &&
+              type_cast_not_support(value_type,
+                                    field_type)) {  // TODO try to convert the
+                                                    // value type to field type
+            LOG_WARN(
+                "field type mismatch. table=%s, field=%s, field type=%d, "
+                "value_type=%d",
+                table_->name(), field_meta->name(), field_type, value_type);
             return RC::SCHEMA_FIELD_TYPE_MISMATCH;
           }
         }
@@ -76,7 +86,8 @@ RC UpdatePhysicalOperator::open(Trx *trx)
       }
     }
     if (!check) {
-      LOG_WARN("schema mismatch. table name=%s, attribute name=%s", table_->name(), update_unit.attribute_name.c_str());
+      LOG_WARN("schema mismatch. table name=%s, attribute name=%s",
+               table_->name(), update_unit.attribute_name.c_str());
       return RC::SCHEMA_FIELD_MISSING;
     }
     UpdateUnit unit;
@@ -89,8 +100,7 @@ RC UpdatePhysicalOperator::open(Trx *trx)
   return RC::SUCCESS;
 }
 
-RC UpdatePhysicalOperator::next()
-{
+RC UpdatePhysicalOperator::next() {
   RC rc = RC::SUCCESS;
   if (children_.empty()) {
     return RC::RECORD_EOF;
@@ -106,11 +116,12 @@ RC UpdatePhysicalOperator::next()
     int sys_field_num = table_->table_meta().sys_field_num();
     int cell_num = tuple->cell_num() - table_->table_meta().null_filed_num();
     std::vector<Value> values;
-    for (int i = sys_field_num; i < cell_num; i ++) {
+    for (int i = sys_field_num; i < cell_num; i++) {
       Value value;
       bool check = false;
-      for (const auto& update_unit : update_units_) {
-        if (table_->table_meta().field(i)->name() == update_unit.attribute_name) {
+      for (const auto &update_unit : update_units_) {
+        if (table_->table_meta().field(i)->name() ==
+            update_unit.attribute_name) {
           update_unit.value->try_get_value(value);
           values.push_back(value);
           check = true;
@@ -119,7 +130,7 @@ RC UpdatePhysicalOperator::next()
       }
       if (!check) {
         rc = tuple->cell_at(i, value);
-        if(rc != RC::SUCCESS) {
+        if (rc != RC::SUCCESS) {
           break;
         }
         values.push_back(value);
@@ -131,7 +142,8 @@ RC UpdatePhysicalOperator::next()
     Record oldRecord;
     oldRecord.set_rid(row_tuple->record().rid());
     char *tmp = (char *)malloc(row_tuple->record().len());
-    ASSERT(nullptr != tmp, "failed to allocate memory. size=%d", row_tuple->record().len());
+    ASSERT(nullptr != tmp, "failed to allocate memory. size=%d",
+           row_tuple->record().len());
     memcpy(tmp, row_tuple->record().data(), row_tuple->record().len());
     oldRecord.set_data_owner(tmp, row_tuple->record().len());
     // Record oldRecord = row_tuple->record();
@@ -142,7 +154,8 @@ RC UpdatePhysicalOperator::next()
     }
 
     Record updateRecord;
-    RC rc = table_->make_record(static_cast<int>(values.size()), values.data(), updateRecord);
+    RC rc = table_->make_record(static_cast<int>(values.size()), values.data(),
+                                updateRecord);
     if (rc != RC::SUCCESS) {
       LOG_WARN("failed to make record. rc=%s", strrc(rc));
       return rc;
@@ -158,8 +171,7 @@ RC UpdatePhysicalOperator::next()
   return RC::RECORD_EOF;
 }
 
-RC UpdatePhysicalOperator::close()
-{
+RC UpdatePhysicalOperator::close() {
   if (!children_.empty()) {
     children_[0]->close();
   }
