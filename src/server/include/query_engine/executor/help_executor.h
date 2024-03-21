@@ -23,7 +23,7 @@ public:
         "insert into `table` values(`value1`,`value2`);",
         "update `table` set column=value [where `column`=`value`];",
         "delete from `table` [where `column`=`value`];",
-        "select [ * | `columns` ] from `table`;"
+        "select [ * | `columns` | aggregation function ] from `table` where `condition` order by `column name`;"
       };
 
     auto oper = new StringListPhysicalOperator();
