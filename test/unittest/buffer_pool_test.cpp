@@ -6,7 +6,7 @@
 #include "include/storage_engine/recorder/record.h"
 #include "include/storage_engine/recorder/record_manager.h"
 
-TEST(test_buffer, test_buffer_pool)
+void test1()
 {
   const char *data_file = "test_buffer_pool.data";
   ::remove(data_file);
@@ -30,7 +30,7 @@ TEST(test_buffer, test_buffer_pool)
   RID rid;
   Record record;
   for (int i = 0; i < 10; i++) {
-    rid.page_num = i;
+    rid.page_num = 1;
     rid.slot_num = i;
     rc = record_page_handle.insert_record(data_buf, &rid);
     ASSERT_EQ(rc, RC::SUCCESS);
@@ -48,6 +48,40 @@ TEST(test_buffer, test_buffer_pool)
 
   bp->close_file();
   delete bpm;
+}
+
+void test2()
+{
+  const char *data_file = "test_buffer_pool.data";
+  BufferPoolManager *bpm = new BufferPoolManager();
+  FileBufferPool *bp = nullptr;
+  RC rc = bpm->open_file(data_file, bp);
+  ASSERT_EQ(rc, RC::SUCCESS);
+
+  RecordPageHandler record_page_handle;
+  rc = record_page_handle.init(*bp, 1, true);
+  ASSERT_EQ(rc, RC::SUCCESS);
+
+  RecordPageIterator iterator;
+  iterator.init(record_page_handle);
+  int count = 0;
+  Record record;
+  while (iterator.has_next()) {
+    count++;
+    rc = iterator.next(record);
+    ASSERT_EQ(rc, RC::SUCCESS);
+    printf("%s\n",record.data());
+  }
+  ASSERT_EQ(count, 10);
+
+  bp->close_file();
+  delete bpm;
+}
+
+TEST(test_buffer, test_buffer_pool)
+{
+  test1();  // 创建新文件并写入数据
+  test2();  // 读取该文件，检验是否持久化成功
 }
 
 int main(int argc, char **argv)
