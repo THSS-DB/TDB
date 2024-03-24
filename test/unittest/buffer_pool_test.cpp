@@ -24,6 +24,8 @@ void test1()
   const int record_size = 8;
   RecordPageHandler record_page_handle;
   rc = record_page_handle.init_empty_page(*bp, frame->page_num(), record_size);
+  // frame 在allocate_page的时候，是有一个pin的，在init_empty_page时又会增加一个，所以这里手动释放一个
+  frame->unpin();
   ASSERT_EQ(rc, RC::SUCCESS);
 
   char data_buf[record_size] = "1234567";
