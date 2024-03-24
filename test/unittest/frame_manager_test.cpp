@@ -34,6 +34,7 @@ TEST(test_buffer, test_frame_manager)
    */
   Frame *frame_get = frame_manager.get(file_desc, size - 1);
   ASSERT_EQ(frame_get, used_list.back());
+  frame_get->unpin();
 
   /**
    * 测试3：FrameManager的purge_frames方法
@@ -41,12 +42,28 @@ TEST(test_buffer, test_frame_manager)
   Frame *frame_fail = frame_manager.alloc(file_desc, ++size);  // 分配失败
   ASSERT_EQ(frame_fail, nullptr);
 
+  // 先 unpin 一些 Frame 便于后续驱逐
+  for (int i = 0; i < 3; i++) {
+    used_list.front()->unpin();
+    used_list.pop_front();
+  }
+
   auto evict_action = [&](Frame *frame) { return RC::SUCCESS; };
   frame_manager.evict_frames(3, evict_action);  // 驱逐3个Frame
-  ASSERT_EQ(used_list.size() - 3, frame_manager.frame_num());
+  ASSERT_EQ(used_list.size(), frame_manager.frame_num());
+
+  frame_manager.evict_frames(1, evict_action);  // 驱逐失败，没有 pin_count=0 的 Frame
+  ASSERT_EQ(used_list.size(), frame_manager.frame_num());
 
   Frame *item2 = frame_manager.alloc(file_desc, size);  // 分配成功
   ASSERT_NE(item2, nullptr);
+  item2->unpin();
+
+  // 清理所有的 Frame
+  while (!used_list.empty()) {
+    used_list.front()->unpin();
+    used_list.pop_front();
+  }
 
   frame_manager.cleanup();
 }

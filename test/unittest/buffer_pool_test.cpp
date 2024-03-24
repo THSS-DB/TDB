@@ -46,6 +46,10 @@ void test1()
   }
   ASSERT_EQ(count, 10);
 
+  // 先释放 record_page_handle 对 bp 的引用，避免析构顺序错误
+  rc = record_page_handle.cleanup();
+  ASSERT_EQ(rc, RC::SUCCESS);
+
   bp->close_file();
   delete bpm;
 }
@@ -73,6 +77,9 @@ void test2()
     printf("%s\n",record.data());
   }
   ASSERT_EQ(count, 10);
+
+  rc = record_page_handle.cleanup();
+  ASSERT_EQ(rc, RC::SUCCESS);
 
   bp->close_file();
   delete bpm;
