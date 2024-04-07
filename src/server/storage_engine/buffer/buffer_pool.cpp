@@ -303,6 +303,25 @@ RC FileBufferPool::recover_page(PageNum page_num)
   return RC::SUCCESS;
 }
 
+RC FileBufferPool::dispose_page(PageNum page_num)
+{
+  std::scoped_lock lock_guard(lock_);
+  Frame *used_frame = frame_manager_.get(file_desc_, page_num);
+  if (used_frame != nullptr) {
+    ASSERT("the page try to dispose is in use. frame:%s", to_string(*used_frame).c_str());
+    frame_manager_.free(file_desc_, page_num, used_frame);
+  } else {
+    LOG_WARN("failed to fetch the page while disposing it. pageNum=%d", page_num);
+    return RC::NOTFOUND;
+  }
+
+  hdr_frame_->mark_dirty();
+  file_header_->allocated_pages--;
+  char tmp = 1 << (page_num % 8);
+  file_header_->bitmap[page_num / 8] &= ~tmp;
+  return RC::SUCCESS;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 
 BufferPoolIterator::BufferPoolIterator()
