@@ -80,7 +80,6 @@ public:
    * @param record[in/out] 传入的数据包含具体的数据，插入成功会通过此字段返回RID
    */
   RC insert_record(Record &record);
-//  RC insert_record(Record &record, MvccTrx * trx);
   RC delete_record(const Record &record);
   RC visit_record(const RID &rid, bool readonly, std::function<void(Record &)> visitor);
   RC get_record(const RID &rid, Record &record);
@@ -111,7 +110,6 @@ public:
 
 private:
   RC insert_entry_of_indexes(const char *record, const RID &rid);
-//  RC insert_entry_of_indexes(const char *record, const RID &rid, MvccTrx *trx);
   RC delete_entry_of_indexes(const char *record, const RID &rid, bool error_on_not_exists);
 
 private:

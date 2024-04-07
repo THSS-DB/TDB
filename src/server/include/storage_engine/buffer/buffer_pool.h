@@ -60,6 +60,12 @@ public:
 
   RC recover_page(PageNum page_num);
 
+  /**
+   * @brief 释放某个页面，将此页面设置为未分配状态
+   * @param page_num 待释放的页面
+   */
+  RC dispose_page(PageNum page_num);
+
 protected:
   RC allocate_frame(PageNum page_num, Frame **buf);
   RC flush_page_internal(Frame &frame);

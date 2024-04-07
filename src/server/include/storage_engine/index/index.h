@@ -29,36 +29,33 @@ public:
   Index() = default;
   virtual ~Index() = default;
 
-  Index(Table *table) {}
+//  Index(Table *table) {}
 
   const IndexMeta &index_meta() const
   {
     return index_meta_;
   }
 
-  virtual RC create(const char *file_name, const IndexMeta &index_meta, const std::vector<FieldMeta> &multi_field_metas);
-  virtual RC open(const char *file_name, const IndexMeta &index_meta, const std::vector<FieldMeta> &multi_field_metas);
-  virtual RC close();
+//  virtual RC create(const char *file_name, const IndexMeta &index_meta, const std::vector<FieldMeta> &multi_field_metas);
+//  virtual RC open(const char *file_name, const IndexMeta &index_meta, const std::vector<FieldMeta> &multi_field_metas);
+//  virtual RC close();
 
   /**
    * @brief 插入一条数据
-   * 
    * @param record 插入的记录，当前假设记录是定长的
    * @param[out] rid    插入的记录的位置
    */
-  virtual RC insert_entry(const char *record, const RID *rid);
-  virtual RC insert_entry(const char *record, const RID *rid, int sys_field_num, MvccTrx *trx);
+  virtual RC insert_entry(const char *record, const RID *rid) = 0;
+  virtual RC insert_entry(const char *record, const RID *rid, int sys_field_num, MvccTrx *trx) = 0;
   /**
    * @brief 删除一条数据
-   * 
    * @param record 删除的记录，当前假设记录是定长的
    * @param[in] rid   删除的记录的位置
    */
-  virtual RC delete_entry(const char *record, const RID *rid);
+  virtual RC delete_entry(const char *record, const RID *rid) = 0;
 
   /**
    * @brief 创建一个索引数据的扫描器
-   * 
    * @param left_key 要扫描的左边界
    * @param left_len 左边界的长度
    * @param left_inclusive 是否包含左边界
@@ -67,12 +64,12 @@ public:
    * @param right_inclusive 是否包含右边界
    */
   virtual IndexScanner *create_scanner(const char *left_key, int left_len, bool left_inclusive, const char *right_key,
-      int right_len, bool right_inclusive);
+      int right_len, bool right_inclusive) = 0;
 
   /**
    * @brief 同步索引数据到磁盘
    */
-  virtual RC sync();
+  virtual RC sync() = 0;
 
 protected:
   RC init(const IndexMeta &index_meta, const std::vector<FieldMeta> &multi_field_metas);

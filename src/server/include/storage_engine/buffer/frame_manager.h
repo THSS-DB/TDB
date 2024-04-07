@@ -61,8 +61,11 @@ public:
 
  size_t frame_num() const { return frames_.count(); }
 
+ RC free(int file_desc, PageNum page_num, Frame *frame);
+
 private:
  Frame *get_internal(const FrameId &frame_id);
+ RC free_internal(const FrameId &frame_id, Frame *frame);
 
 private:
  class FrameIdHasher {

@@ -85,3 +85,25 @@ std::list<Frame *> FrameManager::find_list(int file_desc)
   frames_.foreach (fetcher);
   return frames;
 }
+
+RC FrameManager::free(int file_desc, PageNum page_num, Frame *frame)
+{
+  FrameId frame_id(file_desc, page_num);
+
+  std::lock_guard<std::mutex> lock_guard(lock_);
+  return free_internal(frame_id, frame);
+}
+
+RC FrameManager::free_internal(const FrameId &frame_id, Frame *frame)
+{
+  Frame *frame_source = nullptr;
+  [[maybe_unused]] bool found = frames_.get(frame_id, frame_source);
+  ASSERT(found && frame == frame_source && frame->pin_count() == 1,
+         "failed to free frame. found=%d, frameId=%s, frame_source=%p, frame=%p, pinCount=%d, lbt=%s",
+         found, to_string(frame_id).c_str(), frame_source, frame, frame->pin_count(), lbt());
+
+  frame->unpin();
+  frames_.remove(frame_id);
+  allocator_.free(frame);
+  return RC::SUCCESS;
+}
