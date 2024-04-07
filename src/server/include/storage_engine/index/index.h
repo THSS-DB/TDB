@@ -29,16 +29,10 @@ public:
   Index() = default;
   virtual ~Index() = default;
 
-//  Index(Table *table) {}
-
   const IndexMeta &index_meta() const
   {
     return index_meta_;
   }
-
-//  virtual RC create(const char *file_name, const IndexMeta &index_meta, const std::vector<FieldMeta> &multi_field_metas);
-//  virtual RC open(const char *file_name, const IndexMeta &index_meta, const std::vector<FieldMeta> &multi_field_metas);
-//  virtual RC close();
 
   /**
    * @brief 插入一条数据

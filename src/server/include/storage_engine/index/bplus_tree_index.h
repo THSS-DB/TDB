@@ -20,7 +20,7 @@ class BplusTreeIndex : public Index
   RC close();
 
   RC insert_entry(const char *record, const RID *rid) override;
-  RC insert_entry(const char *record, const RID *rid, int sys_field_num, MvccTrx *trx);
+  RC insert_entry(const char *record, const RID *rid, int sys_field_num, MvccTrx *trx) override;
   RC delete_entry(const char *record, const RID *rid) override;
 
   /**
