@@ -89,8 +89,7 @@ public:
      const FieldExpr *field_expr = species_[i];
      const Field &field = field_expr->field();
      if (0 == strcmp(table_name, field.table_name()) &&
-         0 == strcmp(field_name, field.field_name()) &&
-         0 == strcmp(spec.alias(), field.table_alias())) {
+         0 == strcmp(field_name, field.field_name())) {
        return cell_at(i, cell);
      }
    }

@@ -66,3 +66,24 @@ std::string IndexScanPhysicalOperator::param() const
 {
   return std::string(index_->index_meta().name()) + " ON " + table_->name();
 }
+
+RC IndexScanPhysicalOperator::filter(RowTuple &tuple, bool &result)
+{
+  RC rc = RC::SUCCESS;
+  Value value;
+  for (std::unique_ptr<Expression> &expr : predicates_) {
+    rc = expr->get_value(tuple, value);
+    if (rc != RC::SUCCESS) {
+      return rc;
+    }
+
+    bool tmp_result = value.get_boolean();
+    if (!tmp_result) {
+      result = false;
+      return rc;
+    }
+  }
+
+  result = true;
+  return rc;
+}

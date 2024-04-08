@@ -15,7 +15,6 @@ FOREACH (F ${ALL_SRC})
     get_filename_component(prjName ${F} NAME_WE)
     MESSAGE("Build ${prjName} according to ${F}")
     ADD_EXECUTABLE(${prjName} ${F})
-    # 不是所有的单测都需要链接server_static
     TARGET_LINK_LIBRARIES(${prjName} common pthread dl gtest gtest_main server_static)
     gtest_discover_tests(${prjName})
 ENDFOREACH (F)

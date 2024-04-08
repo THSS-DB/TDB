@@ -2,6 +2,11 @@
 
 RC Optimizer::rewrite(std::unique_ptr<LogicalNode> &logical_operator)
 {
-    //Currently we don't support optimization.
-    return RC::SUCCESS;
+    RC rc;
+    bool change = false;
+    rc = rewriter_.rewrite(logical_operator, change);
+    if(rc != RC::SUCCESS){
+      return rc;
+    }
+    return rc;
 }
