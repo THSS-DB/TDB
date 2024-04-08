@@ -40,7 +40,6 @@ public:
    * @param[out] rid    插入的记录的位置
    */
   virtual RC insert_entry(const char *record, const RID *rid) = 0;
-  virtual RC insert_entry(const char *record, const RID *rid, int sys_field_num, MvccTrx *trx) = 0;
   /**
    * @brief 删除一条数据
    * @param record 删除的记录，当前假设记录是定长的

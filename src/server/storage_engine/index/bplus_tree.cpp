@@ -887,6 +887,7 @@ RC BplusTreeHandler::print_leaf(Frame *frame)
 {
   LeafIndexNodeHandler leaf_node(file_header_, frame);
   LOG_INFO("leaf node: %s", to_string(leaf_node, key_printer_).c_str());
+  printf("leaf node: %s", to_string(leaf_node, key_printer_).c_str());
   file_buffer_pool_->unpin_page(frame);
   return RC::SUCCESS;
 }
@@ -895,8 +896,10 @@ RC BplusTreeHandler::print_internal_node_recursive(Frame *frame)
 {
   RC rc = RC::SUCCESS;
   LOG_INFO("bplus tree. file header: %s", file_header_.to_string().c_str());
+  printf("bplus tree. file header: %s", file_header_.to_string().c_str());
   InternalIndexNodeHandler internal_node(file_header_, frame);
   LOG_INFO("internal node: %s", to_string(internal_node, key_printer_).c_str());
+  printf("internal node: %s", to_string(internal_node, key_printer_).c_str());
 
   int node_size = internal_node.size();
   for (int i = 0; i < node_size; i++) {
@@ -934,6 +937,7 @@ RC BplusTreeHandler::print_tree()
   }
   if (is_empty()) {
     LOG_INFO("tree is empty");
+    printf("tree is empty");
     return RC::SUCCESS;
   }
 
@@ -958,6 +962,7 @@ RC BplusTreeHandler::print_leafs()
 {
   if (is_empty()) {
     LOG_INFO("empty tree");
+    printf("empty tree");
     return RC::SUCCESS;
   }
 
@@ -972,13 +977,11 @@ RC BplusTreeHandler::print_leafs()
   while (frame->page_num() != BP_INVALID_PAGE_NUM) {
     LeafIndexNodeHandler leaf_node(file_header_, frame);
     LOG_INFO("leaf info: %s", to_string(leaf_node, key_printer_).c_str());
-
+    printf("leaf info: %s", to_string(leaf_node, key_printer_).c_str());
     PageNum next_page_num = leaf_node.next_page();
-
     if (next_page_num == BP_INVALID_PAGE_NUM) {
       break;
     }
-
     rc = file_buffer_pool_->get_this_page(next_page_num, &frame);
     if (rc != RC::SUCCESS) {
       LOG_WARN("failed to get next page. page id=%d, rc=%d:%s", next_page_num, rc, strrc(rc));
@@ -1007,7 +1010,6 @@ bool BplusTreeHandler::validate_node_recursive(Frame *frame)
         result = false;
         break;
       }
-
       result = validate_node_recursive(child_frame);
     }
   }

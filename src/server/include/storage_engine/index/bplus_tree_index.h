@@ -30,6 +30,11 @@ class BplusTreeIndex : public Index
 
   RC sync() override;
 
+  BplusTreeHandler &get_index_handler()
+  {
+    return index_handler_;
+  }
+
  private:
   bool inited_ = false;
   BplusTreeHandler index_handler_;

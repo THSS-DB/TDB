@@ -83,13 +83,24 @@ RC BplusTreeIndex::close()
   return RC::SUCCESS;
 }
 
+/**
+ * 由于支持多字段索引，需要从record中取出multi_field_metas_中的字段值，作为key。
+ * 需要调用BplusTreeHandler的insert_entry完成插入操作。
+ * 注意如果是唯一索引（unique），需要判断是否存在重复的字段值，如果有，返回RECORD_DUPLICATE_KEY，插入失败。
+ */
 RC BplusTreeIndex::insert_entry(const char *record, const RID *rid)
 {
+  // TODO [Lab2] 增加索引项的处理逻辑
   return RC::SUCCESS;
 }
 
+/**
+ * 由于支持多字段索引，需要从record中取出multi_field_metas_中的字段值，作为key。
+ * 需要调用BplusTreeHandler的delete_entry完成插入操作。
+ */
 RC BplusTreeIndex::delete_entry(const char *record, const RID *rid)
 {
+  // TODO [Lab2] 增加索引项的处理逻辑
   return RC::SUCCESS;
 }
 
