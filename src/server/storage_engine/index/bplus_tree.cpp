@@ -1837,12 +1837,12 @@ RC BplusTreeScanner::next_entry(RID &rid, bool isdelete)
   if (!first_emitted_) {
     fetch_item(rid);
     first_emitted_ = true;
+
+    if (!isdelete) {
+      iter_index_++;
+    }
     return RC::SUCCESS;
   }
-
-  //  if (!isdelete) {
-  //    iter_index_++;
-  //  }
 
   LeafIndexNodeHandler node(tree_handler_.file_header_, current_frame_);
   if (iter_index_ < node.size()) {

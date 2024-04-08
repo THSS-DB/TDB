@@ -45,14 +45,19 @@ public:
 
   std::string param() const override;
 
+  void set_predicates(std::vector<std::unique_ptr<Expression>> &predicates) {
+    predicates_ = std::move(predicates);
+  }
+
  private:
+  RC filter(RowTuple &tuple, bool &result);
   Table *table_ = nullptr;
   Index *index_ = nullptr;
   IndexScanner *index_scanner_ = nullptr;
   RecordFileHandler *record_handler_ = nullptr;
   bool  readonly_ = false;
 
-  RecordPageHandler record_page_handler_ =;
+  RecordPageHandler record_page_handler_;
   Record current_record_;
   RowTuple tuple_;
 
@@ -60,4 +65,5 @@ public:
   Value right_value_;
   bool left_inclusive_ = false;
   bool right_inclusive_ = false;
+  std::vector<std::unique_ptr<Expression>> predicates_;
 };

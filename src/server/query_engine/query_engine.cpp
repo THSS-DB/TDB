@@ -6,11 +6,13 @@
 #include "include/query_engine/analyzer/analyzer.h"
 #include "include/session/communicator.h"
 
+#include <chrono>
 #include <memory>
 
 // 处理从session传来的请求, 包含sql执行与结果写回
 bool QueryEngine::process_session_request(SessionRequest *request) {
   RC rc;
+  char *time_str = new char[64];
   bool need_disconnect = true;
 
   std::string sql = request->query();
@@ -22,6 +24,8 @@ bool QueryEngine::process_session_request(SessionRequest *request) {
   request->session()->set_current_request(request);
 
   QueryInfo query_info(request, sql);
+
+  auto start_time = std::chrono::high_resolution_clock::now();
   rc = executeQuery(&query_info);
   if(RC_FAIL(rc) && rc != RC::UNIMPLENMENT){
     request->get_communicator()->write_state(request->sql_result(), need_disconnect);
@@ -30,10 +34,15 @@ bool QueryEngine::process_session_request(SessionRequest *request) {
   }else{
     executor_.execute(request, &query_info, need_disconnect);
   }
-
+  auto end_time = std::chrono::high_resolution_clock::now();
+  auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time);
+  snprintf(time_str, 64, "Cost time: %ld ns\n", duration.count());
+  
+  request->get_communicator()->write_result(time_str, strlen(time_str));
+  request->get_communicator()->flush();
   request->session()->set_current_request(nullptr);
   Session::set_current_session(nullptr);
-
+  delete[] time_str;
   return need_disconnect;
 }
 
