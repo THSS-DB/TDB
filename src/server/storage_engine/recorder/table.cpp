@@ -347,7 +347,7 @@ RC Table::insert_record(Record &record)
     return rc;
   }
 
-  // TODO [Lab2] 增加在全部索引文件中插入相关item的处理逻辑
+  // TODO [Lab2] 增加索引的处理逻辑
 
   return rc;
 }
@@ -356,7 +356,7 @@ RC Table::delete_record(const Record &record)
 {
   RC rc = RC::SUCCESS;
 
-  // TODO [Lab2] 增加在全部索引文件中删除相关item的处理逻辑
+  // TODO [Lab2] 增加索引的处理逻辑
 
   rc = record_handler_->delete_record(&record.rid());
   return rc;
