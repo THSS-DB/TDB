@@ -722,7 +722,6 @@ RC BplusTreeHandler::sync()
       header_dirty_ = false;
     } else {
       LOG_WARN("failed to sync index header file. file_desc=%d, rc=%s", file_buffer_pool_->file_desc(), strrc(rc));
-      // TODO: ingore?
     }
   }
   return file_buffer_pool_->evict_all_pages();
@@ -1290,7 +1289,7 @@ RC BplusTreeHandler::split(Frame *frame, Frame *&new_frame)
   new_node.init_empty();
   new_node.set_parent_page_num(old_node.parent_page_num());
 
-  old_node.move_half_to(new_node, file_buffer_pool_); // TODO remove disk buffer pool
+  old_node.move_half_to(new_node, file_buffer_pool_);
 
   frame->mark_dirty();
   new_frame->mark_dirty();
@@ -1700,13 +1699,13 @@ RC BplusTreeScanner::open(const char *left_user_key, int left_len, bool left_inc
     const int result = attr_comparator(left_user_key, right_user_key);
     if (result > 0 ||  // left > right
                        // left == right but is (left,right)/[left,right) or (left,right]
-        (result == 0 && (left_inclusive == false || right_inclusive == false))) {
+        (result == 0 && (!left_inclusive|| !right_inclusive))) {
       return RC::INVALID_ARGUMENT;
     }
   }
 
-  bool all_in_one_key_left = left_len == tree_handler_.file_header_.attrs_length ? true: false;
-  bool all_in_one_key_right = right_len == tree_handler_.file_header_.attrs_length ? true: false;
+  bool all_in_one_key_left = left_len == tree_handler_.file_header_.attrs_length;
+  bool all_in_one_key_right = right_len == tree_handler_.file_header_.attrs_length;
 
   if (nullptr == left_user_key) {
     rc = tree_handler_.left_most_page(current_frame_);
