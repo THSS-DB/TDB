@@ -26,7 +26,7 @@ public:
  VacuousTrx() = default;
  virtual ~VacuousTrx() = default;
 
- TrxType type() { return VACUOUS; }
+ TrxType type() override { return VACUOUS; }
 
  RC insert_record(Table *table, Record &record) override;
  RC delete_record(Table *table, Record &record) override;

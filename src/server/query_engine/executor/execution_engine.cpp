@@ -49,7 +49,8 @@ void set_operator_schema(QueryInfo *query_info, size_t& min_width)
         break;
       }
       for (const auto *expr : select_stmt->projects()) {
-        const char* alias = expr->alias().empty() ? expr->name().c_str() : expr->alias().c_str();
+        std::string alias_str = expr->alias().empty() ? expr->name() : expr->alias();
+        const char* alias = alias_str.c_str();
         schema.append_cell(alias);
         min_width = min_width < strlen(alias) ? strlen(alias) : min_width;
       }

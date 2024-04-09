@@ -496,7 +496,6 @@ class BplusTreeHandler
    * @param key_len user_key的长度
    * @param rid  返回值，记录记录所在的页面号和slot
    */
-  //  RC get_entry(const char *user_key, int key_len, std::list<RID> &rids);
   RC get_entry(const char *multi_keys[], std::list<RID> &rids, int multi_keys_amount = 1);
 
   RC sync();

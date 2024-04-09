@@ -84,7 +84,8 @@ const char *IndexMeta::field(int i) const
 }
 const char *IndexMeta::multi_fields() const
 {
-  std::string multi_field_str = "";
+  static std::string multi_field_str;
+  multi_field_str.clear();
   for (auto str: multi_fields_) {
     multi_field_str += str;
   }
