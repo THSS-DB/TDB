@@ -125,6 +125,7 @@ function do_build
   prepare_build_dir || return
   echo "${CMAKE_COMMAND} ${TOPDIR} $@"
   ${CMAKE_COMMAND} -S ${TOPDIR} $@
+  cp ${TOPDIR}/test/data.txt ${TOPDIR}/build/bin/
 }
 
 function do_clean
