@@ -8,6 +8,7 @@
 #include "include/query_engine/executor/drop_table_executor.h"
 #include "include/query_engine/executor/help_executor.h"
 #include "include/query_engine/executor/show_tables_executor.h"
+#include "include/query_engine/executor/load_data_executor.h"
 
 RC CommandExecutor::execute(QueryInfo *query_info)
 {
@@ -41,6 +42,11 @@ RC CommandExecutor::execute(QueryInfo *query_info)
 
     case StmtType::SHOW_TABLES: {
       ShowTablesExecutor executor;
+      return executor.execute(query_info);
+    }
+
+    case StmtType::LOAD_DATA: {
+      LoadDataExecutor executor;
       return executor.execute(query_info);
     }
 
