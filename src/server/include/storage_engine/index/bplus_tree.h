@@ -476,25 +476,23 @@ class BplusTreeHandler
 
   /**
    * 此函数向IndexHandle对应的索引中插入一个索引项。
-   * 参数user_key指向要插入的属性值，参数rid标识该索引项对应的元组，
-   * 即向索引中插入一个值为（user_key，rid）的键值对
-   * @note 这里假设user_key的内存大小与attr_length 一致
+   * 参数multi_keys指向要插入的属性值（之所以是数组，因为可能是多字段索引），参数rid标识该索引项对应的元组位置，
+   * 即向索引中插入一个值为（multi_keys，rid）的键值对
    */
   RC insert_entry(const char *multi_keys[], const RID *rid, int multi_keys_amount = 1);
 
   /**
-   * 从IndexHandle句柄对应的索引中删除一个值为（*pData，rid）的索引项
+   * 从IndexHandle句柄对应的索引中删除一个值为（multi_keys，rid）的索引项
    * @return RECORD_INVALID_KEY 指定值不存在
-   * @note 这里假设user_key的内存大小与attr_length 一致
    */
   RC delete_entry(const char *multi_keys[], const RID *rid, int multi_keys_amount = 1);
 
   bool is_empty() const;
 
   /**
-   * 获取指定值的record
-   * @param key_len user_key的长度
-   * @param rid  返回值，记录记录所在的页面号和slot
+   * 获取指定值的record对应的RID
+   * @param multi_keys 索引字段的属性值数组（之所以是数组，因为可能是多字段索引）
+   * @param rids  返回值，存储记录所在的位置（之所以是列表，因为可能该字段上有重复值）
    */
   RC get_entry(const char *multi_keys[], std::list<RID> &rids, int multi_keys_amount = 1);
 
