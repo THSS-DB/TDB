@@ -216,13 +216,6 @@ RC send_result(SessionRequest *request, bool &need_disconnect, const size_t &min
     sql_result->set_return_code(rc);
     return communicator->write_state(sql_result, need_disconnect);
   } else {
-    rc = communicator->send_message_delimiter();
-    if (RC_FAIL(rc)) {
-        LOG_ERROR("Failed to send data back to client. ret=%s, error=%s", strrc(rc), strerror(errno));
-        sql_result->close();
-        return rc;
-    }
-
     need_disconnect = false;
   }
 
