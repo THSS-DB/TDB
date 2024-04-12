@@ -12,11 +12,13 @@ RC IndexScanPhysicalOperator::open(Trx *trx)
     return RC::INTERNAL;
   }
 
-  IndexScanner *index_scanner = index_->create_scanner(left_value_.data(),
-                                                       left_value_.length(),
+  const char *left_key = left_null_ ? nullptr : left_value_.data();
+  const char *right_key = right_null_ ? nullptr : right_value_.data();
+  IndexScanner *index_scanner = index_->create_scanner(left_key, 
+                                                       left_value_.length(), 
                                                        left_inclusive_,
-                                                       right_value_.data(),
-                                                       right_value_.length(),
+                                                       right_key, 
+                                                       right_value_.length(), 
                                                        right_inclusive_);
   if(index_scanner == nullptr)
   {

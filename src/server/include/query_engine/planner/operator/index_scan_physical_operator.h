@@ -24,9 +24,11 @@ public:
  {
     if (left_value != nullptr) {
       left_value_ = *left_value;
+      left_null_ = false;
     }
     if (right_value != nullptr) {
       right_value_ = *right_value;
+      right_null_ = false;
     }
   }
 
@@ -65,5 +67,7 @@ public:
   Value right_value_;
   bool left_inclusive_ = false;
   bool right_inclusive_ = false;
+  bool left_null_ = true;
+  bool right_null_ = true;
   std::vector<std::unique_ptr<Expression>> predicates_;
 };
