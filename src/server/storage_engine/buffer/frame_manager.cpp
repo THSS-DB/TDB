@@ -1,5 +1,7 @@
 #include "include/storage_engine/buffer/frame_manager.h"
-
+#include "include/storage_engine/buffer/buffer_pool.h"
+using namespace common;
+using namespace std;
 FrameManager::FrameManager(const char *tag) : allocator_(tag)
 {}
 
@@ -33,7 +35,7 @@ Frame *FrameManager::alloc(int file_desc, PageNum page_num)
   frame = allocator_.alloc();
   if (frame != nullptr) {
     ASSERT(frame->pin_count() == 0, "got an invalid frame that pin count is not 0. frame=%s",
-        to_string(*frame).c_str());
+           to_string(*frame).c_str());
     frame->set_page_num(page_num);
     frame->pin();
     frames_.put(frame_id, frame);
@@ -47,13 +49,64 @@ Frame *FrameManager::get(int file_desc, PageNum page_num)
   std::lock_guard<std::mutex> lock_guard(lock_);
   return get_internal(frame_id);
 }
-
+RC FrameManager::free_frame(Frame *buf,FrameId frame_id)
+{
+  allocator_.free(buf);
+  frames_.remove(frame_id);
+  return RC::SUCCESS;
+}
 /**
  * TODO [Lab1] 需要同学们实现页帧驱逐
  */
 int FrameManager::evict_frames(int count, std::function<RC(Frame *frame)> evict_action)
 {
-  return 0;
+  evict_action = [this](Frame *frame) {
+    if (!frame->dirty()) {
+      return RC::SUCCESS;
+    }
+    RC rc = RC::SUCCESS;
+    Page &page=frame->page();
+    int64_t page_num=page.page_num;
+    //  2. 计算该Page在文件中的偏移量
+    int64_t offset = (page_num) * BP_PAGE_SIZE;
+    if (lseek(frame->file_desc(), offset, SEEK_SET) == -1) {
+      return RC::IOERR_SEEK;
+    }
+    //  3. 写入数据到文件的目标位置
+    int ret = writen(frame->file_desc(), &page, BP_PAGE_SIZE);
+    if (ret != 0) {
+      return RC::IOERR_WRITE;
+    }
+    //  4. 清除frame的脏标记
+    frame->clear_dirty();
+    return rc;
+  };
+  int evict_count=0;
+  std::lock_guard<std::mutex> lock_guard(lock_);
+
+  std::list<Frame *> frames;
+  auto fetcher = [this,count,&frames, &evict_count,evict_action](const FrameId &frame_id, Frame *const frame) -> bool {
+    if(frame->pin_count()==0)
+    {
+      evict_count++;
+      if(evict_count>count)
+      {
+        return true;
+      }
+      frames.push_back(frame);
+    }
+    return true;
+  };
+  frames_.foreach (fetcher);
+  for(auto it:frames)
+  {
+    if(evict_action(it)==RC::SUCCESS)
+    {
+      frames_.remove(FrameId(it->file_desc(),it->page_num())); // 从队列中移除该帧
+      allocator_.free(it);
+    }
+  }
+  return evict_count;
 }
 
 Frame *FrameManager::get_internal(const FrameId &frame_id)

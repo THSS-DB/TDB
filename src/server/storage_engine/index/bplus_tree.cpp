@@ -1101,8 +1101,8 @@ RC BplusTreeHandler::left_most_page( Frame *&frame)
 }
 
 RC BplusTreeHandler::find_leaf_internal(BplusTreeOperationType op,
-    const std::function<PageNum(InternalIndexNodeHandler &)> &child_page_getter,
-    Frame *&frame)
+                                        const std::function<PageNum(InternalIndexNodeHandler &)> &child_page_getter,
+                                        Frame *&frame)
 {
   if (is_empty()) {
     return RC::EMPTY;

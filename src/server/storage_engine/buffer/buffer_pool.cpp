@@ -159,7 +159,7 @@ RC FileBufferPool::allocate_page(Frame **frame)
 
   if (file_header_->page_count >= FileHeader::MAX_PAGE_NUM) {
     LOG_WARN("file buffer pool is full. page count %d, max page count %d",
-        file_header_->page_count, FileHeader::MAX_PAGE_NUM);
+             file_header_->page_count, FileHeader::MAX_PAGE_NUM);
     lock_.unlock();
     return RC::BUFFERPOOL_NOBUF;
   }
@@ -213,11 +213,26 @@ RC FileBufferPool::flush_page(Frame &frame)
  */
 RC FileBufferPool::flush_page_internal(Frame &frame)
 {
-//  1. 获取页面Page
-//  2. 计算该Page在文件中的偏移量
-//  3. 写入数据到文件的目标位置
-//  4. 清除frame的脏标记
-//  5. 记录和返回成功
+  //  1. 获取页面Page
+  Page &page=frame.page();
+  int64_t page_num=page.page_num;
+  //  2. 计算该Page在文件中的偏移量
+  int64_t offset = (page_num) * BP_PAGE_SIZE;
+  if (lseek(file_desc_, offset, SEEK_SET) == -1) {
+    LOG_ERROR("Failed to load page %s:%d, due to failed to lseek:%s.", file_name_.c_str(), page_num, strerror(errno));
+
+    return RC::IOERR_SEEK;
+  }
+  //  3. 写入数据到文件的目标位置
+  int ret = writen(file_desc_, &page, BP_PAGE_SIZE);
+  if (ret != 0) {
+    LOG_ERROR("Failed to write page %s, file_desc:%d, page num:%d, due to failed to write data:%s, ret=%d, page count=%d",
+              file_name_.c_str(), file_desc_, page_num, strerror(errno), ret, file_header_->allocated_pages);
+    return RC::IOERR_WRITE;
+  }
+  //  4. 清除frame的脏标记
+  frame.clear_dirty();
+  //  5. 记录和返回成功
   return RC::SUCCESS;
 }
 
@@ -226,6 +241,15 @@ RC FileBufferPool::flush_page_internal(Frame &frame)
  */
 RC FileBufferPool::evict_page(PageNum page_num, Frame *buf)
 {
+  lock_.lock();
+  buf=frame_manager_.get(file_desc_,page_num);
+  if(buf->dirty())//脏页需要刷盘
+  {
+    flush_page(*buf);
+  }
+  frame_manager_.free_frame(buf,FrameId(file_desc_,page_num));
+  disposed_pages_.insert(page_num);
+  lock_.unlock();
   return RC::SUCCESS;
 }
 /**
@@ -233,6 +257,20 @@ RC FileBufferPool::evict_page(PageNum page_num, Frame *buf)
  */
 RC FileBufferPool::evict_all_pages()
 {
+  lock_.lock();
+  for (PageNum page_num = 0; page_num < file_header_->page_count; ++page_num) {
+    Frame *frame = frame_manager_.get(file_desc_, page_num);
+    if (frame == nullptr) {
+      // 页面不存在，跳过该页面
+      continue;
+    }
+    else
+    {
+      evict_page(page_num,frame);
+    }
+  }
+
+  lock_.unlock();
   return RC::SUCCESS;
 }
 
@@ -486,6 +524,10 @@ RC BufferPoolManager::close_file(const char *_file_name)
  */
 RC BufferPoolManager::flush_page(Frame &frame)
 {
+  lock_.lock();
+  FileBufferPool * bufferPool=fd_buffer_pools_[frame.file_desc()];
+  bufferPool->flush_page(frame);
+  lock_.unlock();
   return RC::SUCCESS;
 }
 
