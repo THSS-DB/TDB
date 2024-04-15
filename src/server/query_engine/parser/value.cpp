@@ -43,6 +43,33 @@ Value::Value(const char *s, int len /*= 0*/)
 {
   set_string(s, len);
 }
+
+/**
+ * force mean Force Copy from s
+*/
+Value::Value(const char *s, int len, bool force)
+{
+  if(!force) {
+    set_string(s, len);
+  } else {
+    //为规避0带来的截断问题，我们先将其均置为1，并记录其位置以将其复原
+    char *data_tmp = new char[len];
+    std::vector<int> places_of_zeros;
+    for(int i = 0; i < len; i++) {
+      data_tmp[i] = s[i];
+      if(s[i] == 0) {
+        places_of_zeros.push_back(i);
+        data_tmp[i] = 1;
+      }
+    }
+    set_string(data_tmp, len);
+    //复原
+    for(int i = 0; i < places_of_zeros.size(); i++) {
+      str_value_[places_of_zeros[i]] = 0;
+    }
+    delete[] data_tmp;
+  }
+}
 Value::Value(AttrType attrType)
 {
   switch (attrType) {
