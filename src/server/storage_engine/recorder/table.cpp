@@ -27,11 +27,11 @@ Table::~Table()
 }
 
 RC Table::create(int32_t table_id, 
-    const char *path,
-    const char *name,
-    const char *base_dir,
-    int attribute_count,
-    const AttrInfoSqlNode attributes[])
+                 const char *path,
+                 const char *name,
+                 const char *base_dir,
+                 int attribute_count,
+                 const AttrInfoSqlNode attributes[])
 {
   if (table_id < 0) {
     LOG_WARN("invalid table id. table_id=%d, table_name=%s", table_id, name);
@@ -102,11 +102,11 @@ RC Table::create(int32_t table_id,
 }
 
 RC Table::create(int32_t table_id,
-    const char *name,
-    const char *origin_table_name,
-    SelectStmt *select_stmt,
-    int attribute_count,
-    const AttrInfoSqlNode attributes[]) {
+                 const char *name,
+                 const char *origin_table_name,
+                 SelectStmt *select_stmt,
+                 int attribute_count,
+                 const AttrInfoSqlNode attributes[]) {
 
   if (table_id < 0) {
     LOG_WARN("invalid table id. table_id=%d, view_name=%s", table_id, name);
@@ -131,8 +131,8 @@ RC Table::create(int32_t table_id,
 }
 
 RC Table::drop(int32_t table_id,
-    const char *name,
-    const char *base_dir) {
+               const char *name,
+               const char *base_dir) {
   if (common::is_blank(name)) {
     LOG_WARN("Name cannot be empty");
     return RC::INVALID_ARGUMENT;
@@ -210,7 +210,7 @@ RC Table::open(const char *meta_file, const char *base_dir)
       const FieldMeta *field_meta = table_meta_.field(index_meta->field(j));
       if (field_meta == nullptr) {
         LOG_ERROR("Found invalid index meta info which has a non-exists field. table=%s, index=%s, field=%s",
-              name(), index_meta->name(), index_meta->field(j));
+                  name(), index_meta->name(), index_meta->field(j));
         // skip cleanup here, do all cleanup action in destructive Table function
         return RC::INTERNAL;
       }
@@ -223,7 +223,7 @@ RC Table::open(const char *meta_file, const char *base_dir)
     if (rc != RC::SUCCESS) {
       delete index;
       LOG_ERROR("Failed to open index. table=%s, index=%s, file=%s, rc=%s",
-              name(), index_meta->name(), index_file.c_str(), strrc(rc));
+                name(), index_meta->name(), index_file.c_str(), strrc(rc));
       // skip cleanup here, do all cleanup action in destructive Table function
       return rc;
     }
@@ -348,16 +348,55 @@ RC Table::insert_record(Record &record)
   }
 
   // TODO [Lab2] 增加索引的处理逻辑
-
+  //在插入新记录时，也需要在索引结构中插入一个新的索引项
+  for (Index *index : indexes_) {
+    rc = index->insert_entry(record.data(), &record.rid());
+    if (rc != RC::SUCCESS) {
+      LOG_ERROR("Failed to insert record into index. table=%s, index=%s, rc=%s",
+                name(), index->index_meta().name(), strrc(rc));
+      break;
+    }
+  }
+  if(rc==RC::RECORD_DUPLICATE_KEY)
+  {
+    RC rc1;
+    for (Index *index : indexes_) {
+      rc1 = index->delete_entry(record.data(), &record.rid());
+      if (rc1 != RC::SUCCESS) {
+        if (rc1 != RC::RECORD_INVALID_KEY) {
+          break;
+        }
+      }
+    }
+      if (rc1 != RC::SUCCESS) {
+        LOG_ERROR("Failed to rollback index data when insert index entries failed. table name=%s, rc=%d:%s",
+                  name(), rc1, strrc(rc1));
+      }
+      RC rc2 = record_handler_->delete_record(&record.rid());
+      if(rc2 != RC::SUCCESS)
+      {
+        LOG_ERROR("Failed to rollback index data when insert index entries failed. table name=%s, rc=%d:%s",
+                  name(), rc2, strrc(rc2));
+      }
+  }
   return rc;
 }
+
 
 RC Table::delete_record(const Record &record)
 {
   RC rc = RC::SUCCESS;
 
   // TODO [Lab2] 增加索引的处理逻辑
-
+  //在删除一条记录时，也需要在索引结构中删除对应的索引项
+  for (Index *index : indexes_) {
+    rc = index->delete_entry(record.data(), &record.rid());
+    if (rc != RC::SUCCESS) {
+      LOG_ERROR("Failed to delete record from index. table=%s, index=%s, rc=%s",
+                name(), index->index_meta().name(), strrc(rc));
+      return rc;
+    }
+  }
   rc = record_handler_->delete_record(&record.rid());
   return rc;
 }
@@ -515,10 +554,10 @@ RC Table::change_record_value(char *&record, int idx, const Value &value) const
   if (AttrType::NULLS == value.attr_type()) {
     if (!field->nullable()) {
       LOG_ERROR("Invalid value type. Cannot be null. table name =%s, field name=%s, type=%d, but given=%d",
-          table_meta_.name(),
-          field->name(),
-          field->type(),
-          value.attr_type());
+                table_meta_.name(),
+                field->name(),
+                field->type(),
+                value.attr_type());
       return RC::SCHEMA_FIELD_TYPE_MISMATCH;
     }
     bitmap.set_bit(idx);

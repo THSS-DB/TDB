@@ -60,27 +60,6 @@ RC FrameManager::free_frame(Frame *buf,FrameId frame_id)
  */
 int FrameManager::evict_frames(int count, std::function<RC(Frame *frame)> evict_action)
 {
-  evict_action = [this](Frame *frame) {
-    if (!frame->dirty()) {
-      return RC::SUCCESS;
-    }
-    RC rc = RC::SUCCESS;
-    Page &page=frame->page();
-    int64_t page_num=page.page_num;
-    //  2. 计算该Page在文件中的偏移量
-    int64_t offset = (page_num) * BP_PAGE_SIZE;
-    if (lseek(frame->file_desc(), offset, SEEK_SET) == -1) {
-      return RC::IOERR_SEEK;
-    }
-    //  3. 写入数据到文件的目标位置
-    int ret = writen(frame->file_desc(), &page, BP_PAGE_SIZE);
-    if (ret != 0) {
-      return RC::IOERR_WRITE;
-    }
-    //  4. 清除frame的脏标记
-    frame->clear_dirty();
-    return rc;
-  };
   int evict_count=0;
   std::lock_guard<std::mutex> lock_guard(lock_);
 
