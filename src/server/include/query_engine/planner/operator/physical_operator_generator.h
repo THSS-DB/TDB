@@ -41,6 +41,5 @@ private:
   RC create_plan(DeleteLogicalNode &logical_oper, std::unique_ptr<PhysicalOperator> &oper);
   RC create_plan(UpdateLogicalNode &logical_oper, std::unique_ptr<PhysicalOperator> &oper);
   RC create_plan(ExplainLogicalNode &logical_oper, std::unique_ptr<PhysicalOperator> &oper, bool is_delete = false);
-  RC create_plan(JoinLogicalNode &logical_oper, std::unique_ptr<PhysicalOperator> &oper, bool is_delete = false);
-  RC create_plan(GroupByLogicalNode &logical_oper, std::unique_ptr<PhysicalOperator> &oper, bool is_delete = false);
+  RC create_plan(JoinLogicalNode &logical_oper, std::unique_ptr<PhysicalOperator> &oper);
 };

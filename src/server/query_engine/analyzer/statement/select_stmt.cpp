@@ -288,7 +288,6 @@ RC SelectStmt::create(Db *db, const SelectSqlNode &select_sql, Stmt *&stmt)
   }
   filter_stmt->set_conjunction_type(select_sql.where_conditions.type);
 
-  // TODO [Lab3] Create Group By statement in `group by` statement
   GroupByStmt *group_by_stmt = nullptr;
   if (select_sql.group_by_attributes.size() > 0) {
     rc = GroupByStmt::create(db, default_table, &table_map, select_sql.group_by_attributes, group_by_stmt);

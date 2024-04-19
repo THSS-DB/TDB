@@ -1,6 +1,8 @@
 #include "include/query_engine/planner/operator/physical_operator_generator.h"
 
+#include <cmath>
 #include <utility>
+#include "include/query_engine/planner/node/logical_node.h"
 #include "include/query_engine/planner/operator/physical_operator.h"
 #include "include/query_engine/planner/node/table_get_logical_node.h"
 #include "include/query_engine/planner/operator/table_scan_physical_operator.h"
@@ -21,7 +23,6 @@
 #include "include/query_engine/planner/node/explain_logical_node.h"
 #include "include/query_engine/planner/operator/explain_physical_operator.h"
 #include "include/query_engine/planner/node/join_logical_node.h"
-#include "include/query_engine/planner/node/group_by_logical_node.h"
 #include "include/query_engine/planner/operator/group_by_physical_operator.h"
 #include "common/log/log.h"
 #include "include/storage_engine/recorder/table.h"
@@ -66,7 +67,7 @@ RC PhysicalOperatorGenerator::create(LogicalNode &logical_operator, unique_ptr<P
     case LogicalNodeType::EXPLAIN: {
       return create_plan(static_cast<ExplainLogicalNode &>(logical_operator), oper, is_delete);
     }
-
+    // TODO [Lab3] 实现JoinNode到JoinOperator的转换
     case LogicalNodeType::JOIN:
     case LogicalNodeType::GROUP_BY: {
       return RC::UNIMPLENMENT;
@@ -96,7 +97,6 @@ RC PhysicalOperatorGenerator::create_plan(
     //  }
   // 2. 对应上面example里的process阶段， 找到等值表达式中对应的FieldExpression和ValueExpression(左值和右值)
   // 通过FieldExpression找到对应的Index, 通过ValueExpression找到对应的Value
-  // ps: 由于我们只支持单键索引，所以只需要找到一个等值表达式即可
 
   if(index == nullptr){
     Table *table = table_get_oper.table();
@@ -316,15 +316,9 @@ RC PhysicalOperatorGenerator::create_plan(
   return rc;
 }
 
-// TODO [Lab3]
+// TODO [Lab3] 根据LogicalNode生成对应的PhyiscalOperator
 RC PhysicalOperatorGenerator::create_plan(
-    JoinLogicalNode &join_oper, unique_ptr<PhysicalOperator> &oper, bool is_delete)
+    JoinLogicalNode &join_oper, unique_ptr<PhysicalOperator> &oper)
 {
-  return RC::UNIMPLENMENT;
-}
-
-// TODO [Lab3]
-RC PhysicalOperatorGenerator::create_plan(
-    GroupByLogicalNode &logical_oper, std::unique_ptr<PhysicalOperator> &oper, bool is_delete) {
   return RC::UNIMPLENMENT;
 }

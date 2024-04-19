@@ -69,6 +69,27 @@ RC LogicalPlanGenerator::create(Stmt *stmt, unique_ptr<LogicalNode> &logical_nod
   return rc;
 }
 
+unique_ptr<ConjunctionExpr> _transfer_filter_stmt_to_expr(FilterStmt *filter_stmt){
+  std::vector<unique_ptr<Expression>> cmp_exprs;
+  for (const FilterUnit *filter_unit : filter_stmt->filter_units()) {
+    Expression *left_expr = filter_unit->left_expr()->copy();
+    Expression *right_expr = nullptr;
+    if (filter_unit->right_expr() != nullptr) {
+      right_expr = filter_unit->right_expr()->copy();
+    }
+    auto *cmp_expr = new ComparisonExpr(
+        filter_unit->comp(),
+        unique_ptr<Expression>(left_expr),
+        unique_ptr<Expression>(right_expr));
+    cmp_exprs.emplace_back(cmp_expr);
+  }
+  if (!cmp_exprs.empty()) {
+    unique_ptr<ConjunctionExpr> conjunction_expr(new ConjunctionExpr(filter_stmt->get_conjunction_type(), cmp_exprs));
+    return conjunction_expr;
+  }
+  return nullptr;
+}
+
 RC LogicalPlanGenerator::plan_node(
     SelectStmt *select_stmt, unique_ptr<LogicalNode> &logical_node)
 {
@@ -80,19 +101,30 @@ RC LogicalPlanGenerator::plan_node(
 
   // 1. Table scan node
   //TODO [Lab3] 当前只取一个表作为查询表,当引入Join后需要考虑同时查询多个表的情况
-  Table *default_table = tables[0];
-  const char *table_name = default_table->name();
-  std::vector<Field> fields;
-  for (auto *field : all_fields) {
-    if (0 == strcmp(field->table_name(), default_table->name())) {
-      fields.push_back(*field);
-    }
-  }
+  //参考思路: 遍历tables中的所有Table，针对每个table生成TableGetLogicalNode
+   Table *default_table = tables[0];
+   const char *table_name = default_table->name();
+   std::vector<Field> fields;
+   for (auto *field : all_fields) {
+     if (0 == strcmp(field->table_name(), default_table->name())) {
+       fields.push_back(*field);
+     }
+   }
 
-  root = std::unique_ptr<LogicalNode>(
-      new TableGetLogicalNode(default_table, select_stmt->table_alias()[0], fields, true/*readonly*/));
+   root = std::unique_ptr<LogicalNode>(
+       new TableGetLogicalNode(default_table, select_stmt->table_alias()[0], fields, true/*readonly*/));
 
-  // 2. Table filter node
+  // 2. inner join node
+  // TODO [Lab3] 完善Join节点的逻辑计划生成, 需要解析并设置Join涉及的表,以及Join使用到的连接条件
+  // 如果只有一个TableGetLogicalNode,直接将其设置为root节点，跳过该阶段
+  // 如果有多个TableGetLogicalNode,则需要生成JoinLogicalNode进行连接
+  // 生成JoinLogicalNode可以参考下面的生成流程：
+  // * 遍历TableGetLogicalNode
+  // * 生成JoinLogicalNode, 通过select_stmt中的join_filter_stmts
+  // ps: 需要考虑table数大于2的情况
+
+
+  // 3. Table filter node
   auto *table_filter_stmt = select_stmt->filter_stmt();
   unique_ptr<LogicalNode> predicate_node;
   plan_node(table_filter_stmt, predicate_node);
@@ -100,10 +132,6 @@ RC LogicalPlanGenerator::plan_node(
     predicate_node->add_child(std::move(root));
     root = std::move(predicate_node);
   }
-
-  // 3. inner join node
-  // TODO [Lab3] 完善Join节点的逻辑计划生成, 需要解析并设置Join涉及的表,以及Join使用到的连接条件
-
 
   // 4. aggregation node
   // TODO [Lab3] 当存在Group By时,聚合基于GroupBy的结果进行
@@ -152,27 +180,12 @@ RC LogicalPlanGenerator::plan_node(
 RC LogicalPlanGenerator::plan_node(
     FilterStmt *filter_stmt, unique_ptr<LogicalNode> &logical_node)
 {
-  std::vector<unique_ptr<Expression>> cmp_exprs;
-  const std::vector<FilterUnit *> &filter_units = filter_stmt->filter_units();
-  for (const FilterUnit *filter_unit : filter_units) {
-    Expression *left_expr = filter_unit->left_expr()->copy();
-    Expression *right_expr = nullptr;
-    if (filter_unit->right_expr() != nullptr) {
-      right_expr = filter_unit->right_expr()->copy();
-    }
-    auto *cmp_expr = new ComparisonExpr(
-      filter_unit->comp(),
-      unique_ptr<Expression>(left_expr),
-      unique_ptr<Expression>(right_expr));
-    cmp_exprs.emplace_back(cmp_expr);
-  }
-
+  auto conjunction_expr = _transfer_filter_stmt_to_expr(filter_stmt);
   unique_ptr<PredicateLogicalNode> predicate_node;
-  if (!cmp_exprs.empty()) {
-    unique_ptr<ConjunctionExpr> conjunction_expr(new ConjunctionExpr(filter_stmt->get_conjunction_type(), cmp_exprs));
+  if (conjunction_expr != nullptr) {
     predicate_node = std::make_unique<PredicateLogicalNode>(std::move(conjunction_expr));
+    logical_node = std::move(predicate_node);
   }
-  logical_node = std::move(predicate_node);
   return RC::SUCCESS;
 }
 
