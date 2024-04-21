@@ -80,7 +80,7 @@ RC PhysicalOperatorGenerator::create(LogicalNode &logical_operator, unique_ptr<P
   }
 }
 
-// TODO [Lab2] 
+// TODO [Lab2]
 // 在原有的实现中，会直接生成TableScanOperator对所需的数据进行全表扫描，但其实在生成执行计划时，我们可以进行简单的优化：
 // 首先检查扫描的table是否存在索引，如果存在可以使用的索引，那么我们可以直接生成IndexScanOperator来减少磁盘的扫描
 RC PhysicalOperatorGenerator::create_plan(
@@ -97,30 +97,23 @@ RC PhysicalOperatorGenerator::create_plan(
       if(compare_expr->comp() != EQUAL_TO) continue;
       unique_ptr<Expression> &left_expr  = compare_expr->left();
       unique_ptr<Expression> &right_expr = compare_expr->right();
-      // 左右比较的一边最少是一个值
       if (left_expr->type() != ExprType::VALUE && right_expr->type() != ExprType::VALUE) {
         continue;
       }
-
     FieldExpr *field_expr = nullptr;
     if (left_expr->type() == ExprType::FIELD) {
-      ASSERT(right_expr->type() == ExprType::VALUE, "right expr should be a value expr while left is field expr");
       field_expr = static_cast<FieldExpr *>(left_expr.get());
       value_expression = static_cast<ValueExpr *>(right_expr.get());
-    } else if (right_expr->type() == ExprType::FIELD) {
-      ASSERT(left_expr->type() == ExprType::VALUE, "left expr should be a value expr while right is a field expr");
+    } else{
       field_expr = static_cast<FieldExpr *>(right_expr.get());
       value_expression = static_cast<ValueExpr *>(left_expr.get());
     }
-
     if (field_expr == nullptr) {
       continue;
     }
-
     const Field &field = field_expr->field();
-    index              = table->find_index_by_field(field.field_name());
+    index = table->find_index_by_field(field.field_name());
     if (nullptr != index) {
-      cout<<"find "<<field.field_name()<<endl;
       break;
     }
     }
@@ -145,7 +138,6 @@ RC PhysicalOperatorGenerator::create_plan(
      oper = unique_ptr<PhysicalOperator>(index_operator);
 
   }
-
   return RC::SUCCESS;
 }
 
