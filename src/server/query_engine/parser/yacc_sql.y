@@ -498,7 +498,7 @@ type:
     | TEXT_T   { $$=TEXTS; }
     ;
 
-// TODO: [Lab3] add your aggr_type here
+// TODO: add your aggr_type here
 aggr_type:
     COUNT_T    { $$=AGGR_COUNT; }
     | MIN_T    { $$=AGGR_MIN;   }

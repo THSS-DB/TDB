@@ -4,7 +4,7 @@
 #include "include/query_engine/structor/tuple/join_tuple.h"
 
 /**
- * TODO [Lab3] GroupBy算子的具体实现
+ * TODO GroupBy算子的具体实现
  */
 class GroupByPhysicalOperator : public PhysicalOperator {
 

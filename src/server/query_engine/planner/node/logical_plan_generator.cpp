@@ -134,7 +134,6 @@ RC LogicalPlanGenerator::plan_node(
   }
 
   // 4. aggregation node
-  // TODO [Lab3] 当存在Group By时,聚合基于GroupBy的结果进行
   std::vector<AggrExpr *> aggr_exprs;
   for (auto *expr : select_stmt->projects()) {
     AggrExpr::getAggrExprs(expr, aggr_exprs);
