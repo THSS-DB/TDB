@@ -273,7 +273,9 @@ char *substr(const char *s, int n1, int n2)
 std::string double_to_str(double v)
 {
   char buf[256];
-  snprintf(buf, sizeof(buf), "%.2f", v);
+  //snprintf(buf, sizeof(buf), "%.2f", v);
+  // 为了实现float的精确查找，不再截断float的小数位
+  snprintf(buf, sizeof(buf), "%f", v);
   size_t len = strlen(buf);
   while (buf[len - 1] == '0') {
     len--;
