@@ -292,7 +292,7 @@ typedef enum yysymbol_kind_t yysymbol_kind_t;
 # undef short
 #endif
 
-/* On compilers that do not define __PTRDIFF_MAX__ config., make sure
+/* On compilers that do not define __PTRDIFF_MAX__ etc., make sure
    <limits.h> and (if available) <stdint.h> are included
    so that the code can choose integer types of a good width.  */
 
@@ -2456,10 +2456,10 @@ yyreduce:
 
       if ((yyvsp[-4].join_list) != nullptr) {
         (yyval.sql_node)->selection.join_lists.swap(*(yyvsp[-4].join_list));
+        std::reverse((yyval.sql_node)->selection.join_lists.begin(), (yyval.sql_node)->selection.join_lists.end());
         for (const auto& join_list : (yyval.sql_node)->selection.join_lists) {
           (yyval.sql_node)->selection.relations.emplace_back(join_list.relation);
         }
-        std::reverse((yyval.sql_node)->selection.join_lists.begin(), (yyval.sql_node)->selection.join_lists.end());
         delete (yyvsp[-4].join_list);
       }
       if ((yyvsp[-3].condition_list) != nullptr) {
