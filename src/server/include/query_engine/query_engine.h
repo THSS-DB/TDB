@@ -15,7 +15,7 @@ public:
   ~QueryEngine() = default;
 
   bool process_session_request(SessionRequest *request);
-  RC executeQuery(QueryInfo *query_info);
+  RC planQuery(QueryInfo *query_info);
 private:
   Planner planner_;
   Optimizer optimizer_;

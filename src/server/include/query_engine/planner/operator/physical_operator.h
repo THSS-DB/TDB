@@ -26,7 +26,7 @@ enum class PhysicalOperatorType
   INDEX_SCAN,
   GROUP_BY,
   ORDER_BY,
-  NESTED_LOOP_JOIN,
+  JOIN,
 };
 
 class PhysicalOperator

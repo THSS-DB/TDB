@@ -64,7 +64,11 @@ void Server::recv(int fd, short ev, void *arg)
     LOG_WARN("event is null while read event return success");
     return;
   }
-  query_engine_.process_session_request(event);
+  bool need_disconnect = query_engine_.process_session_request(event);
+  if(need_disconnect){
+    close_connection(comm);
+    return;
+  }
 }
 
 void Server::accept(int fd, short ev, void *arg)

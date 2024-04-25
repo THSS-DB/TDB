@@ -498,7 +498,7 @@ type:
     | TEXT_T   { $$=TEXTS; }
     ;
 
-// TODO: [Lab3] add your aggr_type here
+// TODO: add your aggr_type here
 aggr_type:
     COUNT_T    { $$=AGGR_COUNT; }
     | MIN_T    { $$=AGGR_MIN;   }
@@ -672,10 +672,10 @@ select_stmt:        /*  select 语句的语法解析树*/
 
       if ($5 != nullptr) {
         $$->selection.join_lists.swap(*$5);
+        std::reverse($$->selection.join_lists.begin(), $$->selection.join_lists.end());
         for (const auto& join_list : $$->selection.join_lists) {
           $$->selection.relations.emplace_back(join_list.relation);
         }
-        std::reverse($$->selection.join_lists.begin(), $$->selection.join_lists.end());
         delete $5;
       }
       if ($6 != nullptr) {
