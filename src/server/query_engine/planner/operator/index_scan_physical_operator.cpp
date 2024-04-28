@@ -33,7 +33,7 @@ RC IndexScanPhysicalOperator::open(Trx *trx)
   }
   index_scanner_ = index_scanner;
 
-  tuple_.set_schema(table_,"",table_->table_meta().field_metas());
+  tuple_.set_schema(table_,table_alias_,table_->table_meta().field_metas());
 
   return RC::SUCCESS;
 }
