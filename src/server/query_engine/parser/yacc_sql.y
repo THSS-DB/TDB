@@ -136,6 +136,7 @@ ArithmeticExpr *create_arithmetic_expression(ArithmeticExpr::Type type,
   enum CompOp                       comp;
   RelAttrSqlNode *                  rel_attr;
   std::vector<RelAttrSqlNode> *     rel_attr_list;
+  RelationSqlNode *                 relation;
   std::vector<AttrInfoSqlNode> *    attr_infos;
   AttrInfoSqlNode *                 attr_info;
   std::vector<UpdateUnit> *         update_infos;
@@ -190,6 +191,7 @@ ArithmeticExpr *create_arithmetic_expression(ArithmeticExpr::Type type,
 %type <join_list>           join_list
 %type <condition_list>      condition_list
 %type <expression_list>     select_attr
+%type <relation>            rel_alias
 %type <relation_list>       rel_list
 %type <relation_list>       relation_list
 %type <expression>	    aggr_expr
@@ -980,81 +982,49 @@ rel_attr_list:
     }
 
 relation_list:
-    ID rel_list {
+    rel_alias rel_list {
       if ($2 != nullptr) {
         $$ = $2;
       } else {
         $$ = new std::vector<RelationSqlNode>;
       }
-      RelationSqlNode *relationSqlNode = new RelationSqlNode;
-      relationSqlNode->relation_name = $1;
-      relationSqlNode->alias = "";
-      $$->push_back(*relationSqlNode);
+      $$->push_back(*$1);
       free($1);
-    } | ID ID rel_list {
-      if ($3 != nullptr) {
-        $$ = $3;
-      } else {
-        $$ = new std::vector<RelationSqlNode>;
-      }
-      RelationSqlNode *relationSqlNode = new RelationSqlNode;
-      relationSqlNode->relation_name = $1;
-      relationSqlNode->alias = $2;
-      $$->push_back(*relationSqlNode);
-      free($1);
-      free($2);
-    } | ID AS ID rel_list {
-      if ($4 != nullptr) {
-        $$ = $4;
-      } else {
-        $$ = new std::vector<RelationSqlNode>;
-      }
-      RelationSqlNode *relationSqlNode = new RelationSqlNode;
-      relationSqlNode->relation_name = $1;
-      relationSqlNode->alias = $3;
-      $$->push_back(*relationSqlNode);
-      free($1);
-      free($3);
     }
+    ;
 
 rel_list:
     /* empty */ {
       $$ = nullptr;
-    } | COMMA ID rel_list {
+    } | COMMA rel_alias rel_list {
       if ($3 != nullptr) {
         $$ = $3;
       } else {
         $$ = new std::vector<RelationSqlNode>;
       }
-      RelationSqlNode *relationSqlNode = new RelationSqlNode;
-      relationSqlNode->relation_name = $2;
-      relationSqlNode->alias = "";
-      $$->push_back(*relationSqlNode);
+      $$->push_back(*$2);
+      delete $2;
+    }
+    ;
+
+rel_alias:
+    ID {
+      $$ = new RelationSqlNode;
+      $$->relation_name = $1;
+      $$->alias = "";
+      free($1);
+    } | ID ID {
+      $$ = new RelationSqlNode;
+      $$->relation_name = $1;
+      $$->alias = $2;
+      free($1);
       free($2);
-    } | COMMA ID ID rel_list {
-      if ($4 != nullptr) {
-        $$ = $4;
-      } else {
-        $$ = new std::vector<RelationSqlNode>;
-      }
-      RelationSqlNode *relationSqlNode = new RelationSqlNode;
-      relationSqlNode->relation_name = $2;
-      relationSqlNode->alias = $3;
-      $$->push_back(*relationSqlNode);
-      free($2);
-      free($4);
-    } | COMMA ID AS ID rel_list {
-      if ($5 != nullptr) {
-        $$ = $5;
-      } else {
-        $$ = new std::vector<RelationSqlNode>;
-      }
-      RelationSqlNode *relationSqlNode = new RelationSqlNode;
-      relationSqlNode->relation_name = $2;
-      relationSqlNode->alias = $4;
-      $$->push_back(*relationSqlNode);
-      free($2);
-      free($4);
+    } | ID AS ID {
+      $$ = new RelationSqlNode;
+      $$->relation_name = $1;
+      $$->alias = $3;
+      free($1);
+      free($3);
     }
     ;
 
@@ -1063,17 +1033,14 @@ join_list:
     {
       $$ = nullptr;
     }
-    | INNER JOIN ID join_conditions join_list{
+    | INNER JOIN rel_alias join_conditions join_list{
       if ($5 != nullptr) {
         $$ = $5;
       } else {
         $$ = new std::vector<JoinSqlNode>;
       }
-      RelationSqlNode* relationSqlNode = new RelationSqlNode;
-      relationSqlNode->relation_name = $3;
-      relationSqlNode->alias = "";
       JoinSqlNode* joinSqlNode = new JoinSqlNode;
-      joinSqlNode->relation = *relationSqlNode;
+      joinSqlNode->relation = *$3;
       if ($4 != nullptr) {
         joinSqlNode->join_conditions.swap($4->conditions);
         std::reverse(joinSqlNode->join_conditions.begin(), joinSqlNode->join_conditions.end());
