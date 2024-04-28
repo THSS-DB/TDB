@@ -39,6 +39,7 @@ public:
  void set_schema(const Table *table, const std::string &table_alias, const std::vector<FieldMeta> *fields)
  {
    table_ = table;
+   table_alias_ = table_alias;
    this->species_.reserve(fields->size());
    for (const FieldMeta &field : *fields) {
      species_.push_back(new FieldExpr(table, &field));
@@ -81,15 +82,14 @@ public:
  {
    const char *table_name = spec.table_name();
    const char *field_name = spec.field_name();
-   if (0 != strcmp(table_name, table_->name())) {
+   if (0 != strcmp(table_name, table_->name()) || spec.alias() != table_alias_) {
      return RC::NOTFOUND;
    }
 
    for (size_t i = 0; i < species_.size(); ++i) {
      const FieldExpr *field_expr = species_[i];
      const Field &field = field_expr->field();
-     if (0 == strcmp(table_name, field.table_name()) &&
-         0 == strcmp(field_name, field.field_name())) {
+     if (0 == strcmp(field_name, field.field_name())) {
        return cell_at(i, cell);
      }
    }
@@ -110,6 +110,7 @@ private:
  Record *record_ = nullptr;
  common::Bitmap bitmap_;
  const Table *table_ = nullptr;
+ std::string table_alias_;
  std::vector<FieldExpr *> species_;
  bool order_set_ = false;
 };
