@@ -33,6 +33,12 @@ RC IndexScanPhysicalOperator::open(Trx *trx)
   }
   index_scanner_ = index_scanner;
 
+  if (table_alias_.empty()) {
+    table_alias_ = table_->name();
+    LOG_WARN("table alias is empty, use table name as alias.\n"
+      "Hint: Consider calling set_table_alias() on IndexScanOperator to set an alias for the table.");
+  }
+
   tuple_.set_schema(table_,table_alias_,table_->table_meta().field_metas());
 
   return RC::SUCCESS;
