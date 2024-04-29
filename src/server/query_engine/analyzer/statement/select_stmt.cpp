@@ -58,7 +58,9 @@ static void wildcard_fields(
 }
 
 RC _process_attribute_expression(Db *db, const Expression *expr, const char *table_name, const char* field_name,
-    std::vector<Table *> &tables, std::vector<Expression *> &projects, std::vector<std::string> table_alias) {
+    const std::vector<Table *> &tables /*in*/,
+    std::vector<Expression *> &projects /*out*/,
+    const std::vector<std::string> &table_alias /*in*/) {
   int table_count = static_cast<int>(tables.size());
   /**
    * There should be four possible states for attribute_expression with '*'
