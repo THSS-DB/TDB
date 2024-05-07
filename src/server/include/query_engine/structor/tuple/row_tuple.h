@@ -8,10 +8,7 @@ public:
  RowTuple() = default;
  virtual ~RowTuple()
  {
-   for (FieldExpr *spec : species_) {
-     delete spec;
-   }
-   species_.clear();
+   _clear_species();
  }
 
  const TupleType tuple_type() const override { return RowTuple_Type; }
@@ -36,19 +33,22 @@ public:
    this->bitmap_.init(record->data() + null_filed_meta->offset(), null_filed_meta->len());
  }
 
+void _clear_species(){
+   if(!species_.empty()){
+    for(auto& field_expr : species_){
+      delete field_expr;  //clear()前先释放目前的fields
+    }
+    species_.clear();
+   }
+}
+
 
  void set_schema(const Table *table, const std::string &table_alias, const std::vector<FieldMeta> *fields)
  {
    table_ = table;
    table_alias_ = table_alias;
    this->species_.reserve(fields->size());
-   if(!species_.empty()){
-    for(auto& field_expr : species_){
-      delete field_expr;  //clear()前先释放目前的fields
-    }
-    species_.clear();/// 在TableScanPhysicalOperator::open()会调用set_schema。
-                     //如果不加clear()，当同一个operator多次open()时，sepcies_就会积累多套重复的fields。
-   }
+   _clear_species(); //reopen时防止sepcies_就会积累多套重复的fields。
    for (const FieldMeta &field : *fields) {
      species_.push_back(new FieldExpr(table, &field));
      species_[species_.size() - 1]->set_field_table_alias(table_alias);
