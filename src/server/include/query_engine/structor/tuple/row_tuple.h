@@ -40,7 +40,8 @@ public:
  {
    table_ = table;
    table_alias_ = table_alias;
-   species_.clear();
+   species_.clear();   /// 在TableScanPhysicalOperator::open()会调用set_schema。
+                       //如果不加clear()，当同一个operator多次open()时，sepcies_就会积累多套重复的fields。
    this->species_.reserve(fields->size());
    for (const FieldMeta &field : *fields) {
      species_.push_back(new FieldExpr(table, &field));
