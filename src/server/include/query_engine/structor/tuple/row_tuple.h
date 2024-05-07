@@ -40,6 +40,7 @@ public:
  {
    table_ = table;
    table_alias_ = table_alias;
+   species_.clear();
    this->species_.reserve(fields->size());
    for (const FieldMeta &field : *fields) {
      species_.push_back(new FieldExpr(table, &field));
