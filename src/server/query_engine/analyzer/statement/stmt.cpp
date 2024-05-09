@@ -13,6 +13,8 @@
 #include "include/query_engine/analyzer/statement/show_tables_stmt.h"
 #include "include/query_engine/analyzer/statement/exit_stmt.h"
 #include "include/query_engine/analyzer/statement/load_data_stmt.h"
+#include "include/query_engine/analyzer/statement/trx_begin_stmt.h"
+#include "include/query_engine/analyzer/statement/trx_end_stmt.h"
 
 RC Stmt::create_stmt(Db *db, ParsedSqlNode &sql_node, Stmt *&stmt)
 {
@@ -60,6 +62,15 @@ RC Stmt::create_stmt(Db *db, ParsedSqlNode &sql_node, Stmt *&stmt)
 
     case SCF_LOAD_DATA: {
       return LoadDataStmt::create(db, sql_node.load_data, stmt);
+    }
+
+    case SCF_BEGIN: {
+      return TrxBeginStmt::create(stmt);
+    }
+
+    case SCF_COMMIT:
+    case SCF_ROLLBACK: {
+      return TrxEndStmt::create(sql_node.flag, stmt);
     }
 
     default: {
