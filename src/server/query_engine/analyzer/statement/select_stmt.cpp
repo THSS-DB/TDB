@@ -12,9 +12,24 @@
 
 SelectStmt::~SelectStmt()
 {
+  // 这些都是 create 中创建的对象，独占所有权，需要释放
+  for (auto *field : query_fields_) {
+    delete field;
+  }
+  for (auto *project : projects_) {
+    delete project;
+  }
+
   if (nullptr != filter_stmt_) {
     delete filter_stmt_;
     filter_stmt_ = nullptr;
+  }
+
+  delete group_by_stmt_;
+  delete having_stmt_;
+  delete order_stmt_;
+  for (auto *join_filter_stmt : join_filter_stmts_) {
+    delete join_filter_stmt;
   }
 }
 
@@ -345,7 +360,7 @@ RC SelectStmt::create(Db *db, const SelectSqlNode &select_sql, Stmt *&stmt)
   select_stmt->group_by_stmt_ = group_by_stmt;
   select_stmt->having_stmt_ = having_stmt;
   select_stmt->order_stmt_ = order_stmt;
-  select_stmt->join_filter_stmts_ = join_filter_stmts;
+  select_stmt->join_filter_stmts_.swap(join_filter_stmts);
   stmt = select_stmt;
   return RC::SUCCESS;
 }

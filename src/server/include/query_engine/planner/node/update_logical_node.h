@@ -10,7 +10,7 @@ class UpdateLogicalNode : public LogicalNode
 {
 public:
   UpdateLogicalNode(Table *table, std::vector<UpdateUnit> update_units);
-  ~UpdateLogicalNode() override = default;
+  ~UpdateLogicalNode() override;
 
   LogicalNodeType type() const override
   {
@@ -19,7 +19,7 @@ public:
   Table *table() const {
     return table_;
   }
-  std::vector<UpdateUnit> update_units() {
+  std::vector<UpdateUnit> &update_units() {
     return update_units_;
   }
 private:

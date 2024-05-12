@@ -35,7 +35,11 @@ class FilterUnit
 public:
   FilterUnit() = default;
   ~FilterUnit()
-  {}
+  {
+    // FilterUnit 只会在 create_filter_unit 中创建，这里的左右表达式都是独占所有权，需要释放
+    delete left_expr_;
+    delete right_expr_;
+  }
 
   void set_comp(CompOp comp)
   {

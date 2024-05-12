@@ -22,8 +22,10 @@ Trx *VacuousTrxManager::create_trx(int32_t /*trx_id*/)
  return nullptr;
 }
 
-void VacuousTrxManager::destroy_trx(Trx *)
-{}
+void VacuousTrxManager::destroy_trx(Trx *trx)
+{
+ delete trx;
+}
 
 Trx *VacuousTrxManager::find_trx(int32_t /* trx_id */)
 {

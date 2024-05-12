@@ -9,6 +9,14 @@
 #include "include/query_engine/structor/expression/value_expression.h"
 #include "include/query_engine/structor/tuple/row_tuple.h"
 
+UpdatePhysicalOperator::~UpdatePhysicalOperator()
+{
+  // 这些 update_units 从逻辑算子中转移过来，独占所有权，需要释放
+  for (auto &unit : update_units_) {
+    delete unit.value;
+  }
+}
+
 RC UpdatePhysicalOperator::open(Trx *trx)
 {
   if (children_.empty()) {
@@ -83,6 +91,9 @@ RC UpdatePhysicalOperator::open(Trx *trx)
     unit.attribute_name = update_unit.attribute_name;
     unit.value = new ValueExpr(value);
     processed_update_units.emplace_back(unit);
+  }
+  for (auto &unit : update_units_) {
+    delete unit.value;
   }
   update_units_.clear();
   update_units_ = std::move(processed_update_units);
