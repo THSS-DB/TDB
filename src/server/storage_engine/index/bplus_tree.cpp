@@ -1119,6 +1119,11 @@ RC BplusTreeHandler::find_leaf_internal(BplusTreeOperationType op,
   for (; !node->is_leaf; ) {
     InternalIndexNodeHandler internal_node(file_header_, frame);
     next_page_id = child_page_getter(internal_node);
+
+    // 这里不再持有原来 frame 的引用，转而获取子节点的 frame，需要 unpin 原来的 frame
+    file_buffer_pool_->unpin_page(frame);
+    frame = nullptr;
+
     rc = crabing_protocal_fetch_page(op, next_page_id, false /* is_root_node */, frame);
     if (rc != RC::SUCCESS) {
       LOG_WARN("Failed to load page page_num:%d. rc=%s", next_page_id, strrc(rc));
@@ -1760,6 +1765,8 @@ RC BplusTreeScanner::open(const char *left_user_key, int left_len, bool left_inc
     if (left_index >= left_node.size()) {  // 超出了当前页，就需要向后移动一个位置
       const PageNum next_page_num = left_node.next_page();
       if (next_page_num == BP_INVALID_PAGE_NUM) {  // 这里已经是最后一页，说明当前扫描，没有数据
+        // 释放 current_frame_ 的引用前需要先 unpin
+        tree_handler_.file_buffer_pool_->unpin_page(current_frame_);
         current_frame_ = nullptr;
         return RC::SUCCESS;
       }
@@ -1804,6 +1811,8 @@ RC BplusTreeScanner::open(const char *left_user_key, int left_len, bool left_inc
   }
 
   if (touch_end()) {
+    // 释放 current_frame_ 的引用前需要先 unpin
+    tree_handler_.file_buffer_pool_->unpin_page(current_frame_);
     current_frame_ = nullptr;
   }
 
@@ -1862,6 +1871,10 @@ RC BplusTreeScanner::next_entry(RID &rid, bool isdelete)
     return RC::RECORD_EOF;
   }
 
+  // 准备获取下一页的数据，先释放当前页
+  tree_handler_.file_buffer_pool_->unpin_page(current_frame_);
+  current_frame_ = nullptr;
+
   rc = tree_handler_.file_buffer_pool_->get_this_page(next_page_num, &current_frame_);
   if (rc != RC::SUCCESS) {
     LOG_WARN("failed to get next page. page num=%d, rc=%s", next_page_num, strrc(rc));
@@ -1875,6 +1888,11 @@ RC BplusTreeScanner::next_entry(RID &rid, bool isdelete)
 
 RC BplusTreeScanner::close()
 {
+  if (current_frame_ != nullptr) {
+    // 在 scanner 关闭时释放 current_frame_ 的引用
+    tree_handler_.file_buffer_pool_->unpin_page(current_frame_);
+    current_frame_ = nullptr;
+  }
   inited_ = false;
   LOG_TRACE("bplus tree scanner closed");
   return RC::SUCCESS;
