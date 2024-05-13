@@ -724,7 +724,7 @@ RC BplusTreeHandler::sync()
       LOG_WARN("failed to sync index header file. file_desc=%d, rc=%s", file_buffer_pool_->file_desc(), strrc(rc));
     }
   }
-  return file_buffer_pool_->evict_all_pages();
+  return file_buffer_pool_->flush_all_pages();
 }
 
 RC BplusTreeHandler::create(const char *file_name, bool is_unique, std::vector<AttrType> multi_attr_types, std::vector<int> multi_attr_length, int internal_max_size /* = -1*/,
