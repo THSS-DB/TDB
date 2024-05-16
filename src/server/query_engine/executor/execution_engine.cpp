@@ -25,6 +25,7 @@ RC write_to_communicator(const char* data, int32_t size, Communicator* communica
       LOG_WARN("failed to send data to client. err=%s", strerror(errno));
       return rc;
     }
+    delete[] padding;
   }
   RC rc = communicator->write_result(data, size);
   if(RC_FAIL(rc)){

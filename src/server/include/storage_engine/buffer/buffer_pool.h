@@ -49,6 +49,7 @@ public:
    * 将dirty frame中的数据刷新到磁盘上
    */
   RC flush_page(Frame &frame);
+  RC flush_all_pages();
 
   /**
    * 驱逐frame

@@ -218,7 +218,8 @@ RC PhysicalOperatorGenerator::create_plan(
 
   auto *project_operator = new ProjectPhysicalOperator(&project_oper);
   for (const auto &i : project_oper.expressions()) {
-    project_operator->add_projector(i->copy());
+    // TupleCellSpec 的构造函数中已经 copy 了 Expression，这里无需 copy
+    project_operator->add_projector(i.get());
   }
 
   if (child_phy_oper) {
@@ -285,7 +286,8 @@ RC PhysicalOperatorGenerator::create_plan(UpdateLogicalNode &update_oper, unique
     }
   }
 
-  oper = unique_ptr<PhysicalOperator>(new UpdatePhysicalOperator(update_oper.table(), update_oper.update_units()));
+  // 将 update_units 从逻辑算子转移给物理算子，避免重复释放
+  oper = unique_ptr<PhysicalOperator>(new UpdatePhysicalOperator(update_oper.table(), std::move(update_oper.update_units())));
 
   if (child_physical_oper) {
     oper->add_child(std::move(child_physical_oper));

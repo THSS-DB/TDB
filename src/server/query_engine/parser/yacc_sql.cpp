@@ -2003,7 +2003,7 @@ yyreduce:
 		(yyval.multi_attribute_names) = new std::vector<std::string>;
 	}
 	(yyval.multi_attribute_names)->emplace_back((yyvsp[-1].string));
-	delete (yyvsp[-1].string);
+	free((yyvsp[-1].string));
   }
 #line 2009 "yacc_sql.cpp"
     break;
@@ -2768,7 +2768,7 @@ yyreduce:
       relAttrSqlNode->relation_name  = (yyvsp[-3].string);
       relAttrSqlNode->attribute_name = "*";
       (yyval.expression_list)->emplace_back(new RelAttrExpr(*relAttrSqlNode));
-      delete (yyvsp[-3].string);
+      free((yyvsp[-3].string));
     }
 #line 2774 "yacc_sql.cpp"
     break;
@@ -2837,7 +2837,7 @@ yyreduce:
       relAttrSqlNode->relation_name  = (yyvsp[-3].string);
       relAttrSqlNode->attribute_name = "*";
       (yyval.expression_list)->emplace_back(new RelAttrExpr(*relAttrSqlNode));
-      delete (yyvsp[-3].string);
+      free((yyvsp[-3].string));
     }
 #line 2843 "yacc_sql.cpp"
     break;
@@ -2907,7 +2907,7 @@ yyreduce:
       (yyval.rel_attr) = new RelAttrSqlNode;
       (yyval.rel_attr)->relation_name = "";
       (yyval.rel_attr)->attribute_name = (yyvsp[0].string);
-      delete (yyvsp[0].string);
+      free((yyvsp[0].string));
     }
 #line 2913 "yacc_sql.cpp"
     break;
@@ -2918,8 +2918,8 @@ yyreduce:
       (yyval.rel_attr) = new RelAttrSqlNode;
       (yyval.rel_attr)->relation_name  = (yyvsp[-2].string);
       (yyval.rel_attr)->attribute_name = (yyvsp[0].string);
-      delete (yyvsp[-2].string);
-      delete (yyvsp[0].string);
+      free((yyvsp[-2].string));
+      free((yyvsp[0].string));
     }
 #line 2925 "yacc_sql.cpp"
     break;
@@ -2957,7 +2957,7 @@ yyreduce:
         (yyval.relation_list) = new std::vector<RelationSqlNode>;
       }
       (yyval.relation_list)->push_back(*(yyvsp[-1].relation));
-      free((yyvsp[-1].relation));
+      delete (yyvsp[-1].relation);
     }
 #line 2963 "yacc_sql.cpp"
     break;
@@ -3044,7 +3044,7 @@ yyreduce:
       delete (yyvsp[-1].condition_list);
       (yyval.join_list)->emplace_back(*joinSqlNode);
       delete joinSqlNode;
-      free((yyvsp[-2].relation));
+      delete (yyvsp[-2].relation);
     }
 #line 3050 "yacc_sql.cpp"
     break;
