@@ -363,7 +363,7 @@ multi_attribute_names:
 		$$ = new std::vector<std::string>;
 	}
 	$$->emplace_back($2);
-	delete $2;
+	free($2);
   }
   ;
 
@@ -869,7 +869,7 @@ select_attr:
       relAttrSqlNode->relation_name  = $1;
       relAttrSqlNode->attribute_name = "*";
       $$->emplace_back(new RelAttrExpr(*relAttrSqlNode));
-      delete $1;
+      free($1);
     } | add_expr expression_list {
       if ($2 != nullptr) {
         $$ = $2;
@@ -912,7 +912,7 @@ expression_list:
       relAttrSqlNode->relation_name  = $2;
       relAttrSqlNode->attribute_name = "*";
       $$->emplace_back(new RelAttrExpr(*relAttrSqlNode));
-      delete $2;
+      free($2);
     } | COMMA add_expr expression_list {
       if ($3 != nullptr) {
         $$ = $3;
@@ -956,13 +956,13 @@ rel_attr:
       $$ = new RelAttrSqlNode;
       $$->relation_name = "";
       $$->attribute_name = $1;
-      delete $1;
+      free($1);
     } | ID DOT ID {
       $$ = new RelAttrSqlNode;
       $$->relation_name  = $1;
       $$->attribute_name = $3;
-      delete $1;
-      delete $3;
+      free($1);
+      free($3);
     }
     ;
 
@@ -989,7 +989,7 @@ relation_list:
         $$ = new std::vector<RelationSqlNode>;
       }
       $$->push_back(*$1);
-      free($1);
+      delete $1;
     }
     ;
 
@@ -1048,7 +1048,7 @@ join_list:
       delete $4;
       $$->emplace_back(*joinSqlNode);
       delete joinSqlNode;
-      free($3);
+      delete $3;
     }
     ;
 

@@ -16,6 +16,8 @@ public:
   TupleCellSpec(const char *table_name, const char *field_name, const char *alias = nullptr);
   explicit TupleCellSpec(const char *alias);
 
+  ~TupleCellSpec();
+
   const char *table_name() const {
     return table_name_.c_str();
   }

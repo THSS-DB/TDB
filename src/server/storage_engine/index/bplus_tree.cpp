@@ -724,7 +724,7 @@ RC BplusTreeHandler::sync()
       LOG_WARN("failed to sync index header file. file_desc=%d, rc=%s", file_buffer_pool_->file_desc(), strrc(rc));
     }
   }
-  return file_buffer_pool_->evict_all_pages();
+  return file_buffer_pool_->flush_all_pages();
 }
 
 RC BplusTreeHandler::create(const char *file_name, bool is_unique, std::vector<AttrType> multi_attr_types, std::vector<int> multi_attr_length, int internal_max_size /* = -1*/,
@@ -982,12 +982,14 @@ RC BplusTreeHandler::print_leafs()
     if (next_page_num == BP_INVALID_PAGE_NUM) {
       break;
     }
+    file_buffer_pool_->unpin_page(frame);
     rc = file_buffer_pool_->get_this_page(next_page_num, &frame);
     if (rc != RC::SUCCESS) {
       LOG_WARN("failed to get next page. page id=%d, rc=%d:%s", next_page_num, rc, strrc(rc));
       return rc;
     }
   }
+  file_buffer_pool_->unpin_page(frame);
   return rc;
 }
 
@@ -1014,6 +1016,7 @@ bool BplusTreeHandler::validate_node_recursive(Frame *frame)
     }
   }
 
+  file_buffer_pool_->unpin_page(frame);
   return result;
 }
 
@@ -1038,6 +1041,7 @@ bool BplusTreeHandler::validate_leaf_link()
 
   bool result = true;
   while (result && next_page_num != BP_INVALID_PAGE_NUM) {
+    file_buffer_pool_->unpin_page(frame);
     rc = file_buffer_pool_->get_this_page(next_page_num, &frame);
     if (rc != RC::SUCCESS) {
       LOG_WARN("failed to fetch next page. page num=%d, rc=%s", next_page_num, strrc(rc));
@@ -1055,6 +1059,7 @@ bool BplusTreeHandler::validate_leaf_link()
   }
 
   // can do more things
+  file_buffer_pool_->unpin_page(frame);
   return result;
 }
 
@@ -1119,6 +1124,11 @@ RC BplusTreeHandler::find_leaf_internal(BplusTreeOperationType op,
   for (; !node->is_leaf; ) {
     InternalIndexNodeHandler internal_node(file_header_, frame);
     next_page_id = child_page_getter(internal_node);
+
+    // 这里不再持有原来 frame 的引用，转而获取子节点的 frame，需要 unpin 原来的 frame
+    file_buffer_pool_->unpin_page(frame);
+    frame = nullptr;
+
     rc = crabing_protocal_fetch_page(op, next_page_id, false /* is_root_node */, frame);
     if (rc != RC::SUCCESS) {
       LOG_WARN("Failed to load page page_num:%d. rc=%s", next_page_id, strrc(rc));
@@ -1460,6 +1470,7 @@ RC BplusTreeHandler::adjust_root(Frame *root_frame)
   IndexNodeHandler root_node(file_header_, root_frame);
   if (root_node.is_leaf() && root_node.size() > 0) {
     root_frame->mark_dirty();
+    file_buffer_pool_->unpin_page(root_frame);
     return RC::SUCCESS;
   }
 
@@ -1477,11 +1488,13 @@ RC BplusTreeHandler::adjust_root(Frame *root_frame)
     RC rc = file_buffer_pool_->get_this_page(child_page_num, &child_frame);
     if (rc != RC::SUCCESS) {
       LOG_WARN("failed to fetch child page. page num=%d, rc=%d:%s", child_page_num, rc, strrc(rc));
+      file_buffer_pool_->unpin_page(root_frame);
       return rc;
     }
 
     IndexNodeHandler child_node(file_header_, child_frame);
     child_node.set_parent_page_num(BP_INVALID_PAGE_NUM);
+    file_buffer_pool_->unpin_page(child_frame);
 
     // file_header_.root_page = child_page_num;
     new_root_page_num = child_page_num;
@@ -1490,6 +1503,7 @@ RC BplusTreeHandler::adjust_root(Frame *root_frame)
   update_root_page_num_locked(new_root_page_num);
 
   PageNum old_root_page_num = root_frame->page_num();
+  file_buffer_pool_->unpin_page(root_frame);
   file_buffer_pool_->dispose_page(old_root_page_num);
 
   return RC::SUCCESS;
@@ -1500,6 +1514,7 @@ RC BplusTreeHandler::coalesce_or_redistribute(Frame *frame)
 {
   IndexNodeHandlerType index_node(file_header_, frame);
   if (index_node.size() >= index_node.min_size()) {
+    file_buffer_pool_->unpin_page(frame);
     return RC::SUCCESS;
   }
 
@@ -1507,17 +1522,20 @@ RC BplusTreeHandler::coalesce_or_redistribute(Frame *frame)
   if (BP_INVALID_PAGE_NUM == parent_page_num) {
     // this is the root page
     if (index_node.size() > 1) {
+      // root page has more than one child, no need to adjust
+      file_buffer_pool_->unpin_page(frame);
+      return RC::SUCCESS;
     } else {
       // adjust the root node
-      adjust_root(frame);
+      return adjust_root(frame);
     }
-    return RC::SUCCESS;
   }
 
   Frame *parent_frame = nullptr;
   RC rc = file_buffer_pool_->get_this_page(parent_page_num, &parent_frame);
   if (rc != RC::SUCCESS) {
     LOG_WARN("failed to fetch parent page. page id=%d, rc=%d:%s", parent_page_num, rc, strrc(rc));
+    file_buffer_pool_->unpin_page(frame);
     return rc;
   }
 
@@ -1538,6 +1556,8 @@ RC BplusTreeHandler::coalesce_or_redistribute(Frame *frame)
   rc = file_buffer_pool_->get_this_page(neighbor_page_num, &neighbor_frame);
   if (rc != RC::SUCCESS) {
     LOG_WARN("failed to fetch neighbor page. page id=%d, rc=%d:%s", neighbor_page_num, rc, strrc(rc));
+    file_buffer_pool_->unpin_page(frame);
+    file_buffer_pool_->unpin_page(parent_frame);
     return rc;
   }
 
@@ -1577,6 +1597,9 @@ RC BplusTreeHandler::coalesce(Frame *neighbor_frame, Frame *frame, Frame *parent
   RC rc = right_node.move_to(left_node, file_buffer_pool_);
   if (rc != RC::SUCCESS) {
     LOG_WARN("failed to move right node to left. rc=%d:%s", rc, strrc(rc));
+    file_buffer_pool_->unpin_page(left_frame);
+    file_buffer_pool_->unpin_page(right_frame);
+    file_buffer_pool_->unpin_page(parent_frame);
     return rc;
   }
   // left_node.validate(key_comparator_);
@@ -1587,6 +1610,11 @@ RC BplusTreeHandler::coalesce(Frame *neighbor_frame, Frame *frame, Frame *parent
     left_leaf_node.set_next_page(right_leaf_node.next_page());
   }
 
+  left_frame->mark_dirty();
+  parent_frame->mark_dirty();
+
+  file_buffer_pool_->unpin_page(left_frame);
+  file_buffer_pool_->unpin_page(right_frame);
   file_buffer_pool_->dispose_page(right_frame->page_num());
   return coalesce_or_redistribute<InternalIndexNodeHandler>(parent_frame);
 }
@@ -1620,6 +1648,10 @@ RC BplusTreeHandler::redistribute(Frame *neighbor_frame, Frame *frame, Frame *pa
   frame->mark_dirty();
   parent_frame->mark_dirty();
 
+  file_buffer_pool_->unpin_page(neighbor_frame);
+  file_buffer_pool_->unpin_page(frame);
+  file_buffer_pool_->unpin_page(parent_frame);
+
   return RC::SUCCESS;
 }
 
@@ -1638,6 +1670,7 @@ RC BplusTreeHandler::delete_entry_internal(Frame *leaf_frame, const char *key)
   leaf_frame->mark_dirty();
 
   if (leaf_index_node.size() >= leaf_index_node.min_size()) {
+    file_buffer_pool_->unpin_page(leaf_frame);
     return RC::SUCCESS;
   }
 
@@ -1760,6 +1793,8 @@ RC BplusTreeScanner::open(const char *left_user_key, int left_len, bool left_inc
     if (left_index >= left_node.size()) {  // 超出了当前页，就需要向后移动一个位置
       const PageNum next_page_num = left_node.next_page();
       if (next_page_num == BP_INVALID_PAGE_NUM) {  // 这里已经是最后一页，说明当前扫描，没有数据
+        // 释放 current_frame_ 的引用前需要先 unpin
+        tree_handler_.file_buffer_pool_->unpin_page(current_frame_);
         current_frame_ = nullptr;
         return RC::SUCCESS;
       }
@@ -1804,6 +1839,8 @@ RC BplusTreeScanner::open(const char *left_user_key, int left_len, bool left_inc
   }
 
   if (touch_end()) {
+    // 释放 current_frame_ 的引用前需要先 unpin
+    tree_handler_.file_buffer_pool_->unpin_page(current_frame_);
     current_frame_ = nullptr;
   }
 
@@ -1862,6 +1899,10 @@ RC BplusTreeScanner::next_entry(RID &rid, bool isdelete)
     return RC::RECORD_EOF;
   }
 
+  // 准备获取下一页的数据，先释放当前页
+  tree_handler_.file_buffer_pool_->unpin_page(current_frame_);
+  current_frame_ = nullptr;
+
   rc = tree_handler_.file_buffer_pool_->get_this_page(next_page_num, &current_frame_);
   if (rc != RC::SUCCESS) {
     LOG_WARN("failed to get next page. page num=%d, rc=%s", next_page_num, strrc(rc));
@@ -1875,6 +1916,11 @@ RC BplusTreeScanner::next_entry(RID &rid, bool isdelete)
 
 RC BplusTreeScanner::close()
 {
+  if (current_frame_ != nullptr) {
+    // 在 scanner 关闭时释放 current_frame_ 的引用
+    tree_handler_.file_buffer_pool_->unpin_page(current_frame_);
+    current_frame_ = nullptr;
+  }
   inited_ = false;
   LOG_TRACE("bplus tree scanner closed");
   return RC::SUCCESS;
