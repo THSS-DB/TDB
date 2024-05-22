@@ -28,9 +28,9 @@ SelectStmt::~SelectStmt()
   delete group_by_stmt_;
   delete having_stmt_;
   delete order_stmt_;
-  for (auto *join_filter_stmt : join_filter_stmts_) {
-    delete join_filter_stmt;
-  }
+  // for (auto *join_filter_stmt : join_filter_stmts_) {
+  //   delete join_filter_stmt;
+  // }
 }
 
 static void wildcard_fields_without_table_name(Table *table, std::vector<Expression*> &projects, const std::string &table_name) {
