@@ -13,7 +13,7 @@ public:
 
   RC init() override;
   const std::vector<FieldMeta> *trx_fields() const override;
-  Trx *create_trx(RedoLogManager *log_manager) override;
+  Trx *create_trx(LogManager *log_manager) override;
   Trx *create_trx(int32_t trx_id) override;
   // 找到对应事务号的事务，当前仅在recover场景下使用
   Trx *find_trx(int32_t trx_id) override;
@@ -33,7 +33,7 @@ private:
 class MvccTrx : public Trx
 {
  public:
-  MvccTrx(MvccTrxManager &trx_kit, RedoLogManager *log_manager);
+  MvccTrx(MvccTrxManager &trx_kit, LogManager *log_manager);
   MvccTrx(MvccTrxManager &trx_kit, int32_t trx_id); // used for recover
   virtual ~MvccTrx() = default;
 
@@ -57,6 +57,8 @@ class MvccTrx : public Trx
   RC commit() override;
   RC rollback() override;
 
+  RC redo(Db *db, const LogEntry &log_entry) override;
+
   int32_t id() const override { return trx_id_; }
 
  private:
@@ -68,13 +70,20 @@ class MvccTrx : public Trx
    */
   void trx_fields(Table *table, Field &begin_xid_field, Field &end_xid_field) const;
 
+  /**
+   * @brief 使用指定的版本号来提交事务
+   * @param commit_xid
+   * @return
+   */
+  RC commit_with_trx_id(int32_t commit_xid);
+
  private:
   static const int32_t MAX_TRX_ID = std::numeric_limits<int32_t>::max();
 
  private:
   using OperationSet = std::unordered_set<Operation, OperationHasher, OperationEqualer>;
   MvccTrxManager & trx_kit_;
-  RedoLogManager *log_manager_ = nullptr;
+  LogManager *log_manager_ = nullptr;
   int32_t      trx_id_ = -1;
   bool         started_ = false;
   bool         recovering_ = false;

@@ -1,20 +1,21 @@
 #pragma once
 
-#include <vector>
+#include <fcntl.h>
+#include <sys/stat.h>
+
+#include <memory>
 #include <string>
 #include <unordered_map>
-#include <memory>
-#include <sys/stat.h>
-#include <fcntl.h>
+#include <vector>
 
-#include "include/common/rc.h"
-#include "include/storage_engine/recorder/table.h"
-#include "include/storage_engine/schema/schema_util.h"
-#include "include/storage_engine/transaction/trx.h"
-#include "include/storage_engine/recover/redo_log.h"
+#include "common/lang/string.h"
 #include "common/log/log.h"
 #include "common/os/path.h"
-#include "common/lang/string.h"
+#include "include/common/rc.h"
+#include "include/storage_engine/recorder/table.h"
+#include "include/storage_engine/recover/log_manager.h"
+#include "include/storage_engine/schema/schema_util.h"
+#include "include/storage_engine/transaction/trx.h"
 
 class Table;
 class SelectStmt;
@@ -57,7 +58,7 @@ public:
 
   RC recover();
 
-  RedoLogManager *redolog_manager();
+  LogManager *log_manager();
 
 private:
   RC open_all_tables();
@@ -66,7 +67,7 @@ private:
   std::string name_;
   std::string path_;
   std::unordered_map<std::string, Table *> opened_tables_;
-  std::unique_ptr<RedoLogManager> redolog_manager_;
+  std::unique_ptr<LogManager> log_manager_;
 
   /// 给每个table都分配一个ID，用来记录日志。这里假设所有的DDL都不会并发操作，所以相关的数据都不上锁
   int32_t next_table_id_ = 0;

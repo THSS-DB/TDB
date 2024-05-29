@@ -1,15 +1,16 @@
 #pragma once
 
 #include <cstddef>
-#include <unordered_set>
 #include <mutex>
+#include <unordered_set>
 #include <utility>
 
-#include "common/log/log.h"
 #include "common/lang/string.h"
-#include "include/storage_engine/recorder/table.h"
+#include "common/log/log.h"
 #include "include/storage_engine/recorder/field.h"
-#include "include/storage_engine/recover/redo_log.h"
+#include "include/storage_engine/recorder/table.h"
+#include "include/storage_engine/recover/log_entry.h"
+#include "include/storage_engine/recover/log_manager.h"
 
 class RID;
 class Record;
@@ -102,6 +103,8 @@ public:
   virtual RC commit() = 0;
   virtual RC rollback() = 0;
 
+  virtual RC redo(Db *db, const LogEntry &log_entry) = 0;
+
   virtual int32_t id() const = 0;
 };
 
@@ -117,7 +120,7 @@ public:
 
   virtual RC init() = 0;
   virtual const std::vector<FieldMeta> *trx_fields() const = 0;
-  virtual Trx *create_trx(RedoLogManager *log_manager) = 0;
+  virtual Trx *create_trx(LogManager *log_manager) = 0;
   virtual Trx *create_trx(int32_t trx_id) = 0;
   virtual Trx *find_trx(int32_t trx_id) = 0;
   virtual void all_trxes(std::vector<Trx *> &trxes) = 0;
@@ -126,7 +129,6 @@ public:
 public:
   static TrxManager *create(const char *name);
   static RC init_global(const char *name);
-  static RC create_global(const char *name);
   static TrxManager *instance();
 };
 

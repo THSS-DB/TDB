@@ -60,7 +60,7 @@ bool Session::is_trx_multi_operation_mode() const
 Trx *Session::current_trx()
 {
   if (trx_ == nullptr) {
-    trx_ = GCTX.trx_manager_->create_trx(db_->redolog_manager());
+    trx_ = GCTX.trx_manager_->create_trx(db_->log_manager());
   }
   return trx_;
 }

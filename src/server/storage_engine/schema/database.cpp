@@ -20,13 +20,13 @@ RC Db::init(const char *name, const char *dbpath)
     return RC::INTERNAL;
   }
 
-  redolog_manager_.reset(new RedoLogManager());
-  if (redolog_manager_ == nullptr) {
-    LOG_ERROR("Failed to init RedoLogManager.");
+  log_manager_.reset(new LogManager());
+  if (log_manager_ == nullptr) {
+    LOG_ERROR("Failed to init LogManager.");
     return RC::NOMEM;
   }
 
-  RC rc = redolog_manager_->init(dbpath);
+  RC rc = log_manager_->init(dbpath);
   if (RC_FAIL(rc)) {
     LOG_WARN("failed to init redolog manager. dbpath=%s, rc=%s", dbpath, strrc(rc));
     return rc;
@@ -207,10 +207,10 @@ RC Db::sync()
 
 RC Db::recover()
 {
-  return RC::SUCCESS;
+  return log_manager_->recover(this);
 }
 
-RedoLogManager *Db::redolog_manager()
+LogManager *Db::log_manager()
 {
-  return redolog_manager_.get();
+  return log_manager_.get();
 }

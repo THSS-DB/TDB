@@ -5,7 +5,7 @@
 #include "include/storage_engine/index/index_meta.h"
 #include "include/storage_engine/recorder/record.h"
 #include "include/storage_engine/recorder/table.h"
-#include "include/storage_engine/recover/redo_log.h"
+#include "include/storage_engine/recover/log_entry.h"
 
 class RID;
 class IndexMeta;

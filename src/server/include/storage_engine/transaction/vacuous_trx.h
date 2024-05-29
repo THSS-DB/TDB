@@ -13,7 +13,7 @@ public:
 
  RC init() override;
  const std::vector<FieldMeta> *trx_fields() const override;
- Trx *create_trx(RedoLogManager *log_manager) override;
+ Trx *create_trx(LogManager *log_manager) override;
  Trx *create_trx(int32_t trx_id) override;
  Trx *find_trx(int32_t trx_id) override;
  void all_trxes(std::vector<Trx *> &trxes) override;
@@ -35,6 +35,8 @@ public:
  RC start_if_need() override;
  RC commit() override;
  RC rollback() override;
+
+ RC redo(Db *db, const LogEntry &log_entry) override;
 
  int32_t id() const override { return 0; }
 };

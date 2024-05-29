@@ -1,4 +1,5 @@
 #include "include/storage_engine/transaction/mvcc_trx.h"
+#include "include/storage_engine/schema/database.h"
 
 using namespace std;
 
@@ -26,7 +27,7 @@ const vector<FieldMeta> *MvccTrxManager::trx_fields() const
   return &fields_;
 }
 
-Trx *MvccTrxManager::create_trx(RedoLogManager *log_manager)
+Trx *MvccTrxManager::create_trx(LogManager *log_manager)
 {
   Trx *trx = new MvccTrx(*this, log_manager);
   if (trx != nullptr) {
@@ -95,7 +96,7 @@ int32_t MvccTrxManager::max_trx_id() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MvccTrx::MvccTrx(MvccTrxManager &kit, RedoLogManager *log_manager) : trx_kit_(kit), log_manager_(log_manager)
+MvccTrx::MvccTrx(MvccTrxManager &kit, LogManager *log_manager) : trx_kit_(kit), log_manager_(log_manager)
 {}
 
 MvccTrx::MvccTrx(MvccTrxManager &kit, int32_t trx_id) : trx_kit_(kit), trx_id_(trx_id)
@@ -149,6 +150,8 @@ RC MvccTrx::start_if_need()
     ASSERT(operations_.empty(), "try to start a new trx while operations is not empty");
     trx_id_ = trx_kit_.next_trx_id();
     LOG_DEBUG("current thread change to new trx with %d", trx_id_);
+    RC rc = log_manager_->append_begin_trx_log(trx_id_);
+    ASSERT(rc == RC::SUCCESS, "failed to append log to clog. rc=%s", strrc(rc));
     started_ = true;
   }
   return RC::SUCCESS;
@@ -156,7 +159,12 @@ RC MvccTrx::start_if_need()
 
 RC MvccTrx::commit()
 {
-  int32_t commit_xid = trx_kit_.next_trx_id();
+  int32_t commit_id = trx_kit_.next_trx_id();
+  return commit_with_trx_id(commit_id);
+}
+
+RC MvccTrx::commit_with_trx_id(int32_t commit_xid)
+{
   RC rc = RC::SUCCESS;
   started_ = false;
 
@@ -197,6 +205,12 @@ RC MvccTrx::commit()
   }
 
   operations_.clear();
+
+  if (!recovering_) {
+    rc = log_manager_->append_commit_trx_log(trx_id_, commit_xid);
+  }
+  LOG_TRACE("append trx commit log. trx id=%d, commit_xid=%d, rc=%s", trx_id_, commit_xid, strrc(rc));
+
   return rc;
 }
 
@@ -238,6 +252,11 @@ RC MvccTrx::rollback()
   }
 
   operations_.clear();
+
+  if (!recovering_) {
+    rc = log_manager_->append_rollback_trx_log(trx_id_);
+  }
+  LOG_TRACE("append trx rollback log. trx id=%d, rc=%s", trx_id_, strrc(rc));
   return rc;
 }
 
@@ -257,4 +276,48 @@ void MvccTrx::trx_fields(Table *table, Field &begin_xid_field, Field &end_xid_fi
   begin_xid_field.set_field(&trx_fields.first[0]);
   end_xid_field.set_table(table);
   end_xid_field.set_field(&trx_fields.first[1]);
+}
+
+// TODO [Lab5] 需要同学们补充代码，相关提示见文档
+RC MvccTrx::redo(Db *db, const LogEntry &log_entry)
+{
+
+  switch (log_entry.log_type()) {
+    case LogEntryType::INSERT: {
+      Table *table = nullptr;
+      const RecordEntry &record_entry = log_entry.record_entry();
+
+      // TODO [Lab5] 需要同学们补充代码，相关提示见文档
+
+      operations_.insert(Operation(Operation::Type::INSERT, table, record_entry.rid_));
+    } break;
+
+    case LogEntryType::DELETE: {
+      Table *table = nullptr;
+      const RecordEntry &record_entry = log_entry.record_entry();
+
+      // TODO [Lab5] 需要同学们补充代码，相关提示见文档
+
+      operations_.insert(Operation(Operation::Type::DELETE, table, record_entry.rid_));
+    } break;
+
+    case LogEntryType::MTR_COMMIT: {
+
+      // TODO [Lab5] 需要同学们补充代码，相关提示见文档
+
+    } break;
+
+    case LogEntryType::MTR_ROLLBACK: {
+
+      // TODO [Lab5] 需要同学们补充代码，相关提示见文档
+
+    } break;
+
+    default: {
+      ASSERT(false, "unsupported redo log. log entry=%s", log_entry.to_string().c_str());
+      return RC::INTERNAL;
+    } break;
+  }
+
+  return RC::SUCCESS;
 }
