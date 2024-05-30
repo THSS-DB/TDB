@@ -8,10 +8,7 @@ public:
  RowTuple() = default;
  virtual ~RowTuple()
  {
-   for (FieldExpr *spec : species_) {
-     delete spec;
-   }
-   species_.clear();
+   _clear_species();
  }
 
  const TupleType tuple_type() const override { return RowTuple_Type; }
@@ -36,10 +33,22 @@ public:
    this->bitmap_.init(record->data() + null_filed_meta->offset(), null_filed_meta->len());
  }
 
+void _clear_species(){
+   if(!species_.empty()){
+    for(auto& field_expr : species_){
+      delete field_expr;  //clear()前先释放目前的fields
+    }
+    species_.clear();
+   }
+}
+
+
  void set_schema(const Table *table, const std::string &table_alias, const std::vector<FieldMeta> *fields)
  {
    table_ = table;
+   table_alias_ = table_alias;
    this->species_.reserve(fields->size());
+   _clear_species(); //reopen时防止sepcies_就会积累多套重复的fields。
    for (const FieldMeta &field : *fields) {
      species_.push_back(new FieldExpr(table, &field));
      species_[species_.size() - 1]->set_field_table_alias(table_alias);
@@ -81,15 +90,14 @@ public:
  {
    const char *table_name = spec.table_name();
    const char *field_name = spec.field_name();
-   if (0 != strcmp(table_name, table_->name())) {
+   if (0 != strcmp(table_name, table_->name()) || spec.alias() != table_alias_) {
      return RC::NOTFOUND;
    }
 
    for (size_t i = 0; i < species_.size(); ++i) {
      const FieldExpr *field_expr = species_[i];
      const Field &field = field_expr->field();
-     if (0 == strcmp(table_name, field.table_name()) &&
-         0 == strcmp(field_name, field.field_name())) {
+     if (0 == strcmp(field_name, field.field_name())) {
        return cell_at(i, cell);
      }
    }
@@ -110,6 +118,7 @@ private:
  Record *record_ = nullptr;
  common::Bitmap bitmap_;
  const Table *table_ = nullptr;
+ std::string table_alias_;
  std::vector<FieldExpr *> species_;
  bool order_set_ = false;
 };

@@ -8,6 +8,7 @@
 #include "common/log/log.h"
 #include "common/lang/string.h"
 #include "include/storage_engine/recorder/table.h"
+#include "include/storage_engine/recorder/field.h"
 #include "include/storage_engine/recover/redo_log.h"
 
 class RID;
@@ -48,7 +49,7 @@ public:
 
 private:
   Type type_;
-  Table * table_ = nullptr;  // 操作的哪张表。这里直接使用表其实并不准确，因为表中的索引也可能有日志
+  Table * table_ = nullptr;  // 操作的哪张表
   PageNum page_num_;
   SlotNum slot_num_;
 };
@@ -100,8 +101,6 @@ public:
   virtual RC start_if_need() = 0;
   virtual RC commit() = 0;
   virtual RC rollback() = 0;
-
-//  virtual RC redo(Db *db, const RedoLogRecord &log_record);
 
   virtual int32_t id() const = 0;
 };

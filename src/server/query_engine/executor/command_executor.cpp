@@ -9,6 +9,8 @@
 #include "include/query_engine/executor/help_executor.h"
 #include "include/query_engine/executor/show_tables_executor.h"
 #include "include/query_engine/executor/load_data_executor.h"
+#include "include/query_engine/executor/trx_begin_executor.h"
+#include "include/query_engine/executor/trx_end_executor.h"
 
 RC CommandExecutor::execute(QueryInfo *query_info)
 {
@@ -47,6 +49,17 @@ RC CommandExecutor::execute(QueryInfo *query_info)
 
     case StmtType::LOAD_DATA: {
       LoadDataExecutor executor;
+      return executor.execute(query_info);
+    }
+
+    case StmtType::BEGIN: {
+      TrxBeginExecutor executor;
+      return executor.execute(query_info);
+    }
+
+    case StmtType::COMMIT:
+    case StmtType::ROLLBACK: {
+      TrxEndExecutor executor;
       return executor.execute(query_info);
     }
 
