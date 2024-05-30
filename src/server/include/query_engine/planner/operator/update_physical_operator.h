@@ -15,7 +15,7 @@ public:
   UpdatePhysicalOperator(Table *table, std::vector<UpdateUnit> update_units) : table_(table), update_units_(std::move(update_units))
   {}
 
-  virtual ~UpdatePhysicalOperator() = default;
+  virtual ~UpdatePhysicalOperator();
 
   PhysicalOperatorType type() const override
   {

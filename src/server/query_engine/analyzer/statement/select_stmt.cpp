@@ -12,9 +12,24 @@
 
 SelectStmt::~SelectStmt()
 {
+  // 这些都是 create 中创建的对象，独占所有权，需要释放
+  for (auto *field : query_fields_) {
+    delete field;
+  }
+  for (auto *project : projects_) {
+    delete project;
+  }
+
   if (nullptr != filter_stmt_) {
     delete filter_stmt_;
     filter_stmt_ = nullptr;
+  }
+
+  delete group_by_stmt_;
+  delete having_stmt_;
+  delete order_stmt_;
+  for (auto *join_filter_stmt : join_filter_stmts_) {
+    delete join_filter_stmt;
   }
 }
 
@@ -48,12 +63,7 @@ static void wildcard_fields(
     Table *table,
     int table_count,
     std::vector<Expression*> &projects,
-    std::unordered_map<Table *, std::string> &alias_map) {
-
-  std::string alias = table->name();
-  if (alias_map.contains(table)) {
-    alias = alias_map[table];
-  }
+    const std::string &alias) {
 
   if (table_count == 1) {
     wildcard_fields_without_table_name(table, projects, alias);
@@ -63,8 +73,9 @@ static void wildcard_fields(
 }
 
 RC _process_attribute_expression(Db *db, const Expression *expr, const char *table_name, const char* field_name,
-    std::vector<Table *> &tables, std::vector<Expression *> &projects,std::unordered_map<Table *, std::string> alias_map,
-    std::unordered_map<std::string, Table *> &table_map){
+    const std::vector<Table *> &tables /*in*/,
+    std::vector<Expression *> &projects /*out*/,
+    const std::vector<std::string> &table_alias /*in*/) {
   int table_count = static_cast<int>(tables.size());
   /**
    * There should be four possible states for attribute_expression with '*'
@@ -76,75 +87,63 @@ RC _process_attribute_expression(Db *db, const Expression *expr, const char *tab
    * This method is complex, you can try to optimize it and submit PR if you like.
    */
 
-  if (common::is_blank(table_name) &&
-      0 == strcmp(field_name, "*")) { // select *
-    for (Table *table : tables) {
-      wildcard_fields(table, table_count, projects, alias_map);
-    }
-  // Table name is not null
-  } else if (!common::is_blank(table_name)) {
-    if (0 == strcmp(table_name, "*")) {
-      if (0 != strcmp(field_name, "*")) {
-        // *.attr is unsupported, because you can't guarantee there is
-        // corresponding 'attr' in each table
-        LOG_WARN("invalid field name while table is *. attr=%s", field_name);
-        return RC::SCHEMA_FIELD_MISSING;
-      }
-      // *.* is supported
-      for (Table *table : tables) {
-        wildcard_fields(table, table_count, projects, alias_map);
-      }
-    } else {
-      // If table_name is not '*', just get fieldExpressions.
-      auto iter = table_map.find(table_name);
-      if (iter == table_map.end()) {
-        LOG_WARN("no such table in from list: %s", table_name);
-        return RC::SCHEMA_FIELD_MISSING;
-      }
+  bool table_is_blank = common::is_blank(table_name);
+  bool table_is_wildcard = 0 == strcmp(table_name, "*");
+  bool field_is_wildcard = 0 == strcmp(field_name, "*");
 
-      Table *table = iter->second;
-      if (0 == strcmp(field_name, "*")) { // select table.*
-        std::string alias = table->name();
-        if (alias_map.contains(table)) {
-          alias = alias_map[table];
-        }
-        wildcard_fields_with_table_name(table, projects, alias);
-
-      } else { // table.attr
-        const FieldMeta *field_meta = table->table_meta().field(field_name);
-        if (nullptr == field_meta) {
-          LOG_WARN("no such field. field=%s.%s.%s", db->name(), table->name(), field_name);
-          return RC::SCHEMA_FIELD_MISSING;
-        }
-        auto *field_expr = new FieldExpr(table, field_meta);
-        std::string alias = table->name();
-        if (alias_map.find(table) != alias_map.end()) {
-          alias = alias_map[table];
-        }
-        field_expr->set_field_table_alias(alias);
-        field_expr->set_alias(expr->alias().empty() ? expr->name() : expr->alias());
-        projects.push_back(field_expr);
-
+  if (field_is_wildcard) {
+    if (table_is_blank || table_is_wildcard) {
+      // select * or select *.*
+      for (int i = 0; i < table_count; i++) {
+        wildcard_fields(tables[i], table_count, projects, table_alias[i]);
       }
+      return RC::SUCCESS;
     }
   } else {
+    if (table_is_wildcard) {
+      // select *.attr is unsupported, because you can't guarantee there is
+      // corresponding 'attr' in each table
+      LOG_WARN("invalid field name while table is *. attr=%s", field_name);
+      return RC::SCHEMA_FIELD_MISSING;
+    }
+  }
+
+  // select attr or select table.(attr|*), all for a certain table
+  Table *table = nullptr;
+  std::string alias;
+
+  if (table_is_blank) {
     // If table_name is null, there should be only one table as default table, otherwise it
     // will be ambiguous
-    if (tables.size() != 1) {
+    if (table_count != 1) {
       LOG_WARN("invalid. I do not know the attr's table. attr=%s", field_name);
       return RC::SCHEMA_FIELD_MISSING;
     }
-    Table *table = tables[0];
+
+    table = tables.front();
+    alias = table_alias.front();
+  } else {
+    auto iter = std::find(table_alias.begin(), table_alias.end(), table_name);
+    if (iter == table_alias.end()) {
+      LOG_WARN("no such table in from list: %s", table_name);
+      return RC::SCHEMA_FIELD_MISSING;
+    }
+
+    table = tables[iter - table_alias.begin()];
+    alias = *iter;
+  }
+
+  if (field_is_wildcard) {
+    // select table.*
+    wildcard_fields_with_table_name(table, projects, alias);
+  } else {
+    // select a single field
     const FieldMeta *field_meta = table->table_meta().field(field_name);
     if (nullptr == field_meta) {
       LOG_WARN("no such field. field=%s.%s", table->name(), field_name);
       return RC::SCHEMA_FIELD_MISSING;
     }
     auto *field_expr = new FieldExpr(table, field_meta);
-    std::string alias = table->name();
-    if (alias_map.contains(table)) {
-      alias = alias_map[table];
-    }
     field_expr->set_field_table_alias(alias);
     field_expr->set_alias(expr->alias().empty() ? expr->name() : expr->alias());
     projects.push_back(field_expr);
@@ -162,39 +161,31 @@ RC SelectStmt::analyze_tables_and_projects(
     std::vector<Expression *> &projects) {
 
   // 1. Collect tables in `from` statement
-  std::unordered_map<Table *, std::string> alias_map;
   for (size_t i = 0; i < select_sql.relations.size(); i++) {
-    const char *table_name = select_sql.relations[i].relation_name.c_str();
-    const char *alias_name = select_sql.relations[i].alias.c_str();
-    if (nullptr == table_name) {
-      LOG_WARN("invalid argument. relation name is null. index=%d", i);
-      return RC::INVALID_ARGUMENT;
+    const string &table_name = select_sql.relations[i].relation_name;
+    string alias_name = select_sql.relations[i].alias;
+    
+    // If alias is empty, use table_name as alias
+    if (alias_name.empty()) {
+      alias_name = table_name;
     }
 
     // check if alias duplicate
-    if (!select_sql.relations[i].alias.empty()) {
-      if (0 != table_map.count(std::string(alias_name))) {
-        return RC::SQL_SYNTAX;
-      }
+    if (0 != table_map.count(alias_name)) {
+      return RC::SQL_SYNTAX;
     }
 
     // Find relevant table object from memory(opened_tables)
-    Table *table = db->find_table(table_name);
+    Table *table = db->find_table(table_name.c_str());
     if (nullptr == table) {
-      LOG_WARN("no such table. db=%s, table_name=%s", db->name(), table_name);
+      LOG_WARN("no such table. db=%s, table_name=%s", db->name(), table_name.c_str());
       return RC::SCHEMA_TABLE_NOT_EXIST;
     }
 
     tables.push_back(table);
 
-    table_map.insert(std::pair<std::string, Table *>(table_name, table));
-    if (!select_sql.relations[i].alias.empty()) {
-      table_map.insert(std::pair<std::string, Table *>(alias_name, table));
-      alias_map.insert(std::pair<Table *, std::string>(table, alias_name));
-      table_alias.emplace_back(alias_name);
-    } else {
-      table_alias.emplace_back(table_name);
-    }
+    table_map.insert(std::pair<std::string, Table *>(alias_name, table));
+    table_alias.emplace_back(alias_name);
   }
 
   // 2. Collect info in `select` statement
@@ -206,8 +197,11 @@ RC SelectStmt::analyze_tables_and_projects(
       const auto *rel_attr_expr = dynamic_cast<const RelAttrExpr *>(expr);
       const RelAttrSqlNode relation_attr = rel_attr_expr->rel_attr_sql_node();
       // special logic for attribute expression to deal with '*'
-      _process_attribute_expression(db, expr, relation_attr.relation_name.c_str(), relation_attr.attribute_name.c_str(),
-          tables, projects, alias_map, table_map);
+      RC rc = _process_attribute_expression(db, expr, relation_attr.relation_name.c_str(), relation_attr.attribute_name.c_str(),
+          tables, projects, table_alias);
+      if (rc != RC::SUCCESS) {
+        return rc;
+      }
 
     } else {
       // normal expression analysis
@@ -366,7 +360,7 @@ RC SelectStmt::create(Db *db, const SelectSqlNode &select_sql, Stmt *&stmt)
   select_stmt->group_by_stmt_ = group_by_stmt;
   select_stmt->having_stmt_ = having_stmt;
   select_stmt->order_stmt_ = order_stmt;
-  select_stmt->join_filter_stmts_ = join_filter_stmts;
+  select_stmt->join_filter_stmts_.swap(join_filter_stmts);
   stmt = select_stmt;
   return RC::SUCCESS;
 }

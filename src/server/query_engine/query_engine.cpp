@@ -36,7 +36,7 @@ bool QueryEngine::process_session_request(SessionRequest *request) {
   }
   auto end_time = std::chrono::high_resolution_clock::now();
   auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time);
-  snprintf(time_str, 64, "Cost time: %ld ns\n", duration.count());
+  snprintf(time_str, 64, "Cost time: %lld ns\n", duration.count());
   
   request->get_communicator()->write_result(time_str, strlen(time_str));
   request->get_communicator()->send_message_delimiter();

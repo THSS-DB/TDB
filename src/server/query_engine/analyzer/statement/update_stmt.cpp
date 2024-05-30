@@ -9,6 +9,15 @@
 UpdateStmt::UpdateStmt(Table *table, std::vector<UpdateUnit> update_units, FilterStmt *filter_stmt) : table_(table), update_units_(std::move(update_units)), filter_stmt_(filter_stmt)
 {}
 
+UpdateStmt::~UpdateStmt()
+{
+  // 这些都是 create 中创建的对象，独占所有权，需要释放
+  delete filter_stmt_;
+  for (auto &unit : update_units_) {
+    delete unit.value;
+  }
+}
+
 RC UpdateStmt::create(Db *db, const UpdateSqlNode &update, Stmt *&stmt)
 {
   const char *table_name = update.relation_name.c_str();

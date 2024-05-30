@@ -25,6 +25,7 @@ RC write_to_communicator(const char* data, int32_t size, Communicator* communica
       LOG_WARN("failed to send data to client. err=%s", strerror(errno));
       return rc;
     }
+    delete[] padding;
   }
   RC rc = communicator->write_result(data, size);
   if(RC_FAIL(rc)){
@@ -171,6 +172,7 @@ RC send_result(SessionRequest *request, bool &need_disconnect, const size_t &min
         Value value;
         rc = tuple->cell_at(i, value);
         if(rc != RC::SUCCESS){
+          LOG_WARN("failed to get value from tuple. rc=%s", strrc(rc));
           sql_result->close();
           return rc;
         }
@@ -178,6 +180,7 @@ RC send_result(SessionRequest *request, bool &need_disconnect, const size_t &min
         std::string value_str;
         rc = value_to_string(value, value_str);
         if(rc != RC::SUCCESS){
+          LOG_WARN("failed to convert value to string. rc=%s", strrc(rc));
           sql_result->close();
           return rc;
         }

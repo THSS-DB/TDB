@@ -1,23 +1,20 @@
 #include "include/storage_engine/transaction/trx.h"
 #include "include/storage_engine/transaction/vacuous_trx.h"
-#include "include/storage_engine/recorder/table.h"
+#include "include/storage_engine/transaction/mvcc_trx.h"
 #include "include/storage_engine/recorder/record.h"
 #include "include/storage_engine/recorder/record_manager.h"
-#include "include/storage_engine/schema/database.h"
-#include "include/storage_engine/recover/redo_log.h"
 
 static TrxManager *global_trx_manager = nullptr;
 
 TrxManager *TrxManager::create(const char *name)
 {
- if (common::is_blank(name) || 0 == strcasecmp(name, "vacuous")) {
-   return dynamic_cast<TrxManager*>(new VacuousTrxManager());
- }
-//  TODO [Lab4] 需要同学们完成MVCC的实现
-// if (0 == strcasecmp(name, "mvcc")) {
-//   return dynamic_cast<TrxManager*>(new MvccTrxManager());
-// }
- LOG_ERROR("unknown trx kit name. name=%s", name);
+  if (common::is_blank(name) || 0 == strcasecmp(name, "vacuous")) {
+    return dynamic_cast<TrxManager*>(new VacuousTrxManager());
+  }
+  if (0 == strcasecmp(name, "mvcc")) {
+    return dynamic_cast<TrxManager*>(new MvccTrxManager());
+  }
+  LOG_ERROR("unknown trx kit name. name=%s", name);
   return nullptr;
 }
 

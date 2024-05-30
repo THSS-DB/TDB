@@ -301,8 +301,13 @@ int Server::start_stdin_server()
 
     /// 在当前线程立即处理对应的事件
     bool need_disconnect = query_engine_.process_session_request(event);
+    // event 对象在 read_event 中创建，需要在这里释放
+    delete event;
     if(need_disconnect){
-      Server::close_connection(communicator);
+      // 函数最后已经做了清理工作，且 stdin server 不需要创建 read_event
+      // 所以此处无需调用 close_connection，直接退出循环即可
+      // Server::close_connection(communicator);
+      break;
     }
   }
 

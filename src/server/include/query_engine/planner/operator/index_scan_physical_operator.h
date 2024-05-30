@@ -39,6 +39,10 @@ public:
     return PhysicalOperatorType::INDEX_SCAN;
   }
 
+  void set_table_alias(const std::string &alias) {
+    table_alias_ = alias;
+  }
+
   RC open(Trx *trx) override;
   RC next() override;
   RC close() override;
@@ -54,6 +58,7 @@ public:
  private:
   RC filter(RowTuple &tuple, bool &result);
   Table *table_ = nullptr;
+  std::string table_alias_;
   Index *index_ = nullptr;
   IndexScanner *index_scanner_ = nullptr;
   RecordFileHandler *record_handler_ = nullptr;

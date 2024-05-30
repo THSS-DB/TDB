@@ -15,6 +15,7 @@ class UpdateStmt : public Stmt
 {
 public:
   UpdateStmt(Table *table, std::vector<UpdateUnit> update_units, FilterStmt *filter_stmt);
+  ~UpdateStmt();
 
 public:
   static RC create(Db *db, const UpdateSqlNode &update_sql, Stmt *&stmt);

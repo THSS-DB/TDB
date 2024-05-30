@@ -26,3 +26,9 @@ TupleCellSpec::TupleCellSpec(const char *alias)
     alias_ = alias;
   }
 }
+
+TupleCellSpec::~TupleCellSpec()
+{
+  // 构造时 copy 了一份 expression，这里需要释放
+  delete expression_;
+}
