@@ -59,7 +59,8 @@ class OperationHasher
 public:
   size_t operator()(const Operation &op) const
   {
-    return (((size_t)op.page_num()) << 32) | (op.slot_num());
+    // 哈希时考虑操作类型
+    return (((size_t)op.page_num()) << 32) | ((size_t)(op.slot_num()) << 2) | (size_t)op.type();
   }
 };
 
@@ -68,8 +69,10 @@ class OperationEqualer
 public:
   bool operator()(const Operation &op1, const Operation &op2) const
   {
+    // 判断重复时考虑操作类型
     return op1.table_id() == op2.table_id() &&
-        op1.page_num() == op2.page_num() && op1.slot_num() == op2.slot_num();
+        op1.page_num() == op2.page_num() && op1.slot_num() == op2.slot_num()
+        && op1.type() == op2.type();
   }
 };
 
