@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <atomic>
 #include <deque>
 #include <string>
 #include <fcntl.h>
