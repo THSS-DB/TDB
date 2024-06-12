@@ -1,6 +1,9 @@
 #include "include/storage_engine/recorder/record_manager.h"
 #include "include/storage_engine/recorder/table.h"
 #include "include/storage_engine/transaction/trx.h"
+#include "include/query_engine/structor/expression/comparison_expression.h"
+#include "include/query_engine/structor/expression/field_expression.h"
+#include "include/query_engine/structor/expression/value_expression.h"
 
 
 using namespace common;
@@ -473,6 +476,31 @@ RC RecordFileScanner::open_scan(
   return rc;
 }
 
+RC RecordFileScanner::open_scan(
+    Table *table, FileBufferPool &buffer_pool, Trx *trx, bool readonly,
+    std::vector<std::unique_ptr<Expression>> predicate_exprs) {
+  close_scan();
+
+  table_ = table;
+  file_buffer_pool_ = &buffer_pool;
+  trx_ = trx;
+  readonly_ = readonly;
+
+  RC rc = bp_iterator_.init(buffer_pool);
+  if (rc != RC::SUCCESS) {
+    LOG_WARN("failed to init bp iterator. rc=%d:%s", rc, strrc(rc));
+    return rc;
+  }
+
+  predicates_ = std::move(predicate_exprs);
+
+  rc = fetch_next_record();
+  if (rc == RC::RECORD_EOF) {
+    rc = RC::SUCCESS;
+  }
+  return rc;
+}
+
 /**
  * @brief 从当前位置开始找到下一条有效的记录
  *
@@ -535,6 +563,81 @@ RC RecordFileScanner::fetch_next_record_in_page()
 
     // 如果有过滤条件，就用过滤条件过滤一下
     if (condition_filter_ != nullptr && !condition_filter_->filter(next_record_)) {
+      continue;
+    }
+
+    bool pass = false;
+    if (!predicates_.empty()) {
+      ValueExpr *value_expression = nullptr;
+      for (auto &predicate : predicates_) {
+        if (predicate->type() == ExprType::COMPARISON) {
+          /**
+           * 例如 where id = 1
+           */
+          auto comp_expr = dynamic_cast<ComparisonExpr *>(predicate.get());
+
+          Expression *left_expr = comp_expr->left().get();    // 即id
+          Expression *right_expr = comp_expr->right().get();  // 即1
+
+          Value right_value;  // 1
+          rc = right_expr->try_get_value(right_value);
+          bool left_value_is_field = true;  // 默认左边是字段
+          // 有可能是 1 = id 的情况
+          if (rc != RC::SUCCESS) {
+            left_value_is_field = false;
+          }
+
+          // 获取左边的字段
+          std::vector<Field *> query_fields;
+          if (left_value_is_field)
+            left_expr->getFields(query_fields);
+          else
+            right_expr->getFields(query_fields);
+
+          for (auto field : query_fields) {
+            const char *record = field->get_data(next_record_);
+            char *recordNonConst = const_cast<char *>(record);
+
+            Value left_value;
+            // id=1的情况
+            if (left_value_is_field) {
+              // 获取左边的值
+              left_value =
+                  Value(field->attr_type(), recordNonConst, field->len());
+            }
+            // 1=id的情况
+            else {
+              left_expr->try_get_value(left_value);
+              right_value =
+                  Value(field->attr_type(), recordNonConst, field->len());
+            }
+
+            // 比较左右两边的值
+            bool compare_result = false;
+            rc = comp_expr->compare_value(left_value, right_value,
+                                          compare_result);
+
+            if (rc != RC::SUCCESS) {
+              LOG_WARN("failed to compare value. rc=%s", strrc(rc));
+              return rc;
+            }
+
+            // 不相等则过滤掉
+            if (!compare_result) {
+              pass = true;
+              break;
+            }
+          }
+
+          if (pass) {
+            break;
+          }
+        }
+      }
+    }
+
+    // 不满足过滤条件，就继续找下一条记录，不需要进行事务探测
+    if (pass) {
       continue;
     }
 
