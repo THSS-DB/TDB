@@ -95,6 +95,12 @@ int32_t MvccTrxManager::max_trx_id() const
   return numeric_limits<int32_t>::max();
 }
 
+void MvccTrxManager::update_trx_id(int32_t trx_id)
+{
+  int32_t old_trx_id = current_trx_id_;
+  while (old_trx_id < trx_id && !current_trx_id_.compare_exchange_weak(old_trx_id, trx_id));
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 MvccTrx::MvccTrx(MvccTrxManager &kit, LogManager *log_manager) : trx_kit_(kit), log_manager_(log_manager)
 {}
@@ -167,6 +173,11 @@ RC MvccTrx::commit_with_trx_id(int32_t commit_xid)
 {
   RC rc = RC::SUCCESS;
   started_ = false;
+
+  if (recovering_) {
+    // 在事务恢复时，更新当前事务 id 避免被后续事务重用
+    trx_kit_.update_trx_id(commit_xid);
+  }
 
   for (const Operation &operation : operations_) {
     switch (operation.type()) {

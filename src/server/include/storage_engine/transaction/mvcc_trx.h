@@ -23,6 +23,9 @@ public:
   int32_t next_trx_id();
   int32_t max_trx_id() const;
 
+  // 在 recover 场景下使用，确保当前事务 id 不小于 trx_id
+  void update_trx_id(int32_t trx_id);
+
 private:
   std::vector<FieldMeta> fields_; // 存储事务数据需要用到的字段元数据，所有表结构都需要带
   std::atomic<int32_t> current_trx_id_{0};
