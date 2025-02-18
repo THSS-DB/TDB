@@ -215,7 +215,8 @@ int Server::start_tcp_server()
   }
 
   started_ = true;
-  LOG_INFO("Observer start success");
+  LOG_INFO("TDB server start success");
+  std::cout << "TDB server started! \nTry to launch client to use TDB." << std::endl;
   return 0;
 }
 
@@ -272,7 +273,7 @@ int Server::start_unix_socket_server()
   }
 
   started_ = true;
-  LOG_INFO("Observer start success");
+  LOG_INFO("TDB server start success");
   return 0;
 }
 

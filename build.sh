@@ -9,8 +9,7 @@ CMAKE_COMMAND="cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 --log-level=STATUS"
 
 ALL_ARGS=("$@")
 BUILD_ARGS=()
-MAKE_ARGS=(-j $CPU_CORES)
-MAKE=make
+MAKE_ARGS=(-j 4)
 
 echo "$0 ${ALL_ARGS[@]}"
 
@@ -31,8 +30,8 @@ function usage
   echo "# Init."
   echo "./build.sh init"
   echo ""
-  echo "# Build by debug mode and make with -j24."
-  echo "./build.sh debug --make -j24"
+  echo "# Build： by debug mode and make with -j4."
+  echo "./build.sh debug --make -j4"
 }
 
 function parse_args
@@ -55,11 +54,8 @@ function parse_args
 # try call command make, if use give --make in command line.
 function try_make
 {
-  if [[ $MAKE != false ]]
-  then
-    # use single thread `make` if concurrent building failed
-    $MAKE "${MAKE_ARGS[@]}" || $MAKE
-  fi
+  # use single thread `make` if concurrent building failed
+  make "${MAKE_ARGS[@]}" || make
 }
 
 # create build directory and cd it.
