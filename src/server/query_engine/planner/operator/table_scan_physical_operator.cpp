@@ -5,7 +5,8 @@ using namespace std;
 
 RC TableScanPhysicalOperator::open(Trx *trx)
 {
-  RC rc = table_->get_record_scanner(record_scanner_, trx, readonly_);
+  // 将predicates_传下去，让record_scanner_做过滤
+  RC rc = table_->get_record_scanner(record_scanner_, trx, readonly_,std::move(predicates_));
   if (rc == RC::SUCCESS) {
     tuple_.set_schema(table_, table_alias_, table_->table_meta().field_metas());
   }
