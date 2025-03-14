@@ -85,7 +85,7 @@ public:
    * @brief 判断当前页帧是否可以被淘汰
    * @details 当pin count为0时，页面可以被淘汰
    */
-  bool can_evict() { return pin_count_.load() == 0; }
+  bool can_evict() const { return pin_count_.load() == 0; }
 
   /**
    * @brief 给当前页帧增加引用计数
