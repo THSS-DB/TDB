@@ -90,6 +90,8 @@ public:
 
   RC get_record_scanner(RecordFileScanner &scanner, Trx *trx, bool readonly);
 
+  RC get_record_scanner(RecordFileScanner &scanner, Trx *trx, bool readonly, std::vector<std::unique_ptr<Expression>> predicate_exprs);
+
   RecordFileHandler *record_handler() const
   {
     return record_handler_;

@@ -2,6 +2,8 @@
 #include "include/storage_engine/recorder/record_manager.h"
 #include "include/storage_engine/schema/schema_util.h"
 #include "include/storage_engine/index/bplus_tree_index.h"
+#include "include/storage_engine/transaction/mvcc_trx.h"
+#include "include/storage_engine/transaction/trx.h"
 #include <random>
 
 
@@ -486,6 +488,18 @@ RC Table::get_record_scanner(RecordFileScanner &scanner, Trx *trx, bool readonly
   RC rc = scanner.open_scan(this, *data_buffer_pool_, trx, readonly, nullptr);
   if (rc != RC::SUCCESS) {
     LOG_ERROR("failed to open scanner. rc=%s", strrc(rc));
+  }
+  return rc;
+}
+
+RC Table::get_record_scanner(
+    RecordFileScanner &scanner, Trx *trx, bool readonly,
+    std::vector<std::unique_ptr<Expression>> predicate_exprs) {
+  
+  RC rc = scanner.open_scan(this, *data_buffer_pool_, trx, readonly,
+                            std::move(predicate_exprs));
+  if (rc != RC::SUCCESS) {
+    LOG_WARN("failed to open scanner. rc=%s", strrc(rc));
   }
   return rc;
 }
