@@ -3,6 +3,8 @@
 #include "include/storage_engine/recorder/record.h"
 #include "include/query_engine/analyzer/statement/filter_stmt.h"
 #include "include/storage_engine/recorder/field.h"
+#include <algorithm>
+
 OrderPhysicalOperator::OrderPhysicalOperator(std::vector<OrderByUnit *> order_units) : order_units_(std::move(order_units))
 {}
 
