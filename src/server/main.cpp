@@ -18,7 +18,7 @@ static Server *g_server = nullptr;
 
 void usage()
 {
-  std::cout << "Useage " << std::endl;
+  std::cout << "Usage " << std::endl;
   std::cout << "-p: server port. if not specified, the item in the config file will be used" << std::endl;
   std::cout << "-f: path of config file." << std::endl;
   std::cout << "-s: use unix socket and the argument is socket address" << std::endl;
