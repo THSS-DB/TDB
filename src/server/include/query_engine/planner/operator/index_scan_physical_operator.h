@@ -51,7 +51,7 @@ public:
 
   std::string param() const override;
 
-  void set_predicates(std::vector<std::unique_ptr<Expression>> &predicates) {
+  void set_predicates(std::vector<std::unique_ptr<Expression>> &&predicates) {
     predicates_ = std::move(predicates);
   }
 
