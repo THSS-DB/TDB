@@ -10,6 +10,8 @@
 #include "include/storage_engine/schema/database.h"
 #include "include/storage_engine/recorder/table.h"
 
+#include <algorithm>
+
 SelectStmt::~SelectStmt()
 {
   // 这些都是 create 中创建的对象，独占所有权，需要释放
