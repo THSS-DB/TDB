@@ -55,7 +55,7 @@ const int32_t RecordEntry::HEADER_SIZE = sizeof(RecordEntry) - sizeof(RecordEntr
 
 RecordEntry::~RecordEntry()
 {
-  if (data_ == nullptr) {
+  if (data_ != nullptr) {
     delete[] data_;
   }
 }
