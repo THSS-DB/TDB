@@ -3,6 +3,7 @@
 #include "include/storage_engine/buffer/buffer_pool.h"
 #include "include/storage_engine/recorder/record.h"
 #include "include/storage_engine/recorder/condition_filter.h"
+#include "include/query_engine/structor/expression/expression.h"
 #include "common/lang/bitmap.h"
 
 class ConditionFilter;
@@ -323,6 +324,7 @@ public:
    * @param condition_filter 做一些初步过滤操作
    */
   RC open_scan(Table *table, FileBufferPool &buffer_pool, Trx *trx, bool readonly, ConditionFilter *condition_filter);
+  RC open_scan(Table *table, FileBufferPool &buffer_pool, Trx *trx, bool readonly, std::vector<std::unique_ptr<Expression>> predicate_exprs);
 
   /**
    * @brief 关闭一个文件扫描，释放相应的资源
@@ -367,4 +369,6 @@ private:
   RecordPageHandler  record_page_handler_;         // 处理文件某页面的记录
   RecordPageIterator record_page_iterator_;        // 遍历某个页面上的所有record
   Record             next_record_;                 // 获取的记录放在这里缓存起来
+  std::vector<std::unique_ptr<Expression>> predicates_; // 过滤的谓词
+
 };
