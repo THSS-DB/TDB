@@ -7,13 +7,12 @@
 #include "include/query_engine/analyzer/statement/select_stmt.h"
 
 RC analyze_expression(
-    const Expression* expr,
+    const Expression *expr,
     Db *db,
     const std::unordered_map<std::string, Table *> &table_map,
     const std::vector<Table *> &tables,
     Expression *&res_expr,
     bool is_create_table_select) {
-
   if (expr->type() == ExprType::AGGR) {
     const auto *aggr_expr = dynamic_cast<const AggrExpr *>(expr);
     Expression *field_expr = nullptr;
@@ -24,7 +23,7 @@ RC analyze_expression(
       field_expr = new FieldExpr(tables.front(), new FieldMeta("*", AttrType::INTS, 0, 1, true));
       field_expr->set_name("*");
       field_expr->set_alias("*");
-      ((FieldExpr *) field_expr)->set_field_table_alias(tables.front()->name());
+      ((FieldExpr *)field_expr)->set_field_table_alias(tables.front()->name());
       res_expr = new AggrExpr(aggr_expr->_aggr_type_(), field_expr);
       res_expr->set_name(expr->name());
       res_expr->set_alias(expr->alias());
@@ -85,9 +84,9 @@ RC analyze_expression(
 
     // Create new expression
     res_expr = new ArithmeticExpr(
-      arithmetic_expr->arithmetic_type(),
-      std::unique_ptr<Expression>(left_expr),
-      std::unique_ptr<Expression>(right_expr));
+        arithmetic_expr->arithmetic_type(),
+        std::unique_ptr<Expression>(left_expr),
+        std::unique_ptr<Expression>(right_expr));
     res_expr->set_name(expr->name());
     res_expr->set_alias(expr->alias());
     return RC::SUCCESS;
@@ -98,7 +97,7 @@ RC analyze_expression(
     const char *table_name = rel_attr_sql_node.relation_name.c_str();
     const char *field_name = rel_attr_sql_node.attribute_name.c_str();
 
-    if (common::is_blank(table_name)) { // Select from only one table
+    if (common::is_blank(table_name)) {  // Select from only one table
       if (tables.size() != 1) {
         LOG_WARN("invalid. I do not know the attr's table. attr=%s", field_name);
         return RC::SCHEMA_FIELD_MISSING;
@@ -124,12 +123,12 @@ RC analyze_expression(
           break;
         }
       }
-      ((FieldExpr *) res_expr)->set_field_table_alias(alias);
+      ((FieldExpr *)res_expr)->set_field_table_alias(alias);
       res_expr->set_name(expr->name());
       res_expr->set_alias(expr->alias());
       return RC::SUCCESS;
 
-    } else { // Select from specified table
+    } else {  // Select from specified table
       auto iter = table_map.find(table_name);
       if (iter == table_map.end()) {
         LOG_WARN("no such table in from list: %s", table_name);
@@ -144,7 +143,7 @@ RC analyze_expression(
       }
 
       res_expr = new FieldExpr(table, field_meta);
-      ((FieldExpr *) res_expr)->set_field_table_alias(rel_attr_sql_node.relation_name);
+      ((FieldExpr *)res_expr)->set_field_table_alias(rel_attr_sql_node.relation_name);
       res_expr->set_name(expr->name());
       res_expr->set_alias(expr->alias());
       if (std::string(table_name) != std::string(table->name())) {

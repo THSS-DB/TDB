@@ -6,8 +6,7 @@ using namespace common;
 static const int LOG_BUFFER_SIZE = 4 * 1024 * 1024;
 static const char *LOG_FILE_NAME = "redo.log";
 
-RC LogBuffer::append_log_entry(LogEntry *log_entry)
-{
+RC LogBuffer::append_log_entry(LogEntry *log_entry) {
   if (nullptr == log_entry) {
     return RC::INVALID_ARGUMENT;
   }
@@ -24,8 +23,7 @@ RC LogBuffer::append_log_entry(LogEntry *log_entry)
   return RC::SUCCESS;
 }
 
-RC LogBuffer::write_log_entry(LogFile &log_file, LogEntry *log_entry)
-{
+RC LogBuffer::write_log_entry(LogFile &log_file, LogEntry *log_entry) {
   const LogEntryHeader &header = log_entry->header();
   RC rc = log_file.write(reinterpret_cast<const char *>(&header), sizeof(header));
   if (rc != RC::SUCCESS) {
@@ -61,8 +59,7 @@ RC LogBuffer::write_log_entry(LogFile &log_file, LogEntry *log_entry)
   return rc;
 }
 
-RC LogBuffer::flush_buffer(LogFile &log_file)
-{
+RC LogBuffer::flush_buffer(LogFile &log_file) {
   RC rc = RC::SUCCESS;
   int count = 0;
   while (!log_entrys_.empty()) {
@@ -90,8 +87,7 @@ RC LogBuffer::flush_buffer(LogFile &log_file)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-LogFile::~LogFile()
-{
+LogFile::~LogFile() {
   if (fd_ >= 0) {
     LOG_INFO("close log file. file=%s, fd=%d", filename_.c_str(), fd_);
     ::close(fd_);
@@ -99,8 +95,7 @@ LogFile::~LogFile()
   }
 }
 
-RC LogFile::init(const char *path)
-{
+RC LogFile::init(const char *path) {
   RC rc = RC::SUCCESS;
   std::string log_file_path = std::string(path) + common::FILE_PATH_SPLIT_STR + LOG_FILE_NAME;
   int fd = ::open(log_file_path.c_str(), O_RDWR | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR);
@@ -115,8 +110,7 @@ RC LogFile::init(const char *path)
   return rc;
 }
 
-RC LogFile::write(const char *data, int len)
-{
+RC LogFile::write(const char *data, int len) {
   int ret = writen(fd_, data, len);
   if (0 != ret) {
     LOG_WARN("failed to write data to file. filename=%s, data len=%d, error=%s", filename_.c_str(), len, strerror(ret));
@@ -125,8 +119,7 @@ RC LogFile::write(const char *data, int len)
   return RC::SUCCESS;
 }
 
-RC LogFile::read(char *data, int len)
-{
+RC LogFile::read(char *data, int len) {
   int ret = readn(fd_, data, len);
   if (ret != 0) {
     if (ret == -1) {
@@ -140,8 +133,7 @@ RC LogFile::read(char *data, int len)
   return RC::SUCCESS;
 }
 
-RC LogFile::sync()
-{
+RC LogFile::sync() {
   int ret = fsync(fd_);
   if (ret != 0) {
     LOG_WARN("failed to sync file. file=%s, error=%s", filename_.c_str(), strerror(errno));
@@ -150,8 +142,7 @@ RC LogFile::sync()
   return RC::SUCCESS;
 }
 
-RC LogFile::offset(int64_t &off) const
-{
+RC LogFile::offset(int64_t &off) const {
   off_t pos = lseek(fd_, 0, SEEK_CUR);
   if (pos == -1) {
     LOG_WARN("failed to seek. error=%s", strerror(errno));

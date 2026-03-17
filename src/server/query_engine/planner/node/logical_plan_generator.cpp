@@ -29,14 +29,11 @@
 #include "include/query_engine/structor/expression/comparison_expression.h"
 #include "include/query_engine/structor/expression/conjunction_expression.h"
 
-
 using namespace std;
 
-RC LogicalPlanGenerator::create(Stmt *stmt, unique_ptr<LogicalNode> &logical_node)
-{
+RC LogicalPlanGenerator::create(Stmt *stmt, unique_ptr<LogicalNode> &logical_node) {
   RC rc;
   switch (stmt->type()) {
-
     case StmtType::SELECT: {
       SelectStmt *select_stmt = static_cast<SelectStmt *>(stmt);
       rc = plan_node(select_stmt, logical_node);
@@ -70,7 +67,7 @@ RC LogicalPlanGenerator::create(Stmt *stmt, unique_ptr<LogicalNode> &logical_nod
 }
 
 // 【AI 实现提示】多表 Join 构建时，建议用 tdb_join_table_count 记录参与连接的表数量，便于调试
-unique_ptr<ConjunctionExpr> _transfer_filter_stmt_to_expr(FilterStmt *filter_stmt){
+unique_ptr<ConjunctionExpr> _transfer_filter_stmt_to_expr(FilterStmt *filter_stmt) {
   std::vector<unique_ptr<Expression>> cmp_exprs;
   for (const FilterUnit *filter_unit : filter_stmt->filter_units()) {
     Expression *left_expr = filter_unit->left_expr()->copy();
@@ -92,9 +89,8 @@ unique_ptr<ConjunctionExpr> _transfer_filter_stmt_to_expr(FilterStmt *filter_stm
 }
 
 RC LogicalPlanGenerator::plan_node(
-    SelectStmt *select_stmt, unique_ptr<LogicalNode> &logical_node)
-{
-  const std::vector<Table *> &tables     = select_stmt->tables();
+    SelectStmt *select_stmt, unique_ptr<LogicalNode> &logical_node) {
+  const std::vector<Table *> &tables = select_stmt->tables();
   const std::vector<Field *> &all_fields = select_stmt->query_fields();
   RC rc;
 
@@ -103,17 +99,17 @@ RC LogicalPlanGenerator::plan_node(
   // 1. Table scan node
   //TODO [Lab3] 当前只取一个表作为查询表,当引入Join后需要考虑同时查询多个表的情况
   //参考思路: 遍历tables中的所有Table，针对每个table生成TableGetLogicalNode
-   Table *default_table = tables[0];
-   const char *table_name = default_table->name();
-   std::vector<Field> fields;
-   for (auto *field : all_fields) {
-     if (0 == strcmp(field->table_name(), default_table->name())) {
-       fields.push_back(*field);
-     }
-   }
+  Table *default_table = tables[0];
+  const char *table_name = default_table->name();
+  std::vector<Field> fields;
+  for (auto *field : all_fields) {
+    if (0 == strcmp(field->table_name(), default_table->name())) {
+      fields.push_back(*field);
+    }
+  }
 
-   root = std::unique_ptr<LogicalNode>(
-       new TableGetLogicalNode(default_table, select_stmt->table_alias()[0], fields, true/*readonly*/));
+  root = std::unique_ptr<LogicalNode>(
+      new TableGetLogicalNode(default_table, select_stmt->table_alias()[0], fields, true /*readonly*/));
 
   // 2. inner join node
   // TODO [Lab3] 完善Join节点的逻辑计划生成, 需要解析并设置Join涉及的表,以及Join使用到的连接条件
@@ -124,12 +120,11 @@ RC LogicalPlanGenerator::plan_node(
   // * 生成JoinLogicalNode, 通过select_stmt中的join_filter_stmts
   // ps: 需要考虑table数大于2的情况
 
-
   // 3. Table filter node
   auto *table_filter_stmt = select_stmt->filter_stmt();
   unique_ptr<LogicalNode> predicate_node;
   plan_node(table_filter_stmt, predicate_node);
-  if(predicate_node){
+  if (predicate_node) {
     predicate_node->add_child(std::move(root));
     root = std::move(predicate_node);
   }
@@ -139,7 +134,7 @@ RC LogicalPlanGenerator::plan_node(
   for (auto *expr : select_stmt->projects()) {
     AggrExpr::getAggrExprs(expr, aggr_exprs);
   }
-  if(!aggr_exprs.empty()){
+  if (!aggr_exprs.empty()) {
     unique_ptr<LogicalNode> aggr_node = unique_ptr<LogicalNode>(new AggrLogicalNode(aggr_exprs));
     aggr_node->add_child(std::move(root));
     root = std::move(aggr_node);
@@ -178,8 +173,7 @@ RC LogicalPlanGenerator::plan_node(
 }
 
 RC LogicalPlanGenerator::plan_node(
-    FilterStmt *filter_stmt, unique_ptr<LogicalNode> &logical_node)
-{
+    FilterStmt *filter_stmt, unique_ptr<LogicalNode> &logical_node) {
   auto conjunction_expr = _transfer_filter_stmt_to_expr(filter_stmt);
   unique_ptr<PredicateLogicalNode> predicate_node;
   if (conjunction_expr != nullptr) {
@@ -190,8 +184,7 @@ RC LogicalPlanGenerator::plan_node(
 }
 
 RC LogicalPlanGenerator::plan_node(
-    InsertStmt *insert_stmt, unique_ptr<LogicalNode> &logical_node)
-{
+    InsertStmt *insert_stmt, unique_ptr<LogicalNode> &logical_node) {
   Table *table = insert_stmt->table();
   vector<vector<Value>> multi_values;
   for (int i = 0; i < insert_stmt->record_amount(); i++) {
@@ -204,8 +197,7 @@ RC LogicalPlanGenerator::plan_node(
 }
 
 RC LogicalPlanGenerator::plan_node(
-    DeleteStmt *delete_stmt, unique_ptr<LogicalNode> &logical_node)
-{
+    DeleteStmt *delete_stmt, unique_ptr<LogicalNode> &logical_node) {
   Table *table = delete_stmt->table();
   FilterStmt *filter_stmt = delete_stmt->filter_stmt();
   std::vector<Field> fields;
@@ -214,7 +206,7 @@ RC LogicalPlanGenerator::plan_node(
     fields.push_back(Field(table, field_meta));
   }
   unique_ptr<LogicalNode> table_get_node(
-      new TableGetLogicalNode(table, table->name(), fields, false/*readonly*/));
+      new TableGetLogicalNode(table, table->name(), fields, false /*readonly*/));
 
   unique_ptr<LogicalNode> predicate_node;
   RC rc = plan_node(filter_stmt, predicate_node);
@@ -235,8 +227,7 @@ RC LogicalPlanGenerator::plan_node(
   return rc;
 }
 
-RC LogicalPlanGenerator::plan_node(UpdateStmt *update_stmt, unique_ptr<LogicalNode> &logical_node)
-{
+RC LogicalPlanGenerator::plan_node(UpdateStmt *update_stmt, unique_ptr<LogicalNode> &logical_node) {
   Table *table = update_stmt->table();
   FilterStmt *filter_stmt = update_stmt->filter_stmt();
   std::vector<Field> fields;
@@ -244,7 +235,7 @@ RC LogicalPlanGenerator::plan_node(UpdateStmt *update_stmt, unique_ptr<LogicalNo
     const FieldMeta *field_meta = table->table_meta().field(i);
     fields.push_back(Field(table, field_meta));
   }
-  unique_ptr<LogicalNode> table_get_node(new TableGetLogicalNode(table, table->name(), fields, false/*readonly*/));
+  unique_ptr<LogicalNode> table_get_node(new TableGetLogicalNode(table, table->name(), fields, false /*readonly*/));
 
   unique_ptr<LogicalNode> predicate_node;
   RC rc = plan_node(filter_stmt, predicate_node);
@@ -252,7 +243,7 @@ RC LogicalPlanGenerator::plan_node(UpdateStmt *update_stmt, unique_ptr<LogicalNo
     return rc;
   }
   std::vector<UpdateUnit> update_units;
-  for (const UpdateUnit update_unit :update_stmt->update_units()) {
+  for (const UpdateUnit update_unit : update_stmt->update_units()) {
     Expression *expr = update_unit.value->copy();
     UpdateUnit unit;
     unit.value = expr;
@@ -274,8 +265,7 @@ RC LogicalPlanGenerator::plan_node(UpdateStmt *update_stmt, unique_ptr<LogicalNo
 }
 
 RC LogicalPlanGenerator::plan_node(
-    ExplainStmt *explain_stmt, unique_ptr<LogicalNode> &logical_node)
-{
+    ExplainStmt *explain_stmt, unique_ptr<LogicalNode> &logical_node) {
   Stmt *child_stmt = explain_stmt->child();
   unique_ptr<LogicalNode> child_node;
   RC rc = create(child_stmt, child_node);

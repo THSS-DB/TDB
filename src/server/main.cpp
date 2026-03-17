@@ -16,8 +16,7 @@ using namespace common;
 
 static Server *g_server = nullptr;
 
-void usage()
-{
+void usage() {
   std::cout << "Usage " << std::endl;
   std::cout << "-p: server port. if not specified, the item in the config file will be used" << std::endl;
   std::cout << "-f: path of config file." << std::endl;
@@ -27,8 +26,7 @@ void usage()
   std::cout << "-n: buffer pool memory size in byte" << std::endl;
 }
 
-void parse_parameter(int argc, char **argv)
-{
+void parse_parameter(int argc, char **argv) {
   std::string process_name = get_process_name(argv[0]);
 
   ProcessParam *process_param = the_process_param();
@@ -75,8 +73,7 @@ void parse_parameter(int argc, char **argv)
   }
 }
 
-Server *init_server()
-{
+Server *init_server() {
   std::map<std::string, std::string> net_section = get_properties()->get(NET);
 
   ProcessParam *process_param = the_process_param();
@@ -135,8 +132,7 @@ Server *init_server()
  * 那么直接在signal_handler里面处理的话，可能会导致死锁
  * 所以这里单独创建一个线程
  */
-void *quit_thread_func(void *_signum)
-{
+void *quit_thread_func(void *_signum) {
   intptr_t signum = (intptr_t)_signum;
   LOG_INFO("Receive signal: %ld", signum);
   if (g_server) {
@@ -144,14 +140,12 @@ void *quit_thread_func(void *_signum)
   }
   return nullptr;
 }
-void quit_signal_handle(int signum)
-{
+void quit_signal_handle(int signum) {
   pthread_t tid;
   pthread_create(&tid, nullptr, quit_thread_func, (void *)(intptr_t)signum);
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   int rc = STATUS_SUCCESS;
 
   setSignalHandler(quit_signal_handle);

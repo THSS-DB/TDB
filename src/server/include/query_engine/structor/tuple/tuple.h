@@ -31,8 +31,7 @@ class Table;
  *
  */
 
-enum TupleType
-{
+enum TupleType {
   RowTuple_Type,
   ProjectTuple_Type,
   AggrTuple_Type,
@@ -44,31 +43,25 @@ enum TupleType
  * @brief The basic schema of tuple containing the field(cell) it has.
  * @ingroup Tuple
  */
-class TupleSchema
-{
-public:
-
-  void append_cell(const TupleCellSpec &cell)
-  {
+class TupleSchema {
+ public:
+  void append_cell(const TupleCellSpec &cell) {
     cells_.push_back(cell);
   }
 
-  void append_cell(const char *alias)
-  {
+  void append_cell(const char *alias) {
     append_cell(TupleCellSpec(alias));
   }
 
-  int cell_num() const
-  {
+  int cell_num() const {
     return static_cast<int>(cells_.size());
   }
 
-  const TupleCellSpec &cell_at(int i) const
-  {
+  const TupleCellSpec &cell_at(int i) const {
     return cells_[i];
   }
 
-private:
+ private:
   std::vector<TupleCellSpec> cells_;
 };
 
@@ -76,9 +69,8 @@ private:
  * @brief The abstract description of tuple
  * @ingroup Tuple
  */
-class Tuple
-{
-public:
+class Tuple {
+ public:
   Tuple() = default;
   virtual ~Tuple() = default;
 
@@ -110,8 +102,7 @@ public:
    */
   virtual void set_record(std::vector<Record *> &records) = 0;
 
-  virtual std::string to_string() const
-  {
+  virtual std::string to_string() const {
     std::string str;
     const int cell_num = this->cell_num();
     for (int i = 0; i < cell_num - 1; i++) {
@@ -129,8 +120,3 @@ public:
     return str;
   }
 };
-
-
-
-
-

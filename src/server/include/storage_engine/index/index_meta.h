@@ -22,14 +22,13 @@ class Value;
  * @ingroup Index
  * @details 一个索引包含了表的哪些字段，索引的名称等。
  */
-class IndexMeta
-{
-public:
+class IndexMeta {
+ public:
   IndexMeta() = default;
 
   RC init(bool unique, const char *name, std::vector<const FieldMeta *> &multi_fields);
 
-public:
+ public:
   const char *name() const;
   const char *field(int i) const;
   const char *multi_fields() const;
@@ -38,12 +37,12 @@ public:
 
   void desc(std::ostream &os) const;
 
-public:
+ public:
   void to_json(Json::Value &json_value) const;
   static RC from_json(const TableMeta &table, const Json::Value &json_value, IndexMeta &index);
 
-protected:
-  bool is_unique_;  // 是否是唯一索引
+ protected:
+  bool is_unique_;    // 是否是唯一索引
   std::string name_;  // index's name
   std::vector<std::string> multi_fields_;
 };

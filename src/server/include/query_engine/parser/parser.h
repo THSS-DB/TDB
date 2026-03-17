@@ -6,5 +6,5 @@
 #include "include/session/session_request.h"
 
 namespace Parser {
-    RC parse(QueryInfo *query_info);
+RC parse(QueryInfo *query_info);
 }

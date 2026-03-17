@@ -2,8 +2,7 @@
 #include "include/query_engine/structor/expression/comparison_expression.h"
 #include "include/query_engine/structor/expression/value_expression.h"
 
-RC ComparisonSimplificationRule::rewrite(std::unique_ptr<Expression> &expr, bool &change_made)
-{
+RC ComparisonSimplificationRule::rewrite(std::unique_ptr<Expression> &expr, bool &change_made) {
   RC rc = RC::SUCCESS;
   change_made = false;
   if (expr->type() == ExprType::COMPARISON) {

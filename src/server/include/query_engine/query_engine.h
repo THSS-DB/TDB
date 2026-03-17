@@ -8,15 +8,15 @@
 class SessionRequest;
 class QueryInfo;
 
-class QueryEngine
-{
-public:
+class QueryEngine {
+ public:
   QueryEngine() = default;
   ~QueryEngine() = default;
 
   bool process_session_request(SessionRequest *request);
   RC planQuery(QueryInfo *query_info);
-private:
+
+ private:
   Planner planner_;
   Optimizer optimizer_;
   Executor executor_;

@@ -2,11 +2,9 @@
 
 #include "expression.h"
 
-class ConjunctionExpr : public Expression
-{
-public:
-
-public:
+class ConjunctionExpr : public Expression {
+ public:
+ public:
   ConjunctionExpr(ConjunctionType type, std::vector<std::unique_ptr<Expression>> &children)
       : conjunction_type_(type), children_(std::move(children)) {
     this->type_ = ExprType::CONJUNCTION;
@@ -23,7 +21,7 @@ public:
 
   RC set_trx(Trx *trx) const;
 
-  ConjunctionExpr* copy() const override {
+  ConjunctionExpr *copy() const override {
     std::vector<std::unique_ptr<Expression>> children;
     for (auto &child : children_) {
       children.emplace_back(static_cast<std::unique_ptr<Expression>>(child->copy()));
@@ -34,7 +32,7 @@ public:
     return res;
   }
 
-private:
+ private:
   ConjunctionType conjunction_type_ = ConjunctionType::AND;
   std::vector<std::unique_ptr<Expression>> children_;
 };

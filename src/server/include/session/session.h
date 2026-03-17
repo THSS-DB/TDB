@@ -10,16 +10,15 @@ class SessionRequest;
  * @brief 表示会话
  * @details 当前一个连接一个会话，没有做特殊的会话管理，这也简化了会话处理
  */
-class Session
-{
-public:
+class Session {
+ public:
   /**
    * @brief 获取默认的会话数据，新生成的会话都基于默认会话设置参数
    * @note 当前并没有会话参数
    */
   static Session &default_session();
 
-public:
+ public:
   Session() = default;
   ~Session();
 
@@ -77,10 +76,10 @@ public:
    */
   static Session *current_session();
 
-private:
+ private:
   Db *db_ = nullptr;
   Trx *trx_ = nullptr;
-  SessionRequest *current_request_ = nullptr; ///< 当前正在处理的请求
-  bool trx_multi_operation_mode_ = false;   ///< 当前事务的模式，是否多语句模式. 单语句模式自动提交
-  bool sql_debug_ = false;                  ///< 是否输出SQL调试信息
+  SessionRequest *current_request_ = nullptr;  ///< 当前正在处理的请求
+  bool trx_multi_operation_mode_ = false;      ///< 当前事务的模式，是否多语句模式. 单语句模式自动提交
+  bool sql_debug_ = false;                     ///< 是否输出SQL调试信息
 };

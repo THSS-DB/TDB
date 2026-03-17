@@ -38,21 +38,20 @@ class QueryEngine;
  * @details 当前支持网络连接，有TCP和Unix Socket两种方式。通过命令行参数来指定使用哪种方式。
  * 启动后监听端口或unix socket，使用libevent来监听事件，当有新的连接到达时，创建一个Communicator对象进行处理。
  */
-class Server
-{
-public:
+class Server {
+ public:
   Server(ServerParam input_server_param);
   ~Server();
 
-public:
+ public:
   static void init();
   static void close_connection(Communicator *comm);
 
-public:
+ public:
   int serve();
   void shutdown();
 
-private:
+ private:
   /**
    * @brief 接收到新的连接时，调用此函数创建Communicator对象
    * @details 此函数作为libevent中监听套接字对应的回调函数
@@ -70,7 +69,7 @@ private:
    */
   static void recv(int fd, short ev, void *arg);
 
-private:
+ private:
   /**
    * @brief 将socket描述符设置为非阻塞模式
    *
@@ -95,16 +94,16 @@ private:
    */
   int start_stdin_server();
 
-private:
+ private:
   volatile bool started_ = false;
 
-  int server_socket_ = -1;  ///< 监听套接字，是一个描述符
-  struct event_base *event_base_ = nullptr; ///< libevent对象
-  struct event *listen_ev_ = nullptr;  ///< libevent监听套接字事件
+  int server_socket_ = -1;                   ///< 监听套接字，是一个描述符
+  struct event_base *event_base_ = nullptr;  ///< libevent对象
+  struct event *listen_ev_ = nullptr;        ///< libevent监听套接字事件
 
   ServerParam server_param_;  ///< 服务启动参数
 
-  CommunicatorFactory communicator_factory_; ///< 通过这个对象创建新的Communicator对象
+  CommunicatorFactory communicator_factory_;  ///< 通过这个对象创建新的Communicator对象
 
   static QueryEngine query_engine_;  ///< 通过这个对象处理查询请求
 };

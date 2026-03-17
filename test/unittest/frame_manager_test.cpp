@@ -3,9 +3,7 @@
 #include "include/storage_engine/buffer/frame_manager.h"
 #include "gtest/gtest.h"
 
-
-TEST(test_buffer, test_frame_manager)
-{
+TEST(test_buffer, test_frame_manager) {
   FrameManager frame_manager("Test");
   frame_manager.init(2);
 
@@ -17,7 +15,7 @@ TEST(test_buffer, test_frame_manager)
   const int file_desc = 0;
   int size = 0;
   Frame *frame_alloc;
-  for ( ; true; size++) {
+  for (; true; size++) {
     frame_alloc = frame_manager.alloc(file_desc, size);
     if (frame_alloc != nullptr) {
       frame_alloc->set_file_desc(file_desc);
@@ -68,8 +66,7 @@ TEST(test_buffer, test_frame_manager)
   frame_manager.cleanup();
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   // 分析gtest程序的命令行参数
   testing::InitGoogleTest(&argc, argv);
 

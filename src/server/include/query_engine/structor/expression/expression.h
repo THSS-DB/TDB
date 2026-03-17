@@ -25,8 +25,7 @@ extern std::string transform_date_formation(int date, std::string format);
  * @brief 表达式类型
  * @ingroup Expression
  */
-enum class ExprType
-{
+enum class ExprType {
   NONE,
   FIELD,        ///< 字段。在实际执行时，根据行数据内容提取对应字段的值
   VALUE,        ///< 常量值
@@ -49,9 +48,8 @@ enum class ExprType
  * 才能计算出来真实的值。但是有些表达式可能就表示某一个固定的
  * 值，比如ValueExpr。
  */
-class Expression
-{
-public:
+class Expression {
+ public:
   Expression() = default;
   virtual ~Expression() = default;
 
@@ -64,8 +62,7 @@ public:
    * @brief 在没有实际运行的情况下，也就是无法获取tuple的情况下，尝试获取表达式的值
    * @details 有些表达式的值是固定的，比如ValueExpr，这种情况下可以直接获取值
    */
-  virtual RC try_get_value(Value &value) const
-  {
+  virtual RC try_get_value(Value &value) const {
     return RC::UNIMPLENMENT;
   }
 
@@ -100,17 +97,14 @@ public:
 
   virtual void getFields(std::vector<Field *> &query_fields) const {}
 
-  virtual Expression* copy() const {
+  virtual Expression *copy() const {
     return nullptr;
   }
 
-protected:
+ protected:
   ExprType type_ = ExprType::NONE;
 
-private:
+ private:
   std::string name_;
   std::string alias_;
 };
-
-
-

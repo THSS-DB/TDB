@@ -6,11 +6,9 @@
 using namespace std;
 
 InsertPhysicalOperator::InsertPhysicalOperator(Table *table, std::vector<std::vector<Value>> &&multi_values)
-    : table_(table), multi_values_(std::move(multi_values))
-{}
+    : table_(table), multi_values_(std::move(multi_values)) {}
 
-RC InsertPhysicalOperator::open(Trx *trx)
-{
+RC InsertPhysicalOperator::open(Trx *trx) {
   RC rc;
   for (int i = 0; i < multi_values_.size(); i++) {
     Record record;
@@ -29,12 +27,10 @@ RC InsertPhysicalOperator::open(Trx *trx)
   return rc;
 }
 
-RC InsertPhysicalOperator::next()
-{
+RC InsertPhysicalOperator::next() {
   return RC::RECORD_EOF;
 }
 
-RC InsertPhysicalOperator::close()
-{
+RC InsertPhysicalOperator::close() {
   return RC::SUCCESS;
 }

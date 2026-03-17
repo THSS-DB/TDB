@@ -4,14 +4,12 @@
 #include "include/storage_engine/index/bplus_tree.h"
 #include "include/storage_engine/recorder/table.h"
 
-
-class BplusTreeIndex : public Index
-{
+class BplusTreeIndex : public Index {
  public:
   BplusTreeIndex() = default;
   virtual ~BplusTreeIndex() noexcept;
 
-  BplusTreeIndex(Table * table) {
+  BplusTreeIndex(Table *table) {
     table_ = table;
   }
 
@@ -30,23 +28,21 @@ class BplusTreeIndex : public Index
 
   RC sync() override;
 
-  BplusTreeHandler &get_index_handler()
-  {
+  BplusTreeHandler &get_index_handler() {
     return index_handler_;
   }
 
  private:
   bool inited_ = false;
   BplusTreeHandler index_handler_;
-  Table * table_;
+  Table *table_;
 };
 
 /**
  * @brief B+树索引扫描器
  * @ingroup Index
  */
-class BplusTreeIndexScanner : public IndexScanner
-{
+class BplusTreeIndexScanner : public IndexScanner {
  public:
   BplusTreeIndexScanner(BplusTreeHandler &tree_handle);
   ~BplusTreeIndexScanner() noexcept override;

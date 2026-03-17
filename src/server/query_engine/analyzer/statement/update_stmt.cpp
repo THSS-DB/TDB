@@ -6,11 +6,9 @@
 #include "include/storage_engine/schema/database.h"
 #include "include/storage_engine/recorder/table.h"
 
-UpdateStmt::UpdateStmt(Table *table, std::vector<UpdateUnit> update_units, FilterStmt *filter_stmt) : table_(table), update_units_(std::move(update_units)), filter_stmt_(filter_stmt)
-{}
+UpdateStmt::UpdateStmt(Table *table, std::vector<UpdateUnit> update_units, FilterStmt *filter_stmt) : table_(table), update_units_(std::move(update_units)), filter_stmt_(filter_stmt) {}
 
-UpdateStmt::~UpdateStmt()
-{
+UpdateStmt::~UpdateStmt() {
   // 这些都是 create 中创建的对象，独占所有权，需要释放
   delete filter_stmt_;
   for (auto &unit : update_units_) {
@@ -18,10 +16,9 @@ UpdateStmt::~UpdateStmt()
   }
 }
 
-RC UpdateStmt::create(Db *db, const UpdateSqlNode &update, Stmt *&stmt)
-{
+RC UpdateStmt::create(Db *db, const UpdateSqlNode &update, Stmt *&stmt) {
   const char *table_name = update.relation_name.c_str();
-  if(nullptr == db || nullptr == table_name || update.update_units.empty()) {
+  if (nullptr == db || nullptr == table_name || update.update_units.empty()) {
     LOG_WARN("invalid argument. db=%p, table_name=%p", db, table_name);
     return RC::INVALID_ARGUMENT;
   }
@@ -55,8 +52,8 @@ RC UpdateStmt::create(Db *db, const UpdateSqlNode &update, Stmt *&stmt)
       if (attribute_name == field_meta->name()) {
         field_exist = true;
         Expression *expression = nullptr;
-        const std::unordered_map <std::string, Table *> table_map;
-        const std::vector <Table *>                     tables;
+        const std::unordered_map<std::string, Table *> table_map;
+        const std::vector<Table *> tables;
         if (expr->type() == ExprType::VALUE) {
           RC rc = analyze_expression(expr, db, table_map, tables, expression);
           if (RC::SUCCESS != rc) {

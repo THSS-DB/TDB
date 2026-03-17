@@ -7,14 +7,12 @@
  * @brief Explain物理算子
  * @ingroup PhysicalOperator
  */
-class ExplainPhysicalOperator : public PhysicalOperator
-{
-public:
+class ExplainPhysicalOperator : public PhysicalOperator {
+ public:
   ExplainPhysicalOperator() = default;
   virtual ~ExplainPhysicalOperator() = default;
 
-  PhysicalOperatorType type() const override
-  {
+  PhysicalOperatorType type() const override {
     return PhysicalOperatorType::EXPLAIN;
   }
 
@@ -23,10 +21,10 @@ public:
   RC close() override;
   Tuple *current_tuple() override;
 
-private:
+ private:
   void to_string(std::ostream &os, PhysicalOperator *oper, int level, bool last_child, std::vector<bool> &ends);
 
-private:
+ private:
   std::string physical_plan_;
   ValueListTuple tuple_;
 };

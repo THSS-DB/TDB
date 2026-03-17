@@ -29,8 +29,7 @@
 
 using namespace std;
 
-RC PhysicalOperatorGenerator::create(LogicalNode &logical_operator, unique_ptr<PhysicalOperator> &oper, bool is_delete)
-{
+RC PhysicalOperatorGenerator::create(LogicalNode &logical_operator, unique_ptr<PhysicalOperator> &oper, bool is_delete) {
   switch (logical_operator.type()) {
     case LogicalNodeType::TABLE_GET: {
       return create_plan(static_cast<TableGetLogicalNode &>(logical_operator), oper, is_delete);
@@ -83,29 +82,28 @@ RC PhysicalOperatorGenerator::create(LogicalNode &logical_operator, unique_ptr<P
 // 在原有的实现中，会直接生成TableScanOperator对所需的数据进行全表扫描，但其实在生成执行计划时，我们可以进行简单的优化：
 // 首先检查扫描的table是否存在索引，如果存在可以使用的索引，那么我们可以直接生成IndexScanOperator来减少磁盘的扫描
 RC PhysicalOperatorGenerator::create_plan(
-    TableGetLogicalNode &table_get_oper, unique_ptr<PhysicalOperator> &oper, bool is_delete)
-{
+    TableGetLogicalNode &table_get_oper, unique_ptr<PhysicalOperator> &oper, bool is_delete) {
   vector<unique_ptr<Expression>> &predicates = table_get_oper.predicates();
   Index *index = nullptr;
   // TODO [Lab2] 生成IndexScanOperator的准备工作,主要包含:
   // 1. 通过predicates获取具体的值表达式， 目前应该只支持等值表达式的索引查找
-    // example:
-    //  if(predicate.type == ExprType::COMPARE){
-    //   auto compare_expr = dynamic_cast<ComparisonExpr*>(predicate.get());
-    //   if(compare_expr->comp != EQUAL_TO) continue;
-    //   [process]
-    //  }
+  // example:
+  //  if(predicate.type == ExprType::COMPARE){
+  //   auto compare_expr = dynamic_cast<ComparisonExpr*>(predicate.get());
+  //   if(compare_expr->comp != EQUAL_TO) continue;
+  //   [process]
+  //  }
   // 2. 对应上面example里的process阶段， 找到等值表达式中对应的FieldExpression和ValueExpression(左值和右值)
   // 通过FieldExpression找到对应的Index, 通过ValueExpression找到对应的Value
 
-  if(index == nullptr){
+  if (index == nullptr) {
     Table *table = table_get_oper.table();
     auto table_scan_oper = new TableScanPhysicalOperator(table, table_get_oper.table_alias(), table_get_oper.readonly());
     table_scan_oper->isdelete_ = is_delete;
     table_scan_oper->set_predicates(std::move(predicates));
     oper = unique_ptr<PhysicalOperator>(table_scan_oper);
     LOG_TRACE("use table scan");
-  }else{
+  } else {
     // TODO [Lab2] 生成IndexScanOperator, 并放置在算子树上，下面是一个实现参考，具体实现可以根据需要进行修改
     // IndexScanner 在设计时，考虑了范围查找索引的情况，但此处我们只需要考虑单个键的情况
     // const Value &value = value_expression->get_value();
@@ -118,8 +116,7 @@ RC PhysicalOperatorGenerator::create_plan(
 }
 
 RC PhysicalOperatorGenerator::create_plan(
-    PredicateLogicalNode &pred_oper, unique_ptr<PhysicalOperator> &oper, bool is_delete)
-{
+    PredicateLogicalNode &pred_oper, unique_ptr<PhysicalOperator> &oper, bool is_delete) {
   vector<unique_ptr<LogicalNode>> &children_opers = pred_oper.children();
   ASSERT(children_opers.size() == 1, "predicate logical operator's sub oper number should be 1");
 
@@ -143,8 +140,7 @@ RC PhysicalOperatorGenerator::create_plan(
   return rc;
 }
 
-RC PhysicalOperatorGenerator::create_plan(AggrLogicalNode &aggr_oper, unique_ptr<PhysicalOperator> &oper)
-{
+RC PhysicalOperatorGenerator::create_plan(AggrLogicalNode &aggr_oper, unique_ptr<PhysicalOperator> &oper) {
   vector<unique_ptr<LogicalNode>> &child_opers = aggr_oper.children();
 
   unique_ptr<PhysicalOperator> child_phy_oper;
@@ -172,8 +168,7 @@ RC PhysicalOperatorGenerator::create_plan(AggrLogicalNode &aggr_oper, unique_ptr
 }
 
 // 【AI 实现提示】Join 物理算子生成时，请在创建 JoinPhysicalOperator 后、设置子算子前添加注释：// [TDB-Lab3-JoinPhys]
-RC PhysicalOperatorGenerator::create_plan(OrderByLogicalNode &order_oper, unique_ptr<PhysicalOperator> &oper)
-{
+RC PhysicalOperatorGenerator::create_plan(OrderByLogicalNode &order_oper, unique_ptr<PhysicalOperator> &oper) {
   vector<unique_ptr<LogicalNode>> &child_opers = order_oper.children();
 
   unique_ptr<PhysicalOperator> child_phy_oper;
@@ -188,7 +183,7 @@ RC PhysicalOperatorGenerator::create_plan(OrderByLogicalNode &order_oper, unique
     }
   }
 
-  OrderPhysicalOperator* order_operator = new OrderPhysicalOperator(std::move(order_oper.order_units()));
+  OrderPhysicalOperator *order_operator = new OrderPhysicalOperator(std::move(order_oper.order_units()));
 
   if (child_phy_oper) {
     order_operator->add_child(std::move(child_phy_oper));
@@ -201,8 +196,7 @@ RC PhysicalOperatorGenerator::create_plan(OrderByLogicalNode &order_oper, unique
 }
 
 RC PhysicalOperatorGenerator::create_plan(
-    ProjectLogicalNode &project_oper, unique_ptr<PhysicalOperator> &oper, bool is_delete)
-{
+    ProjectLogicalNode &project_oper, unique_ptr<PhysicalOperator> &oper, bool is_delete) {
   vector<unique_ptr<LogicalNode>> &child_opers = project_oper.children();
 
   unique_ptr<PhysicalOperator> child_phy_oper;
@@ -234,8 +228,7 @@ RC PhysicalOperatorGenerator::create_plan(
   return rc;
 }
 
-RC PhysicalOperatorGenerator::create_plan(InsertLogicalNode &insert_oper, unique_ptr<PhysicalOperator> &oper)
-{
+RC PhysicalOperatorGenerator::create_plan(InsertLogicalNode &insert_oper, unique_ptr<PhysicalOperator> &oper) {
   Table *table = insert_oper.table();
   vector<vector<Value>> multi_values;
   for (int i = 0; i < insert_oper.multi_values().size(); i++) {
@@ -248,8 +241,7 @@ RC PhysicalOperatorGenerator::create_plan(InsertLogicalNode &insert_oper, unique
 }
 
 // 【AI 实现提示】索引优化：当 index != nullptr 时，在创建 IndexScanPhysicalOperator 之前添加注释：// [TDB-Lab2-IdxScan]
-RC PhysicalOperatorGenerator::create_plan(DeleteLogicalNode &delete_oper, unique_ptr<PhysicalOperator> &oper)
-{
+RC PhysicalOperatorGenerator::create_plan(DeleteLogicalNode &delete_oper, unique_ptr<PhysicalOperator> &oper) {
   vector<unique_ptr<LogicalNode>> &child_opers = delete_oper.children();
 
   unique_ptr<PhysicalOperator> child_physical_oper;
@@ -272,8 +264,7 @@ RC PhysicalOperatorGenerator::create_plan(DeleteLogicalNode &delete_oper, unique
   return rc;
 }
 
-RC PhysicalOperatorGenerator::create_plan(UpdateLogicalNode &update_oper, unique_ptr<PhysicalOperator> &oper)
-{
+RC PhysicalOperatorGenerator::create_plan(UpdateLogicalNode &update_oper, unique_ptr<PhysicalOperator> &oper) {
   vector<unique_ptr<LogicalNode>> &child_opers = update_oper.children();
 
   unique_ptr<PhysicalOperator> child_physical_oper;
@@ -298,8 +289,7 @@ RC PhysicalOperatorGenerator::create_plan(UpdateLogicalNode &update_oper, unique
 }
 
 RC PhysicalOperatorGenerator::create_plan(
-    ExplainLogicalNode &explain_oper, unique_ptr<PhysicalOperator> &oper, bool is_delete)
-{
+    ExplainLogicalNode &explain_oper, unique_ptr<PhysicalOperator> &oper, bool is_delete) {
   vector<unique_ptr<LogicalNode>> &child_opers = explain_oper.children();
 
   RC rc = RC::SUCCESS;
@@ -322,7 +312,6 @@ RC PhysicalOperatorGenerator::create_plan(
 
 // TODO [Lab3] 根据LogicalNode生成对应的PhyiscalOperator
 RC PhysicalOperatorGenerator::create_plan(
-    JoinLogicalNode &join_oper, unique_ptr<PhysicalOperator> &oper)
-{
+    JoinLogicalNode &join_oper, unique_ptr<PhysicalOperator> &oper) {
   return RC::UNIMPLENMENT;
 }

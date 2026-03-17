@@ -9,17 +9,14 @@
  * @brief 事务的Begin语句
  * @ingroup Statement
  */
-class TrxBeginStmt : public Stmt
-{
+class TrxBeginStmt : public Stmt {
  public:
-  TrxBeginStmt()
-  {}
+  TrxBeginStmt() {}
   virtual ~TrxBeginStmt() = default;
 
   StmtType type() const override { return StmtType::BEGIN; }
 
-  static RC create(Stmt *&stmt)
-  {
+  static RC create(Stmt *&stmt) {
     stmt = new TrxBeginStmt();
     return RC::SUCCESS;
   }

@@ -10,10 +10,9 @@
  * @brief 选择/投影物理算子
  * @ingroup PhysicalOperator
  */
-class ProjectPhysicalOperator : public PhysicalOperator
-{
-public:
-  ProjectPhysicalOperator(ProjectLogicalNode * logical_operator) {
+class ProjectPhysicalOperator : public PhysicalOperator {
+ public:
+  ProjectPhysicalOperator(ProjectLogicalNode *logical_operator) {
     for (int i = 0; i < logical_operator->expressions().size(); i++) {
       expressions_.emplace_back(logical_operator->expressions()[i].get()->copy());
     }
@@ -51,7 +50,7 @@ public:
     return res_oper;
   }
 
-private:
+ private:
   ProjectTuple tuple_;
   std::vector<std::unique_ptr<Expression>> expressions_;
 };

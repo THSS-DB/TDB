@@ -6,8 +6,7 @@
 #include "include/session/session.h"
 #include "include/storage_engine/schema/database.h"
 
-RC CreateTableExecutor::execute(QueryInfo *query_info)
-{
+RC CreateTableExecutor::execute(QueryInfo *query_info) {
   Stmt *stmt = query_info->stmt();
   Session *session = query_info->session_event()->session();
   ASSERT(stmt->type() == StmtType::CREATE_TABLE,

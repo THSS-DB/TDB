@@ -3,8 +3,7 @@
 #include "include/query_engine/structor/expression/comparison_expression.h"
 #include "include/query_engine/structor/expression/value_expression.h"
 
-static void replace_all(std::string &str, const std::string &from, const std::string &to)
-{
+static void replace_all(std::string &str, const std::string &from, const std::string &to) {
   if (from.empty()) {
     return;
   }
@@ -19,8 +18,7 @@ RC ComparisonExpr::set_trx(Trx *trx) const {
   return RC::SUCCESS;
 }
 
-RC ComparisonExpr::compare_value(const Value &left, const Value &right, bool &result) const
-{
+RC ComparisonExpr::compare_value(const Value &left, const Value &right, bool &result) const {
   RC rc = RC::SUCCESS;
   // (NOT) EXISTS
   if (comp_ == CompOp::EXISTS || comp_ == CompOp::NOT_EXISTS) {
@@ -117,8 +115,7 @@ RC ComparisonExpr::compare_value(const Value &left, const Value &right, bool &re
   return rc;
 }
 
-RC ComparisonExpr::try_get_value(Value &cell) const
-{
+RC ComparisonExpr::try_get_value(Value &cell) const {
   if (left_->type() == ExprType::VALUE &&
       right_ != nullptr && right_->type() == ExprType::VALUE) {
     auto *left_value_expr = dynamic_cast<ValueExpr *>(left_.get());
@@ -139,8 +136,7 @@ RC ComparisonExpr::try_get_value(Value &cell) const
   return RC::INVALID_ARGUMENT;
 }
 
-RC ComparisonExpr::get_value(const Tuple &tuple, Value &value) const
-{
+RC ComparisonExpr::get_value(const Tuple &tuple, Value &value) const {
   Value left_value;
   Value right_value;
 

@@ -2,9 +2,8 @@
 
 #include "expression.h"
 
-class ValueExpr : public Expression
-{
-public:
+class ValueExpr : public Expression {
+ public:
   ValueExpr() {
     this->type_ = ExprType::VALUE;
   }
@@ -16,7 +15,10 @@ public:
   ~ValueExpr() override = default;
 
   RC get_value(const Tuple &tuple, Value &value) const override;
-  RC try_get_value(Value &value) const override { value = value_; return RC::SUCCESS; }
+  RC try_get_value(Value &value) const override {
+    value = value_;
+    return RC::SUCCESS;
+  }
 
   AttrType value_type() const override { return value_.attr_type(); }
 
@@ -24,14 +26,14 @@ public:
 
   const Value &get_value() const { return value_; }
 
-  ValueExpr* copy() const override {
+  ValueExpr *copy() const override {
     auto *res = new ValueExpr(value_);
     res->set_name(name());
     res->set_alias(alias());
     return res;
   }
 
-private:
+ private:
   Value value_;
 };
 
@@ -40,7 +42,7 @@ private:
  * @ingroup Expression
  */
 class ValuesExpr : public Expression {
-public:
+ public:
   ValuesExpr() {
     this->type_ = ExprType::VALUES;
   }
@@ -58,7 +60,7 @@ public:
   RC value_in(const Value &value, Value &result) const;
   RC value_exists(Value &result) const;
 
-  ValuesExpr* copy() const override {
+  ValuesExpr *copy() const override {
     auto *res = new ValuesExpr;
     for (auto &value : values_) {
       res->add_value(value);
@@ -68,8 +70,6 @@ public:
     return res;
   }
 
-private:
+ private:
   std::vector<Value> values_;
 };
-
-

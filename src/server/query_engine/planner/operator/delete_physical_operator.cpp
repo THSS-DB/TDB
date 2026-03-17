@@ -5,8 +5,7 @@
 #include "include/query_engine/analyzer/statement/delete_stmt.h"
 #include "include/query_engine/structor/tuple/row_tuple.h"
 
-RC DeletePhysicalOperator::open(Trx *trx)
-{
+RC DeletePhysicalOperator::open(Trx *trx) {
   if (children_.empty()) {
     return RC::SUCCESS;
   }
@@ -23,8 +22,7 @@ RC DeletePhysicalOperator::open(Trx *trx)
   return RC::SUCCESS;
 }
 
-RC DeletePhysicalOperator::next()
-{
+RC DeletePhysicalOperator::next() {
   RC rc;
   if (children_.empty()) {
     return RC::RECORD_EOF;
@@ -50,8 +48,7 @@ RC DeletePhysicalOperator::next()
   return RC::RECORD_EOF;
 }
 
-RC DeletePhysicalOperator::close()
-{
+RC DeletePhysicalOperator::close() {
   if (!children_.empty()) {
     children_[0]->close();
   }

@@ -19,7 +19,7 @@ class Expression;
  * @ingroup Statement
  */
 class SelectStmt : public Stmt {
-public:
+ public:
   SelectStmt() = default;
   ~SelectStmt() override;
 
@@ -27,10 +27,10 @@ public:
     return StmtType::SELECT;
   }
 
-public:
+ public:
   static RC create(Db *db, const SelectSqlNode &select_sql, Stmt *&stmt);
 
-public:
+ public:
   const std::vector<Field *> &query_fields() const {
     return query_fields_;
   }
@@ -71,8 +71,7 @@ public:
     return function_results_;
   }
 
-private:
-
+ private:
   static RC analyze_tables_and_projects(
       Db *db,
       const SelectSqlNode &select_sql,

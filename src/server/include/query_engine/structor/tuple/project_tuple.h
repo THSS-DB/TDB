@@ -7,9 +7,8 @@
  * @ingroup Tuple
  * @details 一般在select语句中使用。
  */
-class ProjectTuple : public Tuple
-{
-public:
+class ProjectTuple : public Tuple {
+ public:
   ProjectTuple() = default;
 
   virtual ~ProjectTuple() {
@@ -25,13 +24,11 @@ public:
     this->tuple_ = tuple;
   }
 
-  void get_record(std::vector<Record *> &records) const override
-  {
+  void get_record(std::vector<Record *> &records) const override {
     tuple_->get_record(records);
   }
 
-  void set_record(std::vector<Record *> &records) override
-  {
+  void set_record(std::vector<Record *> &records) override {
     tuple_->set_record(records);
   }
 
@@ -60,7 +57,7 @@ public:
     return tuple_->find_cell(spec, cell);
   }
 
-private:
+ private:
   std::vector<TupleCellSpec *> species_;
   Tuple *tuple_ = nullptr;
 };

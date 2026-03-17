@@ -5,7 +5,7 @@
 #include "common/lang/string.h"
 
 RC analyze_expression(
-    const Expression* expr,
+    const Expression *expr,
     Db *db,
     const std::unordered_map<std::string, Table *> &table_map,
     const std::vector<Table *> &tables,

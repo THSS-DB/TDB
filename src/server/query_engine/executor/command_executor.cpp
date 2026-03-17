@@ -12,8 +12,7 @@
 #include "include/query_engine/executor/trx_begin_executor.h"
 #include "include/query_engine/executor/trx_end_executor.h"
 
-RC CommandExecutor::execute(QueryInfo *query_info)
-{
+RC CommandExecutor::execute(QueryInfo *query_info) {
   Stmt *stmt = query_info->stmt();
 
   switch (stmt->type()) {

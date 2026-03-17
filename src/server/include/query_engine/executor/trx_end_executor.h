@@ -7,14 +7,12 @@
  * @brief 事务结束的执行器，可以是提交或回滚
  * @ingroup Executor
  */
-class TrxEndExecutor
-{
+class TrxEndExecutor {
  public:
   TrxEndExecutor() = default;
   virtual ~TrxEndExecutor() = default;
 
-  RC execute(QueryInfo *query_info)
-  {
+  RC execute(QueryInfo *query_info) {
     Stmt *stmt = query_info->stmt();
     Session *session = query_info->session_event()->session();
     session->set_trx_multi_operation_mode(false);
@@ -22,8 +20,7 @@ class TrxEndExecutor
 
     if (stmt->type() == StmtType::COMMIT) {
       return trx->commit();
-    }
-    else {
+    } else {
       return trx->rollback();
     }
   }

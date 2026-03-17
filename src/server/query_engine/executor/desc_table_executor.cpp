@@ -8,8 +8,7 @@
 
 using namespace std;
 
-RC DescTableExecutor::execute(QueryInfo *query_info)
-{
+RC DescTableExecutor::execute(QueryInfo *query_info) {
   RC rc = RC::SUCCESS;
   Stmt *stmt = query_info->stmt();
   SessionRequest *session_event = query_info->session_event();
@@ -26,7 +25,6 @@ RC DescTableExecutor::execute(QueryInfo *query_info)
   Db *db = session->get_current_db();
   Table *table = db->find_table(table_name);
   if (table != nullptr) {
-
     TupleSchema tuple_schema;
     tuple_schema.append_cell(TupleCellSpec("", "Field", "Field"));
     tuple_schema.append_cell(TupleCellSpec("", "Type", "Type"));
@@ -43,7 +41,6 @@ RC DescTableExecutor::execute(QueryInfo *query_info)
 
     sql_result->set_operator(unique_ptr<PhysicalOperator>(oper));
   } else {
-
     sql_result->set_return_code(RC::SCHEMA_TABLE_NOT_EXIST);
     sql_result->set_state_string("Table not exists");
   }

@@ -4,8 +4,7 @@
 #include "include/query_engine/analyzer/statement/create_index_stmt.h"
 #include "include/session/session.h"
 
-RC CreateIndexExecutor::execute(QueryInfo *query_info)
-{
+RC CreateIndexExecutor::execute(QueryInfo *query_info) {
   Stmt *stmt = query_info->stmt();
   Session *session = query_info->session_event()->session();
   ASSERT(stmt->type() == StmtType::CREATE_INDEX,

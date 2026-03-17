@@ -7,10 +7,8 @@
 #include "include/query_engine/structor/expression/expression.h"
 #include "include/storage_engine/recorder/field.h"
 
-class ProjectLogicalNode : public LogicalNode
-{
-public:
-
+class ProjectLogicalNode : public LogicalNode {
+ public:
   explicit ProjectLogicalNode(const std::vector<Expression *> &exprs) {
     for (auto expr : exprs) {
       expressions_.emplace_back(expr->copy());

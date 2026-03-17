@@ -11,18 +11,16 @@ class FilterStmt;
  * @brief 更新语句
  * @ingroup Statement
  */
-class UpdateStmt : public Stmt
-{
-public:
+class UpdateStmt : public Stmt {
+ public:
   UpdateStmt(Table *table, std::vector<UpdateUnit> update_units, FilterStmt *filter_stmt);
   ~UpdateStmt();
 
-public:
+ public:
   static RC create(Db *db, const UpdateSqlNode &update_sql, Stmt *&stmt);
 
-public:
-  Table *table() const
-  {
+ public:
+  Table *table() const {
     return table_;
   }
 
@@ -34,12 +32,11 @@ public:
     return filter_stmt_;
   }
 
-  StmtType type() const override
-  {
+  StmtType type() const override {
     return StmtType::UPDATE;
   }
 
-private:
+ private:
   Table *table_ = nullptr;
   std::vector<UpdateUnit> update_units_;
   FilterStmt *filter_stmt_ = nullptr;

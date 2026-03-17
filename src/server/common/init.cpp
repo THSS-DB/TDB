@@ -15,26 +15,22 @@
 
 using namespace common;
 
-bool *&_get_init()
-{
+bool *&_get_init() {
   static bool util_init = false;
   static bool *util_init_p = &util_init;
   return util_init_p;
 }
 
-bool get_init()
-{
+bool get_init() {
   return *_get_init();
 }
 
-void set_init(bool value)
-{
+void set_init(bool value) {
   *_get_init() = value;
   return;
 }
 
-void sig_handler(int sig)
-{
+void sig_handler(int sig) {
   // Signal handler will be add in the next step.
   //  Add action to shutdown
 
@@ -43,8 +39,7 @@ void sig_handler(int sig)
   return;
 }
 
-int init_log(ProcessParam *process_cfg, Ini &properties)
-{
+int init_log(ProcessParam *process_cfg, Ini &properties) {
   const std::string &proc_name = process_cfg->get_process_name();
   try {
     // we had better alloc one lock to do so, but simplify the logic
@@ -111,9 +106,7 @@ int init_log(ProcessParam *process_cfg, Ini &properties)
   return 0;
 }
 
-void cleanup_log()
-{
-
+void cleanup_log() {
   if (g_log) {
     delete g_log;
     g_log = nullptr;
@@ -121,8 +114,7 @@ void cleanup_log()
   return;
 }
 
-int init_global_objects(ProcessParam *process_param, Ini &properties)
-{
+int init_global_objects(ProcessParam *process_param, Ini &properties) {
   GCTX.buffer_pool_manager_ = new BufferPoolManager();
   BufferPoolManager::set_instance(GCTX.buffer_pool_manager_);
 
@@ -146,8 +138,7 @@ int init_global_objects(ProcessParam *process_param, Ini &properties)
   return ret;
 }
 
-int uninit_global_objects()
-{
+int uninit_global_objects() {
   // TODO use global context
   DefaultHandler *default_handler = &DefaultHandler::get_default();
   if (default_handler != nullptr) {
@@ -163,10 +154,8 @@ int uninit_global_objects()
   return 0;
 }
 
-int init(ProcessParam *process_param)
-{
+int init(ProcessParam *process_param) {
   if (get_init()) {
-
     return 0;
   }
 
@@ -223,8 +212,7 @@ int init(ProcessParam *process_param)
   return STATUS_SUCCESS;
 }
 
-void cleanup_util()
-{
+void cleanup_util() {
   uninit_global_objects();
 
   if (nullptr != get_properties()) {
@@ -241,7 +229,6 @@ void cleanup_util()
   return;
 }
 
-void cleanup()
-{
+void cleanup() {
   cleanup_util();
 }

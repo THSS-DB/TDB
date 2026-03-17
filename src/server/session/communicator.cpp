@@ -6,8 +6,7 @@
 
 #include "common/lang/mutex.h"
 
-RC Communicator::init(int fd, Session *session, const std::string &addr)
-{
+RC Communicator::init(int fd, Session *session, const std::string &addr) {
   fd_ = fd;
   session_ = session;
   addr_ = addr;
@@ -15,8 +14,7 @@ RC Communicator::init(int fd, Session *session, const std::string &addr)
   return RC::SUCCESS;
 }
 
-Communicator::~Communicator()
-{
+Communicator::~Communicator() {
   if (fd_ >= 0) {
     close(fd_);
     fd_ = -1;
@@ -34,8 +32,7 @@ Communicator::~Communicator()
 
 /////////////////////////////////////////////////////////////////////////////////
 
-Communicator *CommunicatorFactory::create(CommunicateProtocol protocol)
-{
+Communicator *CommunicatorFactory::create(CommunicateProtocol protocol) {
   switch (protocol) {
     case CommunicateProtocol::PLAIN: {
       return new PlainCommunicator;

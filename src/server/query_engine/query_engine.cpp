@@ -26,11 +26,11 @@ bool QueryEngine::process_session_request(SessionRequest *request) {
 
   auto start_time = std::chrono::high_resolution_clock::now();
   rc = planQuery(&query_info);
-  if(RC_FAIL(rc) && rc != RC::UNIMPLENMENT){
+  if (RC_FAIL(rc) && rc != RC::UNIMPLENMENT) {
     request->get_communicator()->write_state(request->sql_result(), need_disconnect);
     request->get_communicator()->flush();
     return need_disconnect;
-  }else{
+  } else {
     //执行引擎入口
     executor_.execute(request, &query_info, need_disconnect);
   }
@@ -50,7 +50,6 @@ bool QueryEngine::process_session_request(SessionRequest *request) {
 
 // 查询的前端解析阶段，对输入的sql进行解析，并构建QueryInfo
 RC QueryEngine::planQuery(QueryInfo *query_info) {
-
   // 1. 语法解析：将sql转为语法树
   RC rc = Parser::parse(query_info);
   if (RC_FAIL(rc)) {
@@ -82,11 +81,10 @@ RC QueryEngine::planQuery(QueryInfo *query_info) {
 
   // 5. 物理计划生成：根据优化后的逻辑计划树生成物理计划树，描述了查询的具体执行逻辑
   rc = planner_.plan_physical_operator(logical_nodes, query_info);
-  if(RC_FAIL(rc)) {
+  if (RC_FAIL(rc)) {
     LOG_TRACE("failed to create physical operator. rc=%s", strrc(rc));
     return rc;
   }
 
   return rc;
 }
-

@@ -7,7 +7,7 @@
 #include "include/storage_engine/schema/database.h"
 
 class DefaultHandler {
-public:
+ public:
   DefaultHandler();
 
   virtual ~DefaultHandler() noexcept;
@@ -75,17 +75,17 @@ public:
    */
   RC drop_table(const char *dbname, const char *relation_name);
 
-public:
+ public:
   Db *find_db(const char *dbname) const;
   Table *find_table(const char *dbname, const char *table_name) const;
 
   RC sync();
 
-public:
+ public:
   static void set_default(DefaultHandler *handler);
   static DefaultHandler &get_default();
 
-private:
+ private:
   std::string base_dir_;
   std::string db_dir_;
   std::map<std::string, Db *> opened_dbs_;

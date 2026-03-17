@@ -5,10 +5,8 @@
 // TODO [Lab2]
 // IndexScanOperator的实现逻辑,通过索引直接获取对应的Page来减少磁盘的扫描
 
-RC IndexScanPhysicalOperator::open(Trx *trx)
-{
-  if(table_ == nullptr || index_ == nullptr)
-  {
+RC IndexScanPhysicalOperator::open(Trx *trx) {
+  if (table_ == nullptr || index_ == nullptr) {
     return RC::INTERNAL;
   }
 
@@ -20,14 +18,12 @@ RC IndexScanPhysicalOperator::open(Trx *trx)
                                                        right_key,
                                                        right_value_.length(),
                                                        right_inclusive_);
-  if(index_scanner == nullptr)
-  {
+  if (index_scanner == nullptr) {
     return RC::INTERNAL;
   }
 
   record_handler_ = table_->record_handler();
-  if(record_handler_ == nullptr)
-  {
+  if (record_handler_ == nullptr) {
     index_scanner->destroy();
     return RC::INTERNAL;
   }
@@ -35,17 +31,17 @@ RC IndexScanPhysicalOperator::open(Trx *trx)
 
   if (table_alias_.empty()) {
     table_alias_ = table_->name();
-    LOG_WARN("table alias is empty, use table name as alias.\n"
-      "Hint: Consider calling set_table_alias() on IndexScanOperator to set an alias for the table.");
+    LOG_WARN(
+        "table alias is empty, use table name as alias.\n"
+        "Hint: Consider calling set_table_alias() on IndexScanOperator to set an alias for the table.");
   }
 
-  tuple_.set_schema(table_,table_alias_,table_->table_meta().field_metas());
+  tuple_.set_schema(table_, table_alias_, table_->table_meta().field_metas());
 
   return RC::SUCCESS;
 }
 
-RC IndexScanPhysicalOperator::next()
-{
+RC IndexScanPhysicalOperator::next() {
   RID rid;
   record_page_handler_.cleanup();
 
@@ -58,25 +54,22 @@ RC IndexScanPhysicalOperator::next()
   return RC::SUCCESS;
 }
 
-RC IndexScanPhysicalOperator::close()
-{
+RC IndexScanPhysicalOperator::close() {
   index_scanner_->destroy();
   index_scanner_ = nullptr;
   return RC::SUCCESS;
 }
 
-Tuple* IndexScanPhysicalOperator::current_tuple(){
+Tuple *IndexScanPhysicalOperator::current_tuple() {
   tuple_._set_record(&current_record_);
   return &tuple_;
 }
 
-std::string IndexScanPhysicalOperator::param() const
-{
+std::string IndexScanPhysicalOperator::param() const {
   return std::string(index_->index_meta().name()) + " ON " + table_->name();
 }
 
-RC IndexScanPhysicalOperator::filter(RowTuple &tuple, bool &result)
-{
+RC IndexScanPhysicalOperator::filter(RowTuple &tuple, bool &result) {
   RC rc = RC::SUCCESS;
   Value value;
   for (std::unique_ptr<Expression> &expr : predicates_) {

@@ -6,15 +6,13 @@
 
 class FilterStmt;
 
-class PredicatePhysicalOperator : public PhysicalOperator
-{
-public:
+class PredicatePhysicalOperator : public PhysicalOperator {
+ public:
   PredicatePhysicalOperator(std::unique_ptr<Expression> expr);
 
   virtual ~PredicatePhysicalOperator() = default;
 
-  PhysicalOperatorType type() const override
-  {
+  PhysicalOperatorType type() const override {
     return PhysicalOperatorType::PREDICATE;
   }
 
@@ -24,6 +22,6 @@ public:
 
   Tuple *current_tuple() override;
 
-private:
+ private:
   std::unique_ptr<Expression> expression_;
 };

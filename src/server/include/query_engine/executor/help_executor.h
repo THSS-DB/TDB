@@ -7,14 +7,12 @@
 #include "sql_result.h"
 #include "include/session/session.h"
 
-class HelpExecutor
-{
-public:
+class HelpExecutor {
+ public:
   HelpExecutor() = default;
   virtual ~HelpExecutor() = default;
 
-  RC execute(QueryInfo *query_info)
-  {
+  RC execute(QueryInfo *query_info) {
     const char *strings[] = {
         "show tables;",
         "desc `table name`;",
@@ -23,8 +21,7 @@ public:
         "insert into `table` values(`value1`,`value2`);",
         "update `table` set column=value [where `column`=`value`];",
         "delete from `table` [where `column`=`value`];",
-        "select [ * | `columns` | aggregation function ] from `table` where `condition` order by `column name`;"
-      };
+        "select [ * | `columns` | aggregation function ] from `table` where `condition` order by `column name`;"};
 
     auto oper = new StringListPhysicalOperator();
     for (size_t i = 0; i < sizeof(strings) / sizeof(strings[0]); i++) {

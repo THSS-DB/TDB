@@ -11,43 +11,36 @@ class Db;
 class Table;
 class FieldMeta;
 
-struct FilterObj
-{
+struct FilterObj {
   bool is_attr;
   Field field;
   Value value;
 
-  void init_attr(const Field &field)
-  {
+  void init_attr(const Field &field) {
     is_attr = true;
     this->field = field;
   }
 
-  void init_value(const Value &value)
-  {
+  void init_value(const Value &value) {
     is_attr = false;
     this->value = value;
   }
 };
 
-class FilterUnit
-{
-public:
+class FilterUnit {
+ public:
   FilterUnit() = default;
-  ~FilterUnit()
-  {
+  ~FilterUnit() {
     // FilterUnit 只会在 create_filter_unit 中创建，这里的左右表达式都是独占所有权，需要释放
     delete left_expr_;
     delete right_expr_;
   }
 
-  void set_comp(CompOp comp)
-  {
+  void set_comp(CompOp comp) {
     comp_ = comp;
   }
 
-  CompOp comp() const
-  {
+  CompOp comp() const {
     return comp_;
   }
 
@@ -64,7 +57,7 @@ public:
   }
 
   Expression *right_expr() {
-      return right_expr_;
+    return right_expr_;
   }
 
   const Expression *left_expr() const {
@@ -75,36 +68,34 @@ public:
     return right_expr_;
   }
 
-private:
+ private:
   CompOp comp_ = NO_OP;
-  Expression* left_expr_ = nullptr;
-  Expression* right_expr_ = nullptr;
+  Expression *left_expr_ = nullptr;
+  Expression *right_expr_ = nullptr;
 };
 
 /**
  * @brief Filter/谓词/过滤语句
  * @ingroup Statement
  */
-class FilterStmt
-{
-public:
+class FilterStmt {
+ public:
   FilterStmt() = default;
   virtual ~FilterStmt();
 
-public:
-  const std::vector<FilterUnit *> &filter_units() const
-  {
+ public:
+  const std::vector<FilterUnit *> &filter_units() const {
     return filter_units_;
   }
 
-public:
+ public:
   static RC create(Db *db, Table *default_table, std::unordered_map<std::string, Table *> *tables,
-      const ConditionSqlNode *conditions, int condition_num, FilterStmt *&stmt);
+                   const ConditionSqlNode *conditions, int condition_num, FilterStmt *&stmt);
 
   static RC create_filter_unit(Db *db, Table *default_table, std::unordered_map<std::string, Table *> *tables,
-      const ConditionSqlNode &condition, FilterUnit *&filter_unit);
+                               const ConditionSqlNode &condition, FilterUnit *&filter_unit);
 
-  void add_filter_unit(FilterUnit* filterUnit) {
+  void add_filter_unit(FilterUnit *filterUnit) {
     filter_units_.emplace_back(filterUnit);
   }
 
@@ -116,10 +107,10 @@ public:
     return conjunction_type_;
   }
 
-private:
+ private:
   ConjunctionType conjunction_type_ = ConjunctionType::AND;
   std::vector<FilterUnit *> filter_units_;
 };
 
 RC get_table_and_field(Db *db, Table *default_table, std::unordered_map<std::string, Table *> *tables,
-    const RelAttrSqlNode &attr, Table *&table, const FieldMeta *&field);
+                       const RelAttrSqlNode &attr, Table *&table, const FieldMeta *&field);
