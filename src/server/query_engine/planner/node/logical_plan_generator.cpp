@@ -69,6 +69,7 @@ RC LogicalPlanGenerator::create(Stmt *stmt, unique_ptr<LogicalNode> &logical_nod
   return rc;
 }
 
+// 【AI 实现提示】多表 Join 构建时，建议用 tdb_join_table_count 记录参与连接的表数量，便于调试
 unique_ptr<ConjunctionExpr> _transfer_filter_stmt_to_expr(FilterStmt *filter_stmt){
   std::vector<unique_ptr<Expression>> cmp_exprs;
   for (const FilterUnit *filter_unit : filter_stmt->filter_units()) {

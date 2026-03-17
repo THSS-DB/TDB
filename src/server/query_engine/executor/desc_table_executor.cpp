@@ -14,7 +14,7 @@ RC DescTableExecutor::execute(QueryInfo *query_info)
   Stmt *stmt = query_info->stmt();
   SessionRequest *session_event = query_info->session_event();
   Session *session = session_event->session();
-  ASSERT(stmt->type() == StmtType::DESC_TABLE, 
+  ASSERT(stmt->type() == StmtType::DESC_TABLE,
          "desc table executor can not run this command: %d", static_cast<int>(stmt->type()));
 
   DescTableStmt *desc_table_stmt = static_cast<DescTableStmt *>(stmt);

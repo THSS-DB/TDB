@@ -17,7 +17,7 @@ class Table;
 /**
  * @defgroup Tuple
  * @brief Tuple 元组，表示一行数据，当前返回客户端时使用
- * @details 
+ * @details
  * tuple是一种可以嵌套的数据结构。
  * 比如select t1.a+t2.b from t1, t2;
  * 需要使用下面的结构表示：
@@ -28,7 +28,7 @@ class Table;
  *      /     \
  *   Row(t1) Row(t2)
  * @endcode
- * 
+ *
  */
 
 enum TupleType
@@ -44,7 +44,7 @@ enum TupleType
  * @brief The basic schema of tuple containing the field(cell) it has.
  * @ingroup Tuple
  */
-class TupleSchema 
+class TupleSchema
 {
 public:
 
@@ -76,7 +76,7 @@ private:
  * @brief The abstract description of tuple
  * @ingroup Tuple
  */
-class Tuple 
+class Tuple
 {
 public:
   Tuple() = default;

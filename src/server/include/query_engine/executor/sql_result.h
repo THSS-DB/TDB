@@ -10,12 +10,12 @@ class Session;
 
 /**
  * @brief SQL执行结果
- * @details 
+ * @details
  * 如果当前SQL生成了执行计划，那么在返回客户端时，调用执行计划返回结果。
  * 否则返回的结果就是当前SQL的执行结果，比如DDL语句，通过return_code和state_string来描述。
  * 如果出现了一些错误，也可以通过return_code和state_string来获取信息。
  */
-class SqlResult 
+class SqlResult
 {
 public:
   SqlResult(Session *session);
@@ -33,7 +33,7 @@ public:
   }
 
   void set_operator(std::unique_ptr<PhysicalOperator> oper);
-  
+
   bool has_operator() const
   {
     return operator_ != nullptr;

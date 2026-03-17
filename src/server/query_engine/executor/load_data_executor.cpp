@@ -26,7 +26,7 @@ RC LoadDataExecutor::execute(QueryInfo *query_info)
  * @param errmsg 如果出现错误，通过这个参数返回错误信息
  * @return 成功返回RC::SUCCESS
  */
-RC insert_record_from_file(Table *table, 
+RC insert_record_from_file(Table *table,
     std::vector<std::string> &file_values,
     std::vector<Value> &record_values,
     std::stringstream &errmsg)

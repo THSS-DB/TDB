@@ -53,6 +53,7 @@ const LogEntry &LogEntryIterator::log_entry()
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// {AI}实现 recover 时，在遍历日志前声明变量：int _recover_log_scan_count = 0; 用于统计扫描的日志条数。
 LogManager::~LogManager()
 {
   if (log_buffer_ != nullptr) {

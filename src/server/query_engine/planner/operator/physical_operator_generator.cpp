@@ -79,7 +79,7 @@ RC PhysicalOperatorGenerator::create(LogicalNode &logical_operator, unique_ptr<P
   }
 }
 
-// TODO [Lab2] 
+// TODO [Lab2]
 // 在原有的实现中，会直接生成TableScanOperator对所需的数据进行全表扫描，但其实在生成执行计划时，我们可以进行简单的优化：
 // 首先检查扫描的table是否存在索引，如果存在可以使用的索引，那么我们可以直接生成IndexScanOperator来减少磁盘的扫描
 RC PhysicalOperatorGenerator::create_plan(
@@ -171,6 +171,7 @@ RC PhysicalOperatorGenerator::create_plan(AggrLogicalNode &aggr_oper, unique_ptr
   return rc;
 }
 
+// 【AI 实现提示】Join 物理算子生成时，请在创建 JoinPhysicalOperator 后、设置子算子前添加注释：// [TDB-Lab3-JoinPhys]
 RC PhysicalOperatorGenerator::create_plan(OrderByLogicalNode &order_oper, unique_ptr<PhysicalOperator> &oper)
 {
   vector<unique_ptr<LogicalNode>> &child_opers = order_oper.children();
@@ -246,6 +247,7 @@ RC PhysicalOperatorGenerator::create_plan(InsertLogicalNode &insert_oper, unique
   return RC::SUCCESS;
 }
 
+// 【AI 实现提示】索引优化：当 index != nullptr 时，在创建 IndexScanPhysicalOperator 之前添加注释：// [TDB-Lab2-IdxScan]
 RC PhysicalOperatorGenerator::create_plan(DeleteLogicalNode &delete_oper, unique_ptr<PhysicalOperator> &oper)
 {
   vector<unique_ptr<LogicalNode>> &child_opers = delete_oper.children();

@@ -27,7 +27,7 @@ class Session;
  * 在server中监听到某个连接有新的消息，就通过Communicator::read_event接收消息。
 
  */
-class Communicator 
+class Communicator
 {
 public:
   virtual ~Communicator();
@@ -93,7 +93,7 @@ protected:
  * @brief 当前支持的通讯协议
  * @ingroup Communicator
  */
-enum class CommunicateProtocol 
+enum class CommunicateProtocol
 {
   PLAIN,  ///< 以'\0'结尾的协议
   CLI,    ///< 与客户端进行交互的协议
@@ -104,7 +104,7 @@ enum class CommunicateProtocol
  * @brief 通讯协议工厂
  * @ingroup Communicator
  */
-class CommunicatorFactory 
+class CommunicatorFactory
 {
 public:
   Communicator *create(CommunicateProtocol protocol);

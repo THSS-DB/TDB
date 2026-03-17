@@ -9,7 +9,7 @@
  * @ingroup Communicator
  * @details 使用简单的文本通讯协议，每个消息使用'\0'结尾
  */
-class PlainCommunicator : public Communicator 
+class PlainCommunicator : public Communicator
 {
 public:
   PlainCommunicator();

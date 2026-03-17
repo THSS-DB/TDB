@@ -11,7 +11,7 @@ class Db;
 class Table;
 class FieldMeta;
 
-struct FilterObj 
+struct FilterObj
 {
   bool is_attr;
   Field field;
@@ -30,7 +30,7 @@ struct FilterObj
   }
 };
 
-class FilterUnit 
+class FilterUnit
 {
 public:
   FilterUnit() = default;
@@ -85,7 +85,7 @@ private:
  * @brief Filter/谓词/过滤语句
  * @ingroup Statement
  */
-class FilterStmt 
+class FilterStmt
 {
 public:
   FilterStmt() = default;

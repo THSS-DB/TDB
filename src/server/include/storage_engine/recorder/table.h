@@ -15,7 +15,7 @@ class Index;
 /**
  * @brief 表
  */
-class Table 
+class Table
 {
 public:
   Table() = default;
@@ -29,7 +29,7 @@ public:
    * @param attribute_count 字段个数
    * @param attributes 字段
    */
-  RC create(int32_t table_id, 
+  RC create(int32_t table_id,
       const char *path,
       const char *name,
       const char *base_dir,

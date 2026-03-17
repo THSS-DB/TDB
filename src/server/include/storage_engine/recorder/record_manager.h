@@ -14,7 +14,7 @@ class Table;
 /**
  * @brief 这里负责管理在一个文件上表记录(行)的组织/管理
  * @defgroup RecordManager
- * 
+ *
  * @details 表记录管理的内容包括如何在文件上存放、读取、检索，也就是记录的增删改查。
  * 这里的文件都会被拆分成页面，每个页面都有一样的大小。更详细的信息可以参考BufferPool。
  * 文件第一个页面用来存放元数据，比如当前文件有多少页面、已经分配了多少页面、每个页面的分配状态等。
@@ -78,7 +78,7 @@ public:
 
   /**
    * @brief 读取下一个记录到record中包括RID和数据，并更新下一个记录位置next_slot_num_
-   * 
+   *
    * @param record 返回的下一个记录
    */
   RC   next(Record &record);
@@ -122,7 +122,7 @@ public:
 
   /**
    * @brief 数据库恢复时，与普通的运行场景有所不同，不做任何并发操作，也不需要加锁
-   * 
+   *
    * @param buffer_pool 关联某个文件时，都通过buffer pool来做读写文件
    * @param page_num    操作的页面编号
    */
@@ -152,7 +152,7 @@ public:
 
   /**
    * @brief 数据库恢复时，在指定位置插入数据
-   * 
+   *
    * @param data 要插入的数据行
    * @param rid  插入的位置
    */
@@ -185,13 +185,13 @@ public:
 
 protected:
   /**
-   * @details 
+   * @details
    * 前面在计算record_capacity时并没有考虑对齐，但第一个record需要8字节对齐
    * 因此按此前计算的record_capacity，最后一个记录的部分数据可能会被挤出页面
    * 所以需要对record_capacity进行修正，保证记录不会溢出
    */
   void fix_record_capacity() {
-    int32_t last_record_offset = page_header_->first_record_offset + 
+    int32_t last_record_offset = page_header_->first_record_offset +
                                  page_header_->record_capacity * page_header_->record_size;
     while(last_record_offset > BP_PAGE_DATA_SIZE) {
       page_header_->record_capacity -= 1;
@@ -201,7 +201,7 @@ protected:
 
   /**
    * @brief 获取指定槽位的记录数据
-   * 
+   *
    * @param 指定的记录槽位
    */
   char *get_record_data(SlotNum slot_num)
@@ -244,14 +244,14 @@ public:
 
   /**
    * @brief 从指定文件中删除指定槽位的记录
-   * 
+   *
    * @param rid 待删除记录的标识符
    */
   RC delete_record(const RID *rid);
 
   /**
    * @brief 插入一个新的记录到指定文件中，并返回该记录的标识符
-   * 
+   *
    * @param data        纪录内容
    * @param record_size 记录大小
    * @param rid         返回该记录的标识符
@@ -260,7 +260,7 @@ public:
 
    /**
    * @brief 数据库恢复时，在指定文件指定位置插入数据
-   * 
+   *
    * @param data        记录内容
    * @param record_size 记录大小
    * @param rid         要插入记录的指定标识符
@@ -329,7 +329,7 @@ public:
    */
   RC close_scan();
 
-  /** 
+  /**
    * @brief 判断是否还有数据
    * @details 判断完成后调用next获取下一条数据
    */
@@ -337,9 +337,9 @@ public:
 
   /**
    * @brief 获取下一条记录
-   * 
+   *
    * @param record 返回的下一条记录
-   * 
+   *
    * @details 获取下一条记录之前先调用has_next()判断是否还有数据
    */
   RC   next(Record &record);

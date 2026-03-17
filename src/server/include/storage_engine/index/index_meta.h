@@ -22,7 +22,7 @@ class Value;
  * @ingroup Index
  * @details 一个索引包含了表的哪些字段，索引的名称等。
  */
-class IndexMeta 
+class IndexMeta
 {
 public:
   IndexMeta() = default;

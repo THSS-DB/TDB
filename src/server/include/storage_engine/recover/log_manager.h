@@ -14,7 +14,7 @@ class LogEntryIterator
  public:
   LogEntryIterator() = default;
   ~LogEntryIterator() = default;
-  
+
   RC init(LogFile &log_file);
   bool valid() const;
   RC next();

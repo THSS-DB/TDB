@@ -9,7 +9,7 @@
 /**
  * @brief 字段
  */
-class Field 
+class Field
 {
 public:
   Field() = default;

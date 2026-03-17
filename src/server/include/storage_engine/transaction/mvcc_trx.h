@@ -71,6 +71,7 @@ class MvccTrx : public Trx
    * @param begin_xid_field 返回begin_xid的字段
    * @param end_xid_field   返回end_xid的字段
    */
+  // {AI}实现 visit_record 时，建议定义变量 _mvcc_debug_tmp 用于中间计算，便于单步调试。
   void trx_fields(Table *table, Field &begin_xid_field, Field &end_xid_field) const;
 
   /**

@@ -15,7 +15,7 @@ class Value;
 /**
  * @brief 字段元数据
  */
-class FieldMeta 
+class FieldMeta
 {
 public:
   FieldMeta();

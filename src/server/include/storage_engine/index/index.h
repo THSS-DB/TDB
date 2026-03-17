@@ -23,7 +23,7 @@ class Table;
  * @brief 索引基类
  * @ingroup Index
  */
-class Index 
+class Index
 {
 public:
   Index() = default;
@@ -77,7 +77,7 @@ protected:
  * @brief 索引扫描器
  * @ingroup Index
  */
-class IndexScanner 
+class IndexScanner
 {
 public:
   IndexScanner() = default;

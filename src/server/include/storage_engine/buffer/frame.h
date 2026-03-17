@@ -17,7 +17,7 @@
 /**
  * @brief 页帧标识符
  */
-class FrameId 
+class FrameId
 {
 public:
   FrameId(int file_desc, PageNum page_num);
@@ -53,7 +53,7 @@ public:
    */
   void reinit() {}
   void reset() {}
-  
+
   void clear_page()
   {
     memset(&page_, 0, sizeof(page_));

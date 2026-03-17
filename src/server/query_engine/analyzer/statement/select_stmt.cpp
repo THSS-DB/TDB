@@ -166,7 +166,7 @@ RC SelectStmt::analyze_tables_and_projects(
   for (size_t i = 0; i < select_sql.relations.size(); i++) {
     const string &table_name = select_sql.relations[i].relation_name;
     string alias_name = select_sql.relations[i].alias;
-    
+
     // If alias is empty, use table_name as alias
     if (alias_name.empty()) {
       alias_name = table_name;

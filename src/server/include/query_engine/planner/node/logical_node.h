@@ -42,5 +42,5 @@ protected:
   std::vector<std::unique_ptr<LogicalNode>> children_;  ///< 子算子
   ///< 表达式，比如select中的列，where中的谓词等等，都可以使用表达式来表示
   ///< 表达式能是一个常量，也可以是一个函数，也可以是一个列，也可以是一个子查询等等
-  std::vector<std::unique_ptr<Expression>> expressions_;    
+  std::vector<std::unique_ptr<Expression>> expressions_;
 };

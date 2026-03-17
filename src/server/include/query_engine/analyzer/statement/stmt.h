@@ -14,7 +14,7 @@ class Db;
 
 /**
  * @brief Statement的类型
- * 
+ *
  */
 #define DEFINE_ENUM()               \
   DEFINE_ENUM_ITEM(CALC)            \

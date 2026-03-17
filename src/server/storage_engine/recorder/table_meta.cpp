@@ -36,7 +36,7 @@ RC TableMeta::init(int32_t table_id, const char *name, int field_num, const Attr
     return RC::INVALID_ARGUMENT;
   }
   RC rc = RC::SUCCESS;
-  
+
   int field_offset = 0;
   int trx_field_num = 0;
   int null_filed_num = 1;
@@ -55,7 +55,7 @@ RC TableMeta::init(int32_t table_id, const char *name, int field_num, const Attr
 
   for (int i = 0; i < field_num; i++) {
     const AttrInfoSqlNode &attr_info = attributes[i];
-    rc = fields_[i + trx_field_num].init(attr_info.name.c_str(), 
+    rc = fields_[i + trx_field_num].init(attr_info.name.c_str(),
             attr_info.type, field_offset, attr_info.length, attr_info.nullable, true/*visible*/);
     if (rc != RC::SUCCESS) {
       LOG_ERROR("Failed to init field meta. table name=%s, field name: %s", name, attr_info.name.c_str());

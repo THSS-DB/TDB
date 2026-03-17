@@ -42,7 +42,7 @@ public:
     return &fields_;
   }
   auto trx_fields() const -> const std::pair<const FieldMeta *, int>;
-  
+
   int field_num() const;  // sys field included
   int null_filed_num() const;
   int sys_field_num() const;

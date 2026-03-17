@@ -20,13 +20,13 @@ class Record;
  * @brief 描述一个操作，比如插入、删除行等
  * @details 通常包含一个操作的类型，以及操作的对象和具体的数据
  */
-class Operation 
+class Operation
 {
 public:
   /**
    * @brief 操作的类型
    */
-  enum class Type : int 
+  enum class Type : int
   {
     INSERT,
     UPDATE,
@@ -35,10 +35,10 @@ public:
   };
 
 public:
-  Operation(Type type, Table *table, const RID &rid) 
-      : type_(type), 
+  Operation(Type type, Table *table, const RID &rid)
+      : type_(type),
         table_(table),
-        page_num_(rid.page_num), 
+        page_num_(rid.page_num),
         slot_num_(rid.slot_num)
   {}
 
@@ -55,7 +55,7 @@ private:
   SlotNum slot_num_;
 };
 
-class OperationHasher 
+class OperationHasher
 {
 public:
   size_t operator()(const Operation &op) const
@@ -65,7 +65,7 @@ public:
   }
 };
 
-class OperationEqualer 
+class OperationEqualer
 {
 public:
   bool operator()(const Operation &op1, const Operation &op2) const

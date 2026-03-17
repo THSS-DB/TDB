@@ -7,7 +7,7 @@
 #include "include/query_engine/structor/expression/expression.h"
 #include "rewrite_rule.h"
 
-class ExpressionRewriter : public RewriteRule 
+class ExpressionRewriter : public RewriteRule
 {
 public:
   ExpressionRewriter();

@@ -7,7 +7,7 @@
  * @brief 服务端启动参数
  * @ingroup Communicator
  */
-class ServerParam 
+class ServerParam
 {
 public:
   ServerParam();

@@ -10,7 +10,7 @@ class SessionRequest;
  * @brief 表示会话
  * @details 当前一个连接一个会话，没有做特殊的会话管理，这也简化了会话处理
  */
-class Session 
+class Session
 {
 public:
   /**
@@ -31,7 +31,7 @@ public:
 
   /**
    * @brief 设置当前会话关联的数据库
-   * 
+   *
    * @param dbname 数据库名字
    */
   void set_current_db(const std::string &dbname);
@@ -48,7 +48,7 @@ public:
 
   /**
    * @brief 当前会话关联的事务
-   * 
+   *
    */
   Trx *current_trx();
 
@@ -67,7 +67,7 @@ public:
 
   /**
    * @brief 将指定会话设置到线程变量中
-   * 
+   *
    */
   static void set_current_session(Session *session);
 
@@ -76,7 +76,7 @@ public:
    * @details 当前某个请求开始时，会将会话设置到线程变量中，在整个请求处理过程中不会改变
    */
   static Session *current_session();
-  
+
 private:
   Db *db_ = nullptr;
   Trx *trx_ = nullptr;

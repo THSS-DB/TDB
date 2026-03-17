@@ -20,7 +20,7 @@ using namespace common;
 const std::string HISTORY_FILE = std::string(getenv("HOME")) + "/.miniob.history";
 time_t last_history_write_time = 0;
 
-char *my_readline(const char *prompt) 
+char *my_readline(const char *prompt)
 {
   int size = history_length;
   if (size == 0) {
@@ -78,8 +78,8 @@ char *read_command()
 {
   const char *prompt_str = "TDB > ";
   char *input_command = nullptr;
-  for (input_command = my_readline(prompt_str); 
-        common::is_blank(input_command); 
+  for (input_command = my_readline(prompt_str);
+        common::is_blank(input_command);
         input_command = my_readline(prompt_str)) {
     free(input_command);
     input_command = nullptr;

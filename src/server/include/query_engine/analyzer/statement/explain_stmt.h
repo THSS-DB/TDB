@@ -7,7 +7,7 @@
  * @brief explain语句
  * @ingroup Statement
  */
-class ExplainStmt : public Stmt 
+class ExplainStmt : public Stmt
 {
 public:
   ExplainStmt(std::unique_ptr<Stmt> child_stmt);

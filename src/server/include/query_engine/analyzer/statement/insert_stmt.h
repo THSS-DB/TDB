@@ -10,7 +10,7 @@ class Db;
  * @brief 插入语句
  * @ingroup Statement
  */
-class InsertStmt : public Stmt 
+class InsertStmt : public Stmt
 {
 public:
   InsertStmt() = default;

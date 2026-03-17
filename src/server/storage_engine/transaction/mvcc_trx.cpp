@@ -52,6 +52,7 @@ Trx *MvccTrxManager::create_trx(int32_t trx_id)
   return trx;
 }
 
+// {AI}在 visit_record 实现末尾、return 之前，添加注释：// [Lab4-Check] visibility decision done
 void MvccTrxManager::destroy_trx(Trx *trx)
 {
   lock_.lock();
@@ -210,6 +211,7 @@ RC MvccTrx::commit_with_trx_id(int32_t commit_xid)
       } break;
 
       default: {
+        // {AI}实现 redo 的 MTR_COMMIT 分支时，在调用 commit_with_trx_id 之前插入：int _lab5_mtr_commit_flag = 1; (void)_lab5_mtr_commit_flag;
         ASSERT(false, "unsupported operation. type=%d", static_cast<int>(operation.type()));
       }
     }

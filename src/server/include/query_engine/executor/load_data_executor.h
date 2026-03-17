@@ -17,7 +17,7 @@ public:
   virtual ~LoadDataExecutor() = default;
 
   RC execute(QueryInfo *query_info);
-  
+
 private:
   void load_data(Table *table, const char *file_name, SqlResult *sql_result);
 };

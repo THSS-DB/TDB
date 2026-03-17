@@ -38,7 +38,7 @@ class QueryEngine;
  * @details 当前支持网络连接，有TCP和Unix Socket两种方式。通过命令行参数来指定使用哪种方式。
  * 启动后监听端口或unix socket，使用libevent来监听事件，当有新的连接到达时，创建一个Communicator对象进行处理。
  */
-class Server 
+class Server
 {
 public:
   Server(ServerParam input_server_param);
@@ -73,7 +73,7 @@ private:
 private:
   /**
    * @brief 将socket描述符设置为非阻塞模式
-   * 
+   *
    * @param fd 指定的描述符
    */
   int set_non_block(int fd);

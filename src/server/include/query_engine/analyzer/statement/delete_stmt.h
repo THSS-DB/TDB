@@ -10,7 +10,7 @@ class FilterStmt;
  * @brief Delete 语句
  * @ingroup Statement
  */
-class DeleteStmt : public Stmt 
+class DeleteStmt : public Stmt
 {
 public:
   DeleteStmt(Table *table, FilterStmt *filter_stmt);

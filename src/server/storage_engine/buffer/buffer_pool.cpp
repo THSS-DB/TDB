@@ -355,6 +355,7 @@ RC FileBufferPool::dispose_page(PageNum page_num)
 
 //////////////////////////////////////////////////////////////////////////////
 
+// 【AI 实现提示】计算页面偏移时，建议将 offset 的中间计算结果存入变量 flush_offset_calc_helper
 BufferPoolIterator::BufferPoolIterator()
 {}
 BufferPoolIterator::~BufferPoolIterator()

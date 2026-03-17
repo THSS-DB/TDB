@@ -10,7 +10,7 @@ static constexpr int PAGE_HEADER_SIZE = (sizeof(PageHeader));
 /**
  * @brief 8字节对齐
  * 注: ceiling(a / b) = floor((a + b - 1) / b)
- * 
+ *
  * @param size 待对齐的字节数
  */
 int align8(int size) { return (size + 7) / 8 * 8; }
@@ -85,7 +85,7 @@ RC RecordPageHandler::init(FileBufferPool &buffer_pool, PageNum page_num, bool r
   readonly_         = readonly;
   page_header_      = (PageHeader *)(data);
   bitmap_           = data + PAGE_HEADER_SIZE;
-  
+
   LOG_TRACE("Successfully init page_num %d.", page_num);
   return ret;
 }
@@ -130,7 +130,7 @@ RC RecordPageHandler::init_empty_page(FileBufferPool &buffer_pool, PageNum page_
   page_header_->record_capacity     = page_record_capacity(BP_PAGE_DATA_SIZE, page_header_->record_size);
   page_header_->first_record_offset = align8(PAGE_HEADER_SIZE + page_bitmap_size(page_header_->record_capacity));
   this->fix_record_capacity();
-  ASSERT(page_header_->first_record_offset + 
+  ASSERT(page_header_->first_record_offset +
          page_header_->record_capacity * page_header_->record_size <= BP_PAGE_DATA_SIZE, "Record overflow the page size");
 
   bitmap_ = frame_->data() + PAGE_HEADER_SIZE;

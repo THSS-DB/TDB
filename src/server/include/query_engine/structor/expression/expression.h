@@ -25,7 +25,7 @@ extern std::string transform_date_formation(int date, std::string format);
  * @brief 表达式类型
  * @ingroup Expression
  */
-enum class ExprType 
+enum class ExprType
 {
   NONE,
   FIELD,        ///< 字段。在实际执行时，根据行数据内容提取对应字段的值
@@ -49,7 +49,7 @@ enum class ExprType
  * 才能计算出来真实的值。但是有些表达式可能就表示某一个固定的
  * 值，比如ValueExpr。
  */
-class Expression 
+class Expression
 {
 public:
   Expression() = default;

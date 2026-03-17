@@ -60,7 +60,7 @@ void Frame::access()
 string to_string(const Frame &frame)
 {
   stringstream ss;
-  ss << "frame id:" << to_string(frame.frame_id()) 
+  ss << "frame id:" << to_string(frame.frame_id())
      << ", dirty=" << frame.dirty()
      << ", pin=" << frame.pin_count()
      << ", fd=" << frame.file_desc()

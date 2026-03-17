@@ -127,7 +127,7 @@ int init_global_objects(ProcessParam *process_param, Ini &properties)
   BufferPoolManager::set_instance(GCTX.buffer_pool_manager_);
 
   GCTX.handler_ = new DefaultHandler();
-  
+
   DefaultHandler::set_default(GCTX.handler_);
 
   int ret = 0;
@@ -226,7 +226,7 @@ int init(ProcessParam *process_param)
 void cleanup_util()
 {
   uninit_global_objects();
-  
+
   if (nullptr != get_properties()) {
     delete get_properties();
     get_properties() = nullptr;
