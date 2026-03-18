@@ -36,7 +36,7 @@ See the Mulan PSL v2 for more details. */
 #include "readline/history.h"
 #endif
 
-#define MAX_MEM_BUFFER_SIZE 63335*2
+#define MAX_MEM_BUFFER_SIZE 63335 * 2
 #define PORT_DEFAULT 6789
 
 using namespace common;
@@ -45,8 +45,7 @@ using namespace common;
 const std::string HISTORY_FILE = std::string(getenv("HOME")) + "/.miniob.history";
 time_t last_history_write_time = 0;
 
-char *my_readline(const char *prompt)
-{
+char *my_readline(const char *prompt) {
   int size = history_length;
   if (size == 0) {
     read_history(HISTORY_FILE.c_str());
@@ -68,9 +67,8 @@ char *my_readline(const char *prompt)
   }
   return line;
 }
-#else // USE_READLINE
-char *my_readline(const char *prompt)
-{
+#else   // USE_READLINE
+char *my_readline(const char *prompt) {
   char *buffer = (char *)malloc(MAX_MEM_BUFFER_SIZE);
   if (nullptr == buffer) {
     return nullptr;
@@ -83,7 +81,7 @@ char *my_readline(const char *prompt)
   }
   return buffer;
 }
-#endif // USE_READLINE
+#endif  // USE_READLINE
 
 /* this function config a exit-cmd list, strncasecmp func truncate the command from terminal according to the number,
    'strncasecmp("exit", cmd, 4)' means that client read command string from terminal, truncate it to 4 chars from
@@ -92,18 +90,17 @@ char *my_readline(const char *prompt)
 bool is_exit_command(const char *cmd) {
   return 0 == strncasecmp("exit", cmd, 4) ||
          0 == strncasecmp("bye", cmd, 3) ||
-         0 == strncasecmp("\\q", cmd, 2) ;
+         0 == strncasecmp("\\q", cmd, 2);
 }
 
-int init_unix_sock(const char *unix_sock_path)
-{
+int init_unix_sock(const char *unix_sock_path) {
   int sockfd = socket(PF_UNIX, SOCK_STREAM, 0);
   if (sockfd < 0) {
     fprintf(stderr, "failed to create unix socket. %s", strerror(errno));
     return -1;
   }
 
-  int sendBufferSize = 65535*2;
+  int sendBufferSize = 65535 * 2;
   if (setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, &sendBufferSize, sizeof(sendBufferSize)) == -1) {
     perror("setsockopt for SO_SNDBUF error");
   }
@@ -121,8 +118,7 @@ int init_unix_sock(const char *unix_sock_path)
   return sockfd;
 }
 
-int init_tcp_sock(const char *server_host, int server_port)
-{
+int init_tcp_sock(const char *server_host, int server_port) {
   struct hostent *host;
   struct sockaddr_in serv_addr;
 
@@ -137,7 +133,7 @@ int init_tcp_sock(const char *server_host, int server_port)
     return -1;
   }
 
-  int sendBufferSize = 65535*2;
+  int sendBufferSize = 65535 * 2;
   if (setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, &sendBufferSize, sizeof(sendBufferSize)) == -1) {
     perror("setsockopt for SO_SNDBUF error");
   }
@@ -155,8 +151,7 @@ int init_tcp_sock(const char *server_host, int server_port)
   return sockfd;
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   const char *unix_socket_path = nullptr;
   const char *server_host = "127.0.0.1";
   int server_port = PORT_DEFAULT;
@@ -203,7 +198,7 @@ int main(int argc, char *argv[])
       break;
     }
 
-    if ((send_bytes = write(sockfd, input_command, strlen(input_command) + 1)) == -1) { // TODO writen
+    if ((send_bytes = write(sockfd, input_command, strlen(input_command) + 1)) == -1) {  // TODO writen
       fprintf(stderr, "send error: %d:%s \n", errno, strerror(errno));
       exit(1);
     }

@@ -3,8 +3,7 @@
 #include "include/query_engine/structor/expression/value_expression.h"
 #include "include/query_engine/structor/expression/conjunction_expression.h"
 
-RC try_to_get_bool_constant(std::unique_ptr<Expression> &expr, bool &constant_value)
-{
+RC try_to_get_bool_constant(std::unique_ptr<Expression> &expr, bool &constant_value) {
   if (expr->type() == ExprType::VALUE && expr->value_type() == BOOLEANS) {
     auto value_expr = static_cast<ValueExpr *>(expr.get());
     constant_value = value_expr->get_value().get_boolean();
@@ -12,8 +11,7 @@ RC try_to_get_bool_constant(std::unique_ptr<Expression> &expr, bool &constant_va
   }
   return RC::INTERNAL;
 }
-RC ConjunctionSimplificationRule::rewrite(std::unique_ptr<Expression> &expr, bool &change_made)
-{
+RC ConjunctionSimplificationRule::rewrite(std::unique_ptr<Expression> &expr, bool &change_made) {
   RC rc = RC::SUCCESS;
   if (expr->type() != ExprType::CONJUNCTION) {
     return rc;

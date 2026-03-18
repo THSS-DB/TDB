@@ -17,9 +17,8 @@ class LogFile;
  * @details 当前的实现非常简单，没有像其它数据库一样，将日志序列化成二进制buffer，
  * 这里仅仅把日志项存储到到链表中。如果日志数量超过某个阈值，就会调用flush_buffer将日志刷新到磁盘中。
  */
-class LogBuffer
-{
-public:
+class LogBuffer {
+ public:
   LogBuffer() {}
   ~LogBuffer() {}
 
@@ -33,7 +32,7 @@ public:
    */
   RC flush_buffer(LogFile &log_file);
 
-private:
+ private:
   /**
    * @brief 将日志记录写入到日志文件中
    * @param log_file 日志文件，概念上来讲不一定是某个特定的文件
@@ -41,10 +40,10 @@ private:
    */
   RC write_log_entry(LogFile &log_file, LogEntry *log_entry);
 
-private:
-  common::Mutex lock_;  // 加锁支持多线程并发写入
+ private:
+  common::Mutex lock_;                                // 加锁支持多线程并发写入
   std::deque<std::unique_ptr<LogEntry>> log_entrys_;  // 当前等待刷盘的日志项
-  std::atomic_int32_t total_size_;  // 当前缓存中的日志项的总大小
+  std::atomic_int32_t total_size_;                    // 当前缓存中的日志项的总大小
 };
 
 /**
@@ -52,9 +51,8 @@ private:
  * @details 这里的名字不太贴切，因为这个类希望管理所有日志文件，而不是特定的某个文件。不过当前
  * 只有一个文件，并且文件名是固定的。
  */
-class LogFile
-{
-public:
+class LogFile {
+ public:
   LogFile() = default;
   ~LogFile();
 
@@ -93,8 +91,8 @@ public:
    */
   bool eof() const { return eof_; }
 
-protected:
+ protected:
   std::string filename_;  // 日志文件名。总是init函数参数path路径下的日志文件
-  int fd_ = -1;  // 文件描述符
-  bool eof_ = false;  // 是否已经读取到文件尾
+  int fd_ = -1;           // 文件描述符
+  bool eof_ = false;      // 是否已经读取到文件尾
 };

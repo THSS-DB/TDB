@@ -3,8 +3,7 @@
 #include "include/query_engine/structor/expression/field_expression.h"
 
 RC OrderByStmt::create_order_unit(Db *db, Table *default_table, std::unordered_map<std::string, Table *> *tables,
-    const OrderByNode& orderByNode, OrderByUnit *&order_unit)
-{
+                                  const OrderByNode &orderByNode, OrderByUnit *&order_unit) {
   Table *table = nullptr;
   const FieldMeta *field = nullptr;
   RC rc = get_table_and_field(db, default_table, tables, orderByNode.sort_attr, table, field);
@@ -13,15 +12,14 @@ RC OrderByStmt::create_order_unit(Db *db, Table *default_table, std::unordered_m
     return rc;
   }
   Expression *expr = new FieldExpr(table, field);
-  ((FieldExpr *) expr)->set_field_table_alias(table->name());
+  ((FieldExpr *)expr)->set_field_table_alias(table->name());
   order_unit = new OrderByUnit;
   order_unit->set_sort_type(orderByNode.is_asc);
   order_unit->set_expr(expr);
   return rc;
 }
 RC OrderByStmt::create(Db *db, Table *default_table, std::unordered_map<std::string, Table *> *tables,
-    const std::vector<OrderByNode>& order_by_list, int order_by_num, OrderByStmt *&stmt)
-{
+                       const std::vector<OrderByNode> &order_by_list, int order_by_num, OrderByStmt *&stmt) {
   RC rc = RC::SUCCESS;
   stmt = nullptr;
 

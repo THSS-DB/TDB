@@ -13,25 +13,21 @@
 JoinPhysicalOperator::JoinPhysicalOperator() = default;
 
 // 执行next()前的准备工作, trx是之后事务中会使用到的，这里不用考虑
-RC JoinPhysicalOperator::open(Trx *trx)
-{
+RC JoinPhysicalOperator::open(Trx *trx) {
   return RC::SUCCESS;
 }
 
 // 计算出接下来需要输出的数据，并将结果set到join_tuple中
 // 如果没有更多数据，返回RC::RECORD_EOF
-RC JoinPhysicalOperator::next()
-{
+RC JoinPhysicalOperator::next() {
   return RC::RECORD_EOF;
 }
 
 // 节点执行完成，清理左右子算子
-RC JoinPhysicalOperator::close()
-{
+RC JoinPhysicalOperator::close() {
   return RC::SUCCESS;
 }
 
-Tuple *JoinPhysicalOperator::current_tuple()
-{
+Tuple *JoinPhysicalOperator::current_tuple() {
   return &joined_tuple_;
 }

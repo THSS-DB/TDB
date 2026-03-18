@@ -5,15 +5,13 @@
 #include "include/storage_engine/recorder/table_meta.h"
 
 InsertStmt::InsertStmt(Table *table, const std::vector<std::vector<Value>> &multi_values, int record_amount, int value_amount)
-    : table_(table), multi_values_(multi_values), record_amount_(record_amount),value_amount_(value_amount)
-{}
+    : table_(table), multi_values_(multi_values), record_amount_(record_amount), value_amount_(value_amount) {}
 
-RC InsertStmt::create(Db *db, const InsertSqlNode &inserts, Stmt *&stmt)
-{
+RC InsertStmt::create(Db *db, const InsertSqlNode &inserts, Stmt *&stmt) {
   const char *table_name = inserts.relation_name.c_str();
   if (nullptr == db || nullptr == table_name || inserts.multi_values.empty()) {
     LOG_WARN("invalid argument. db=%p, table_name=%p, record_num=%d",
-        db, table_name, static_cast<int>(inserts.multi_values.size()));
+             db, table_name, static_cast<int>(inserts.multi_values.size()));
     return RC::INVALID_ARGUMENT;
   }
 
@@ -81,9 +79,9 @@ RC InsertStmt::create(Db *db, const InsertSqlNode &inserts, Stmt *&stmt)
   // check fields type
   const int sys_field_num = table_meta.sys_field_num();
   for (int v = 0; v < multi_values.size(); v++) {
-    std::vector<Value> &values = const_cast<std::vector<Value>&>(multi_values[v]);
-//  }
-//  for (auto & values : inserts.multi_values) {
+    std::vector<Value> &values = const_cast<std::vector<Value> &>(multi_values[v]);
+    //  }
+    //  for (auto & values : inserts.multi_values) {
     for (int i = 0; i < field_num; i++) {
       const FieldMeta *field_meta = table_meta.field(i + sys_field_num);
       const AttrType field_type = field_meta->type();
@@ -91,7 +89,7 @@ RC InsertStmt::create(Db *db, const InsertSqlNode &inserts, Stmt *&stmt)
       if (AttrType::NULLS == value_type) {
         if (!field_meta->nullable()) {
           LOG_WARN("field type mismatch. table=%s, field=%s, field type=%d, value_type=%d",
-          table_name, field_meta->name(), field_type, value_type);
+                   table_name, field_meta->name(), field_type, value_type);
           return RC::SCHEMA_FIELD_TYPE_MISMATCH;
         }
         continue;
@@ -116,7 +114,7 @@ RC InsertStmt::create(Db *db, const InsertSqlNode &inserts, Stmt *&stmt)
       }
       if (field_type != value_type) {  // TODO try to convert the value type to field type
         LOG_WARN("field type mismatch. table=%s, field=%s, field type=%d, value_type=%d",
-          table_name, field_meta->name(), field_type, value_type);
+                 table_name, field_meta->name(), field_type, value_type);
         return RC::SCHEMA_FIELD_TYPE_MISMATCH;
       }
     }

@@ -2,7 +2,6 @@
 
 static GlobalContext global_context;
 
-GlobalContext &GlobalContext::instance()
-{
+GlobalContext &GlobalContext::instance() {
   return global_context;
 }

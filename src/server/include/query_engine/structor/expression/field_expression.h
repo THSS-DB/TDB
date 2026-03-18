@@ -2,10 +2,8 @@
 
 #include "expression.h"
 
-
-class FieldExpr : public Expression
-{
-public:
+class FieldExpr : public Expression {
+ public:
   FieldExpr() {
     type_ = ExprType::FIELD;
   }
@@ -45,13 +43,13 @@ public:
 
   void getFields(std::vector<Field *> &query_fields) const override;
 
-  FieldExpr* copy() const override {
+  FieldExpr *copy() const override {
     auto *res = new FieldExpr(field_);
     res->set_name(name());
     res->set_alias(alias());
     return res;
   }
 
-private:
+ private:
   Field field_;
 };

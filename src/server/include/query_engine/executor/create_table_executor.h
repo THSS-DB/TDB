@@ -4,9 +4,8 @@
 
 class QueryInfo;
 
-class CreateTableExecutor
-{
-public:
+class CreateTableExecutor {
+ public:
   CreateTableExecutor() = default;
   virtual ~CreateTableExecutor() = default;
 

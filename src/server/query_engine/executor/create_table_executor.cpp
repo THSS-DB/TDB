@@ -6,11 +6,10 @@
 #include "include/session/session.h"
 #include "include/storage_engine/schema/database.h"
 
-RC CreateTableExecutor::execute(QueryInfo *query_info)
-{
+RC CreateTableExecutor::execute(QueryInfo *query_info) {
   Stmt *stmt = query_info->stmt();
   Session *session = query_info->session_event()->session();
-  ASSERT(stmt->type() == StmtType::CREATE_TABLE, 
+  ASSERT(stmt->type() == StmtType::CREATE_TABLE,
          "create table executor can not run this command: %d", static_cast<int>(stmt->type()));
 
   CreateTableStmt *create_table_stmt = static_cast<CreateTableStmt *>(stmt);

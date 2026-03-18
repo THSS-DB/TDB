@@ -16,8 +16,7 @@
 #include "include/query_engine/analyzer/statement/trx_begin_stmt.h"
 #include "include/query_engine/analyzer/statement/trx_end_stmt.h"
 
-RC Stmt::create_stmt(Db *db, ParsedSqlNode &sql_node, Stmt *&stmt)
-{
+RC Stmt::create_stmt(Db *db, ParsedSqlNode &sql_node, Stmt *&stmt) {
   stmt = nullptr;
 
   switch (sql_node.flag) {
@@ -28,7 +27,7 @@ RC Stmt::create_stmt(Db *db, ParsedSqlNode &sql_node, Stmt *&stmt)
       return DeleteStmt::create(db, sql_node.deletion, stmt);
     }
     case SCF_UPDATE: {
-      return UpdateStmt::create(db, sql_node.update,stmt);
+      return UpdateStmt::create(db, sql_node.update, stmt);
     }
     case SCF_SELECT: {
       return SelectStmt::create(db, sql_node.selection, stmt);

@@ -5,8 +5,7 @@
 #include "include/storage_engine/schema/database.h"
 #include "include/storage_engine/recorder/table.h"
 
-FilterStmt::~FilterStmt()
-{
+FilterStmt::~FilterStmt() {
   for (FilterUnit *unit : filter_units_) {
     delete unit;
   }
@@ -14,8 +13,7 @@ FilterStmt::~FilterStmt()
 }
 
 RC FilterStmt::create(Db *db, Table *default_table, std::unordered_map<std::string, Table *> *tables,
-    const ConditionSqlNode *conditions, int condition_num, FilterStmt *&stmt)
-{
+                      const ConditionSqlNode *conditions, int condition_num, FilterStmt *&stmt) {
   RC rc = RC::SUCCESS;
   stmt = nullptr;
 
@@ -36,8 +34,7 @@ RC FilterStmt::create(Db *db, Table *default_table, std::unordered_map<std::stri
 }
 
 RC get_table_and_field(Db *db, Table *default_table, std::unordered_map<std::string, Table *> *tables,
-    const RelAttrSqlNode &attr, Table *&table, const FieldMeta *&field)
-{
+                       const RelAttrSqlNode &attr, Table *&table, const FieldMeta *&field) {
   if (common::is_blank(attr.relation_name.c_str())) {
     table = default_table;
   } else if (nullptr != tables) {
@@ -64,8 +61,7 @@ RC get_table_and_field(Db *db, Table *default_table, std::unordered_map<std::str
 }
 
 RC FilterStmt::create_filter_unit(Db *db, Table *default_table, std::unordered_map<std::string, Table *> *tables,
-    const ConditionSqlNode &condition, FilterUnit *&filter_unit)
-{
+                                  const ConditionSqlNode &condition, FilterUnit *&filter_unit) {
   RC rc = RC::SUCCESS;
 
   CompOp comp = condition.comp;

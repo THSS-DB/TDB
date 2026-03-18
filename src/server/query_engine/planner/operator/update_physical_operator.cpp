@@ -9,16 +9,14 @@
 #include "include/query_engine/structor/expression/value_expression.h"
 #include "include/query_engine/structor/tuple/row_tuple.h"
 
-UpdatePhysicalOperator::~UpdatePhysicalOperator()
-{
+UpdatePhysicalOperator::~UpdatePhysicalOperator() {
   // 这些 update_units 从逻辑算子中转移过来，独占所有权，需要释放
   for (auto &unit : update_units_) {
     delete unit.value;
   }
 }
 
-RC UpdatePhysicalOperator::open(Trx *trx)
-{
+RC UpdatePhysicalOperator::open(Trx *trx) {
   if (children_.empty()) {
     return RC::SUCCESS;
   }
@@ -37,14 +35,14 @@ RC UpdatePhysicalOperator::open(Trx *trx)
   const int field_num = table_meta.field_num() - table_meta.sys_field_num() - table_meta.null_filed_num();
   const int sys_field_num = table_meta.sys_field_num();
   std::vector<UpdateUnit> processed_update_units;
-  for (const UpdateUnit& update_unit : update_units_) {
-    Expression* expr = update_unit.value;
+  for (const UpdateUnit &update_unit : update_units_) {
+    Expression *expr = update_unit.value;
     Value value;
     expr->try_get_value(value);
     bool check = false;
     for (int i = 0; i < field_num; i++) {
       const FieldMeta *field_meta = table_meta.field(i + sys_field_num);
-      if(update_unit.attribute_name == field_meta->name()) {
+      if (update_unit.attribute_name == field_meta->name()) {
         const AttrType field_type = field_meta->type();
         const AttrType value_type = value.attr_type();
         if (field_type == TEXTS && value_type == CHARS) {
@@ -67,15 +65,15 @@ RC UpdatePhysicalOperator::open(Trx *trx)
           break;
         }
         if (AttrType::NULLS == value_type) {
-          if ( !field_meta->nullable()) {
+          if (!field_meta->nullable()) {
             LOG_WARN("field type mismatch. table=%s, field=%s, field type=%d, value_type=%d",
-            table_->name(), field_meta->name(), field_type, value_type);
+                     table_->name(), field_meta->name(), field_type, value_type);
             return RC::SCHEMA_FIELD_TYPE_MISMATCH;
           }
         } else {
           if (field_type != value_type && type_cast_not_support(value_type, field_type)) {  // TODO try to convert the value type to field type
             LOG_WARN("field type mismatch. table=%s, field=%s, field type=%d, value_type=%d",
-            table_->name(), field_meta->name(), field_type, value_type);
+                     table_->name(), field_meta->name(), field_type, value_type);
             return RC::SCHEMA_FIELD_TYPE_MISMATCH;
           }
         }
@@ -100,8 +98,7 @@ RC UpdatePhysicalOperator::open(Trx *trx)
   return RC::SUCCESS;
 }
 
-RC UpdatePhysicalOperator::next()
-{
+RC UpdatePhysicalOperator::next() {
   RC rc = RC::SUCCESS;
   if (children_.empty()) {
     return RC::RECORD_EOF;
@@ -117,10 +114,10 @@ RC UpdatePhysicalOperator::next()
     int sys_field_num = table_->table_meta().sys_field_num();
     int cell_num = tuple->cell_num() - table_->table_meta().null_filed_num();
     std::vector<Value> values;
-    for (int i = sys_field_num; i < cell_num; i ++) {
+    for (int i = sys_field_num; i < cell_num; i++) {
       Value value;
       bool check = false;
-      for (const auto& update_unit : update_units_) {
+      for (const auto &update_unit : update_units_) {
         if (table_->table_meta().field(i)->name() == update_unit.attribute_name) {
           update_unit.value->try_get_value(value);
           values.push_back(value);
@@ -130,7 +127,7 @@ RC UpdatePhysicalOperator::next()
       }
       if (!check) {
         rc = tuple->cell_at(i, value);
-        if(rc != RC::SUCCESS) {
+        if (rc != RC::SUCCESS) {
           break;
         }
         values.push_back(value);
@@ -169,8 +166,7 @@ RC UpdatePhysicalOperator::next()
   return RC::RECORD_EOF;
 }
 
-RC UpdatePhysicalOperator::close()
-{
+RC UpdatePhysicalOperator::close() {
   if (!children_.empty()) {
     children_[0]->close();
   }

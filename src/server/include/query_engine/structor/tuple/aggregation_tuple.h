@@ -2,24 +2,19 @@
 
 #include "tuple.h"
 
-
-class AggrTuple : public Tuple
-{
-public:
+class AggrTuple : public Tuple {
+ public:
   AggrTuple() {}
 
   virtual ~AggrTuple() {}
 
   const TupleType tuple_type() const override { return AggrTuple_Type; }
 
-  void get_record(std::vector<Record *> &records) const override
-  {}
+  void get_record(std::vector<Record *> &records) const override {}
 
-  void set_record(std::vector<Record *> &records) override
-  {}
+  void set_record(std::vector<Record *> &records) override {}
 
-  int cell_num() const override
-  {
+  int cell_num() const override {
     return aggr_results_.size();
   }
 
@@ -30,8 +25,7 @@ public:
     aggr_results_ = std::move(aggr_results);
   }
 
-  RC cell_at(int index, Value &cell) const override
-  {
+  RC cell_at(int index, Value &cell) const override {
     if (index < 0 || index >= static_cast<int>(aggr_results_.size())) {
       return RC::INTERNAL;
     }
@@ -49,7 +43,7 @@ public:
     return RC::NOTFOUND;
   }
 
-private:
+ private:
   std::vector<std::string> alias_;
   std::vector<Value> aggr_results_;
 };

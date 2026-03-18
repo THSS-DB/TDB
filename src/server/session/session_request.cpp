@@ -3,19 +3,15 @@
 
 SessionRequest::SessionRequest(Communicator *comm)
     : communicator_(comm),
-    sql_result_(communicator_->session())
-{}
+      sql_result_(communicator_->session()) {}
 
-SessionRequest::~SessionRequest()
-{
+SessionRequest::~SessionRequest() {
 }
 
-Communicator *SessionRequest::get_communicator() const
-{
+Communicator *SessionRequest::get_communicator() const {
   return communicator_;
 }
 
-Session *SessionRequest::session() const
-{
+Session *SessionRequest::session() const {
   return communicator_->session();
 }

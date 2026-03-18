@@ -13,14 +13,12 @@
  * @ingroup Executor
  * @note 与CreateIndex类似，不处理并发
  */
-class ShowTablesExecutor
-{
-public:
+class ShowTablesExecutor {
+ public:
   ShowTablesExecutor() = default;
   virtual ~ShowTablesExecutor() = default;
 
-  RC execute(QueryInfo *query_info)
-  {
+  RC execute(QueryInfo *query_info) {
     SqlResult *sql_result = query_info->session_event()->sql_result();
     SessionRequest *session_event = query_info->session_event();
 

@@ -5,14 +5,12 @@
 #include "include/query_engine/structor/expression/conjunction_expression.h"
 #include "common/log/log.h"
 
-ExpressionRewriter::ExpressionRewriter()
-{
+ExpressionRewriter::ExpressionRewriter() {
   expr_rewrite_rules_.emplace_back(new ComparisonSimplificationRule);
   expr_rewrite_rules_.emplace_back(new ConjunctionSimplificationRule);
 }
 
-RC ExpressionRewriter::rewrite(std::unique_ptr<LogicalNode> &oper, bool &change_made)
-{
+RC ExpressionRewriter::rewrite(std::unique_ptr<LogicalNode> &oper, bool &change_made) {
   RC rc = RC::SUCCESS;
 
   bool sub_change_made = false;
@@ -46,8 +44,7 @@ RC ExpressionRewriter::rewrite(std::unique_ptr<LogicalNode> &oper, bool &change_
   return rc;
 }
 
-RC ExpressionRewriter::rewrite_expression(std::unique_ptr<Expression> &expr, bool &change_made)
-{
+RC ExpressionRewriter::rewrite_expression(std::unique_ptr<Expression> &expr, bool &change_made) {
   RC rc = RC::SUCCESS;
 
   change_made = false;
@@ -103,7 +100,6 @@ RC ExpressionRewriter::rewrite_expression(std::unique_ptr<Expression> &expr, boo
         bool sub_change_made = false;
         rc = rewrite_expression(child_expr, sub_change_made);
         if (rc != RC::SUCCESS) {
-
           LOG_WARN("failed to rewriter conjunction sub expression. rc=%s", strrc(rc));
           return rc;
         }

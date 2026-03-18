@@ -5,8 +5,7 @@
 #include "include/query_engine/structor/expression/conjunction_expression.h"
 #include "include/query_engine/structor/expression/comparison_expression.h"
 
-RC PredicatePushdownRewriter::rewrite(std::unique_ptr<LogicalNode> &oper, bool &change_made)
-{
+RC PredicatePushdownRewriter::rewrite(std::unique_ptr<LogicalNode> &oper, bool &change_made) {
   RC rc = RC::SUCCESS;
   if (oper->type() != LogicalNodeType::PREDICATE) {
     return rc;
@@ -59,8 +58,7 @@ RC PredicatePushdownRewriter::rewrite(std::unique_ptr<LogicalNode> &oper, bool &
  *                       pushdown_exprs 只会增加，不要做清理操作
  */
 RC PredicatePushdownRewriter::get_exprs_can_pushdown(
-    std::unique_ptr<Expression> &expr, std::vector<std::unique_ptr<Expression>> &pushdown_exprs)
-{
+    std::unique_ptr<Expression> &expr, std::vector<std::unique_ptr<Expression>> &pushdown_exprs) {
   RC rc = RC::SUCCESS;
   if (expr->type() == ExprType::CONJUNCTION) {
     ConjunctionExpr *conjunction_expr = static_cast<ConjunctionExpr *>(expr.get());

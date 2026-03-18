@@ -7,8 +7,7 @@
 
 using namespace common;
 
-RC LoadDataExecutor::execute(QueryInfo *query_info)
-{
+RC LoadDataExecutor::execute(QueryInfo *query_info) {
   RC rc = RC::SUCCESS;
   SqlResult *sql_result = query_info->session_event()->sql_result();
   LoadDataStmt *stmt = static_cast<LoadDataStmt *>(query_info->stmt());
@@ -26,12 +25,10 @@ RC LoadDataExecutor::execute(QueryInfo *query_info)
  * @param errmsg 如果出现错误，通过这个参数返回错误信息
  * @return 成功返回RC::SUCCESS
  */
-RC insert_record_from_file(Table *table, 
-    std::vector<std::string> &file_values,
-    std::vector<Value> &record_values,
-    std::stringstream &errmsg)
-{
-
+RC insert_record_from_file(Table *table,
+                           std::vector<std::string> &file_values,
+                           std::vector<Value> &record_values,
+                           std::stringstream &errmsg) {
   const int field_num = record_values.size();
   const int sys_field_num = table->table_meta().sys_field_num();
 
@@ -106,8 +103,7 @@ RC insert_record_from_file(Table *table,
   return rc;
 }
 
-void LoadDataExecutor::load_data(Table *table, const char *file_name, SqlResult *sql_result)
-{
+void LoadDataExecutor::load_data(Table *table, const char *file_name, SqlResult *sql_result) {
   std::stringstream result_string;
 
   std::fstream fs;

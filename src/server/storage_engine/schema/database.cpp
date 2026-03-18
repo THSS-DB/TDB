@@ -1,15 +1,13 @@
 #include "include/storage_engine/schema/database.h"
 
-Db::~Db()
-{
+Db::~Db() {
   for (auto &iter : opened_tables_) {
     delete iter.second;
   }
   LOG_INFO("Db has been closed: %s", name_.c_str());
 }
 
-RC Db::init(const char *name, const char *dbpath)
-{
+RC Db::init(const char *name, const char *dbpath) {
   if (common::is_blank(name)) {
     LOG_ERROR("Failed to init DB, name cannot be empty");
     return RC::INVALID_ARGUMENT;
@@ -49,8 +47,7 @@ RC Db::init(const char *name, const char *dbpath)
   return rc;
 }
 
-RC Db::create_table(const char *table_name, int attribute_count, const AttrInfoSqlNode *attributes)
-{
+RC Db::create_table(const char *table_name, int attribute_count, const AttrInfoSqlNode *attributes) {
   RC rc = RC::SUCCESS;
   // check table_name
   if (opened_tables_.count(table_name) != 0) {
@@ -98,17 +95,16 @@ RC Db::create_view(const char *view_name, const char *origin_table_name, SelectS
   return RC::SUCCESS;
 }
 
-RC Db::drop_table(const char *table_name)
-{
+RC Db::drop_table(const char *table_name) {
   RC rc = RC::SUCCESS;
   // check table_name
-  if(opened_tables_.count(table_name) == 0) {
+  if (opened_tables_.count(table_name) == 0) {
     LOG_WARN("%s hasn't been opened before.", table_name);
     return RC::SCHEMA_TABLE_NOT_EXIST;
   }
 
   Table *table = opened_tables_[table_name];
-  rc = table->drop(table->table_id(),table_name,path_.c_str());
+  rc = table->drop(table->table_id(), table_name, path_.c_str());
   if (rc != RC::SUCCESS) {
     LOG_ERROR("Failed to drop table %s.", table_name);
     delete table;
@@ -121,8 +117,7 @@ RC Db::drop_table(const char *table_name)
   return RC::SUCCESS;
 }
 
-Table *Db::find_table(const char *table_name) const
-{
+Table *Db::find_table(const char *table_name) const {
   std::unordered_map<std::string, Table *>::const_iterator iter = opened_tables_.find(table_name);
   if (iter != opened_tables_.end()) {
     return iter->second;
@@ -130,8 +125,7 @@ Table *Db::find_table(const char *table_name) const
   return nullptr;
 }
 
-Table *Db::find_table(int32_t table_id) const
-{
+Table *Db::find_table(int32_t table_id) const {
   for (auto pair : opened_tables_) {
     if (pair.second->table_id() == table_id) {
       return pair.second;
@@ -140,8 +134,7 @@ Table *Db::find_table(int32_t table_id) const
   return nullptr;
 }
 
-RC Db::open_all_tables()
-{
+RC Db::open_all_tables() {
   std::vector<std::string> table_meta_files;
   int ret = common::list_file(path_.c_str(), TABLE_META_FILE_PATTERN, table_meta_files);
   if (ret < 0) {
@@ -162,7 +155,7 @@ RC Db::open_all_tables()
     if (opened_tables_.count(table->name()) != 0) {
       delete table;
       LOG_ERROR("Duplicate table with difference file name. table=%s, the other filename=%s",
-          table->name(), filename.c_str());
+                table->name(), filename.c_str());
       return RC::INTERNAL;
     }
 
@@ -177,20 +170,17 @@ RC Db::open_all_tables()
   return rc;
 }
 
-const char *Db::name() const
-{
+const char *Db::name() const {
   return name_.c_str();
 }
 
-void Db::all_tables(std::vector<std::string> &table_names) const
-{
+void Db::all_tables(std::vector<std::string> &table_names) const {
   for (const auto &table_item : opened_tables_) {
     table_names.emplace_back(table_item.first);
   }
 }
 
-RC Db::sync()
-{
+RC Db::sync() {
   RC rc = RC::SUCCESS;
   for (const auto &table_pair : opened_tables_) {
     Table *table = table_pair.second;
@@ -205,12 +195,10 @@ RC Db::sync()
   return rc;
 }
 
-RC Db::recover()
-{
+RC Db::recover() {
   return log_manager_->recover(this);
 }
 
-LogManager *Db::log_manager()
-{
+LogManager *Db::log_manager() {
   return log_manager_.get();
 }

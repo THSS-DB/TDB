@@ -23,14 +23,12 @@ class Table;
  * @brief 索引基类
  * @ingroup Index
  */
-class Index 
-{
-public:
+class Index {
+ public:
   Index() = default;
   virtual ~Index() = default;
 
-  const IndexMeta &index_meta() const
-  {
+  const IndexMeta &index_meta() const {
     return index_meta_;
   }
 
@@ -58,17 +56,17 @@ public:
    * @param right_inclusive 是否包含右边界
    */
   virtual IndexScanner *create_scanner(const char *left_key, int left_len, bool left_inclusive, const char *right_key,
-      int right_len, bool right_inclusive) = 0;
+                                       int right_len, bool right_inclusive) = 0;
 
   /**
    * @brief 同步索引数据到磁盘
    */
   virtual RC sync() = 0;
 
-protected:
+ protected:
   RC init(const IndexMeta &index_meta, const std::vector<FieldMeta> &multi_field_metas);
 
-protected:
+ protected:
   IndexMeta index_meta_;  ///< 索引的元数据
   std::vector<FieldMeta> multi_field_metas_;
 };
@@ -77,9 +75,8 @@ protected:
  * @brief 索引扫描器
  * @ingroup Index
  */
-class IndexScanner 
-{
-public:
+class IndexScanner {
+ public:
   IndexScanner() = default;
   virtual ~IndexScanner() = default;
 

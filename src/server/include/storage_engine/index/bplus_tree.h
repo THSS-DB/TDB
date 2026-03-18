@@ -19,8 +19,7 @@
 /**
  * @brief B+树的操作类型
  */
-enum class BplusTreeOperationType
-{
+enum class BplusTreeOperationType {
   READ,
   INSERT,
   DELETE,
@@ -29,22 +28,18 @@ enum class BplusTreeOperationType
 /**
  * @brief 属性比较器
  */
-class AttrComparator
-{
+class AttrComparator {
  public:
-  void init(AttrType type, int length)
-  {
+  void init(AttrType type, int length) {
     attr_type_ = type;
     attr_length_ = length;
   }
 
-  int attr_length() const
-  {
+  int attr_length() const {
     return attr_length_;
   }
 
-  int operator()(const char *v1, const char *v2) const
-  {
+  int operator()(const char *v1, const char *v2) const {
     switch (attr_type_) {
       case INTS: {
         return common::compare_int((void *)v1, (void *)v2);
@@ -74,21 +69,17 @@ class AttrComparator
  * @brief 键的比较器
  * @details BplusTree的键值除了字段属性，还有RID，它是为了避免属性值重复而增加的。
  */
-class KeyComparator
-{
+class KeyComparator {
  public:
-  void init(AttrType type, int length)
-  {
+  void init(AttrType type, int length) {
     attr_comparator_.init(type, length);
   }
 
-  const AttrComparator &attr_comparator() const
-  {
+  const AttrComparator &attr_comparator() const {
     return attr_comparator_;
   }
 
-  int operator()(const char *v1, const char *v2) const
-  {
+  int operator()(const char *v1, const char *v2) const {
     int result = attr_comparator_(v1, v2);
     if (result != 0) {
       return result;
@@ -106,22 +97,18 @@ class KeyComparator
 /**
  * @brief 属性打印器,调试使用
  */
-class AttrPrinter
-{
+class AttrPrinter {
  public:
-  void init(AttrType type, int length)
-  {
+  void init(AttrType type, int length) {
     attr_type_ = type;
     attr_length_ = length;
   }
 
-  int attr_length() const
-  {
+  int attr_length() const {
     return attr_length_;
   }
 
-  std::string operator()(const char *v) const
-  {
+  std::string operator()(const char *v) const {
     switch (attr_type_) {
       case INTS: {
         return std::to_string(*(int *)v);
@@ -157,21 +144,17 @@ class AttrPrinter
 /**
  * @brief 键的打印器,调试使用
  */
-class KeyPrinter
-{
+class KeyPrinter {
  public:
-  void init(AttrType type, int length)
-  {
+  void init(AttrType type, int length) {
     attr_printer_.init(type, length);
   }
 
-  const AttrPrinter &attr_printer() const
-  {
+  const AttrPrinter &attr_printer() const {
     return attr_printer_;
   }
 
-  std::string operator()(const char *v) const
-  {
+  std::string operator()(const char *v) const {
     std::stringstream ss;
     ss << "{key:" << attr_printer_(v) << ",";
 
@@ -188,26 +171,23 @@ class KeyPrinter
  * @brief the meta information of bplus tree
  * @details this is the first page of bplus tree.
  */
-struct IndexFileHeader
-{
-  IndexFileHeader()
-  {
+struct IndexFileHeader {
+  IndexFileHeader() {
     memset(this, 0, sizeof(IndexFileHeader));
     root_page = BP_INVALID_PAGE_NUM;
   }
-  PageNum root_page;          // 根节点在磁盘中的页号
-  int32_t internal_max_size;  // 内部节点最大的键值对数
-  int32_t leaf_max_size;      // 叶子节点最大的键值对数
-  int32_t attr_amount;        // 索引字段的个数
+  PageNum root_page;                             // 根节点在磁盘中的页号
+  int32_t internal_max_size;                     // 内部节点最大的键值对数
+  int32_t leaf_max_size;                         // 叶子节点最大的键值对数
+  int32_t attr_amount;                           // 索引字段的个数
   int32_t multi_attr_lengths[MAX_FIELD_AMOUNT];  // 每个索引字段的长度
   AttrType multi_attr_types[MAX_FIELD_AMOUNT];   // 每个索引字段的类型
-  int32_t attrs_length;       // 索引字段的总长度
-  int32_t key_length;         // 索引键的总长度，attrs length + sizeof(RID)
-  AttrType attrs_type;        // 索引字段的整体类型：如果是多列索引，则统一视为CHAR类型
-  bool is_unique_;            // 是否是唯一索引
+  int32_t attrs_length;                          // 索引字段的总长度
+  int32_t key_length;                            // 索引键的总长度，attrs length + sizeof(RID)
+  AttrType attrs_type;                           // 索引字段的整体类型：如果是多列索引，则统一视为CHAR类型
+  bool is_unique_;                               // 是否是唯一索引
 
-  const std::string to_string()
-  {
+  const std::string to_string() {
     std::stringstream ss;
     ss << "attr_length:" << multi_attr_lengths[0];
     for (int i = 1; i < attr_amount; i++) {
@@ -234,13 +214,12 @@ struct IndexFileHeader
  * | page type | item number | parent page id |
  * @endcode
  */
-struct IndexNode
-{
+struct IndexNode {
   static constexpr int HEADER_SIZE = 12;
 
-  bool    is_leaf;  // whether is leaf node
-  int     key_num;  // the number of keys
-  PageNum parent;   // the parent page id
+  bool is_leaf;    // whether is leaf node
+  int key_num;     // the number of keys
+  PageNum parent;  // the parent page id
 };
 
 /**
@@ -254,8 +233,7 @@ struct IndexNode
  * so the key in leaf page must be unique.
  * the value is rid.
  */
-struct LeafIndexNode : public IndexNode
-{
+struct LeafIndexNode : public IndexNode {
   static constexpr int HEADER_SIZE = IndexNode::HEADER_SIZE + 4;
 
   PageNum next_brother;
@@ -274,8 +252,7 @@ struct LeafIndexNode : public IndexNode
  * @endcode
  * the first key is ignored(key0).
  */
-struct InternalIndexNode : public IndexNode
-{
+struct InternalIndexNode : public IndexNode {
   static constexpr int HEADER_SIZE = IndexNode::HEADER_SIZE;
 
   /**
@@ -288,8 +265,7 @@ struct InternalIndexNode : public IndexNode
  * @brief IndexNode 仅作为数据在内存或磁盘中的表示；IndexNodeHandler 负责对IndexNode做各种操作。
  * 作为一个类来说，虚函数会影响“结构体”真实的内存布局，所以将数据存储与操作分开
  */
-class IndexNodeHandler
-{
+class IndexNodeHandler {
  public:
   IndexNodeHandler(const IndexFileHeader &header, Frame *frame);
   virtual ~IndexNodeHandler() = default;
@@ -297,14 +273,14 @@ class IndexNodeHandler
   void init_empty(bool leaf);
 
   bool is_leaf() const;
-  int  key_size() const;
-  int  value_size() const;
-  int  item_size() const;
+  int key_size() const;
+  int value_size() const;
+  int item_size() const;
 
   void increase_size(int n);
-  int  size() const;
-  int  max_size() const;
-  int  min_size() const;
+  int size() const;
+  int max_size() const;
+  int min_size() const;
   void set_parent_page_num(PageNum page_num);
   PageNum parent_page_num() const;
   PageNum page_num() const;
@@ -317,15 +293,14 @@ class IndexNodeHandler
 
  protected:
   const IndexFileHeader &header_;  // 索引文件的头部信息
-  PageNum page_num_;  // 当前索引节点在磁盘中的页号
-  IndexNode *node_;  // 当前索引节点的数据
+  PageNum page_num_;               // 当前索引节点在磁盘中的页号
+  IndexNode *node_;                // 当前索引节点的数据
 };
 
 /**
  * @brief 叶子节点的操作
  */
-class LeafIndexNodeHandler : public IndexNodeHandler
-{
+class LeafIndexNodeHandler : public IndexNodeHandler {
  public:
   LeafIndexNodeHandler(const IndexFileHeader &header, Frame *frame);
   virtual ~LeafIndexNodeHandler() = default;
@@ -345,7 +320,7 @@ class LeafIndexNodeHandler : public IndexNodeHandler
 
   void insert(int index, const char *key, const char *value);
   void remove(int index);
-  int  remove(const char *key, const KeyComparator &comparator);
+  int remove(const char *key, const KeyComparator &comparator);
   RC move_half_to(LeafIndexNodeHandler &other, FileBufferPool *bp);
   /**
    * move the first item of current leaf node to the end of the left leaf node
@@ -382,8 +357,7 @@ class LeafIndexNodeHandler : public IndexNodeHandler
 /**
  * @brief 内部节点的操作
  */
-class InternalIndexNodeHandler : public IndexNodeHandler
-{
+class InternalIndexNodeHandler : public IndexNodeHandler {
  public:
   InternalIndexNodeHandler(const IndexFileHeader &header, Frame *frame);
   virtual ~InternalIndexNodeHandler() = default;
@@ -398,7 +372,6 @@ class InternalIndexNodeHandler : public IndexNodeHandler
    * 返回指定子节点在当前节点中的索引
    */
   int value_index(PageNum page_num);
-
 
   /**
    * 与Leaf节点不同，lookup返回指定key应该属于哪个子节点，返回这个子节点在当前节点中的索引
@@ -443,8 +416,7 @@ class InternalIndexNodeHandler : public IndexNodeHandler
 /**
  * @brief B+树的实现
  */
-class BplusTreeHandler
-{
+class BplusTreeHandler {
  public:
   /**
    * @details 此函数创建一个名为fileName的索引。
@@ -560,11 +532,11 @@ class BplusTreeHandler
 
  protected:
   FileBufferPool *file_buffer_pool_ = nullptr;
-  bool            header_dirty_ = false;
+  bool header_dirty_ = false;
   IndexFileHeader file_header_;
 
-  KeyComparator   key_comparator_;
-  KeyPrinter      key_printer_;
+  KeyComparator key_comparator_;
+  KeyPrinter key_printer_;
 
   std::unique_ptr<common::MemPoolItem> mem_pool_item_;
 
@@ -577,8 +549,7 @@ class BplusTreeHandler
  * @brief B+树的扫描器
  * @ingroup BPlusTree
  */
-class BplusTreeScanner
-{
+class BplusTreeScanner {
  public:
   BplusTreeScanner(BplusTreeHandler &tree_handler);
   ~BplusTreeScanner();

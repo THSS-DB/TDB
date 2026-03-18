@@ -16,7 +16,6 @@ RC GroupByStmt::create(
     std::unordered_map<std::string, Table *> *tables,
     const std::vector<RelAttrSqlNode> units,
     GroupByStmt *&stmt) {
-
   RC rc = RC::SUCCESS;
   stmt = nullptr;
 
@@ -42,7 +41,6 @@ RC GroupByStmt::create_group_by_unit(
     std::unordered_map<std::string, Table *> *tables,
     const RelAttrSqlNode &unit,
     Expression *&res_expr) {
-
   Table *table = nullptr;
   if (common::is_blank(unit.relation_name.c_str())) {
     table = default_table;
@@ -69,7 +67,7 @@ RC GroupByStmt::create_group_by_unit(
   }
 
   res_expr = new FieldExpr(table, field);
-  ((FieldExpr *) res_expr)->set_field_table_alias(table->name());
+  ((FieldExpr *)res_expr)->set_field_table_alias(table->name());
   res_expr->set_name(unit.attribute_name.c_str());
   res_expr->set_alias(unit.attribute_name.c_str());
   return RC::SUCCESS;

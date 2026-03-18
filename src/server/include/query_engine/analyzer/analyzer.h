@@ -4,5 +4,5 @@
 #include "include/common/rc.h"
 
 namespace Analyzer {
-    RC analyze(QueryInfo *query_info);
+RC analyze(QueryInfo *query_info);
 }

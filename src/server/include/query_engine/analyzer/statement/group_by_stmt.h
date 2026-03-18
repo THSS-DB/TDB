@@ -5,8 +5,7 @@
 #include "include/query_engine/structor/expression/expression.h"
 
 class GroupByStmt : public Stmt {
-public:
-
+ public:
   GroupByStmt() = default;
   ~GroupByStmt() override;
 
@@ -32,7 +31,6 @@ public:
     return exprs_;
   }
 
-private:
+ private:
   std::vector<Expression *> exprs_;
 };
-

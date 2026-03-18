@@ -9,16 +9,13 @@ class UpdateStmt;
  * @brief 物理算子，更新
  * @ingroup PhysicalOperator
  */
-class UpdatePhysicalOperator : public PhysicalOperator
-{
-public:
-  UpdatePhysicalOperator(Table *table, std::vector<UpdateUnit> update_units) : table_(table), update_units_(std::move(update_units))
-  {}
+class UpdatePhysicalOperator : public PhysicalOperator {
+ public:
+  UpdatePhysicalOperator(Table *table, std::vector<UpdateUnit> update_units) : table_(table), update_units_(std::move(update_units)) {}
 
   virtual ~UpdatePhysicalOperator();
 
-  PhysicalOperatorType type() const override
-  {
+  PhysicalOperatorType type() const override {
     return PhysicalOperatorType::UPDATE;
   }
 
@@ -26,15 +23,14 @@ public:
   RC next() override;
   RC close() override;
 
-  Tuple *current_tuple() override
-  {
+  Tuple *current_tuple() override {
     return nullptr;
   }
   std::vector<UpdateUnit> update_units() {
     return update_units_;
   }
 
-private:
+ private:
   Table *table_ = nullptr;
   Trx *trx_ = nullptr;
   std::vector<UpdateUnit> update_units_;

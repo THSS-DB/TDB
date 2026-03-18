@@ -11,7 +11,6 @@
 class SessionRequest;
 class Session;
 
-
 /**
  * @defgroup Communicator
  * @brief 负责处理与客户端的通讯
@@ -27,9 +26,8 @@ class Session;
  * 在server中监听到某个连接有新的消息，就通过Communicator::read_event接收消息。
 
  */
-class Communicator 
-{
-public:
+class Communicator {
+ public:
   virtual ~Communicator();
 
   /**
@@ -46,16 +44,14 @@ public:
   /**
    * @brief 关联的会话信息
    */
-  Session *session() const
-  {
+  Session *session() const {
     return session_;
   }
 
   /**
    * @brief libevent使用的数据，参考server.cpp
    */
-  struct event &read_event()
-  {
+  struct event &read_event() {
     return read_event_;
   }
 
@@ -63,8 +59,7 @@ public:
    * @brief 对端地址
    * 如果是unix socket，可能没有意义
    */
-  const char *addr() const
-  {
+  const char *addr() const {
     return addr_.c_str();
   }
 
@@ -72,20 +67,20 @@ public:
 
   virtual RC write_result(const char *data, int32_t size) = 0;
 
-  RC send_message_delimiter(){
+  RC send_message_delimiter() {
     return writer_->writen(send_message_delimiter_.data(), send_message_delimiter_.size());
   }
 
-  void flush(){
+  void flush() {
     writer_->flush();
   }
 
-protected:
+ protected:
   Session *session_ = nullptr;
   struct event read_event_;
   std::string addr_;
   BufferedWriter *writer_ = nullptr;
-  std::vector<char> send_message_delimiter_; ///< 发送消息分隔符
+  std::vector<char> send_message_delimiter_;  ///< 发送消息分隔符
   int fd_ = -1;
 };
 
@@ -93,8 +88,7 @@ protected:
  * @brief 当前支持的通讯协议
  * @ingroup Communicator
  */
-enum class CommunicateProtocol 
-{
+enum class CommunicateProtocol {
   PLAIN,  ///< 以'\0'结尾的协议
   CLI,    ///< 与客户端进行交互的协议
   MYSQL,  ///< mysql通讯协议。具体实现参考 MysqlCommunicator
@@ -104,8 +98,7 @@ enum class CommunicateProtocol
  * @brief 通讯协议工厂
  * @ingroup Communicator
  */
-class CommunicatorFactory 
-{
-public:
+class CommunicatorFactory {
+ public:
   Communicator *create(CommunicateProtocol protocol);
 };

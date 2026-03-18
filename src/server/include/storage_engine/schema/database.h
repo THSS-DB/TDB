@@ -26,9 +26,8 @@ class RedoLogManager;
  * @details 当前DB的存储模式很简单，一个DB对应一个目录，所有的表和数据都放置在这个目录下。
  * 启动时，从指定的目录下加载所有的表和元数据。
  */
-class Db
-{
-public:
+class Db {
+ public:
   Db() = default;
   ~Db();
 
@@ -60,10 +59,10 @@ public:
 
   LogManager *log_manager();
 
-private:
+ private:
   RC open_all_tables();
 
-private:
+ private:
   std::string name_;
   std::string path_;
   std::unordered_map<std::string, Table *> opened_tables_;

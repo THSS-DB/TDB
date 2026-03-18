@@ -17,19 +17,19 @@
 /**
  * @brief 页帧标识符
  */
-class FrameId 
-{
-public:
+class FrameId {
+ public:
   FrameId(int file_desc, PageNum page_num);
-  bool    equal_to(const FrameId &other) const;
-  bool    operator==(const FrameId &other) const;
-  size_t  hash() const;
-  int     file_desc() const;
+  bool equal_to(const FrameId &other) const;
+  bool operator==(const FrameId &other) const;
+  size_t hash() const;
+  int file_desc() const;
   PageNum page_num() const;
 
   friend std::string to_string(const FrameId &frame_id);
-private:
-  int     file_desc_;
+
+ private:
+  int file_desc_;
   PageNum page_num_;
 };
 
@@ -39,12 +39,10 @@ private:
  * 当某个页面被淘汰时，如果有些内容曾经变更过，那么就需要将这些内容刷新到磁盘上。这里有一个dirty标识，用来标识页面是否被修改过。
  * 为了防止使用过程中页面被淘汰，使用pin count：当页面被使用，pin count会增加；当页面不再使用，pin count会减少。当pin count为0时，页面可以被淘汰。
  */
-class Frame
-{
-public:
-  ~Frame()
-  {
-     LOG_DEBUG("deallocate frame. this=%p, lbt=%s", this, common::lbt());
+class Frame {
+ public:
+  ~Frame() {
+    LOG_DEBUG("deallocate frame. this=%p, lbt=%s", this, common::lbt());
   }
 
   /**
@@ -53,20 +51,19 @@ public:
    */
   void reinit() {}
   void reset() {}
-  
-  void clear_page()
-  {
+
+  void clear_page() {
     memset(&page_, 0, sizeof(page_));
   }
 
-  int     file_desc() const { return file_desc_; }
-  void    set_file_desc(int fd) { file_desc_ = fd; }
-  Page &  page() { return page_; }
+  int file_desc() const { return file_desc_; }
+  void set_file_desc(int fd) { file_desc_ = fd; }
+  Page &page() { return page_; }
   PageNum page_num() const { return page_.page_num; }
-  void    set_page_num(PageNum page_num) { page_.page_num = page_num; }
+  void set_page_num(PageNum page_num) { page_.page_num = page_num; }
   FrameId frame_id() const { return FrameId(file_desc_, page_.page_num); }
-  LSN     lsn() const { return page_.lsn; }
-  void    set_lsn(LSN lsn) { page_.lsn = lsn; }
+  LSN lsn() const { return page_.lsn; }
+  void set_lsn(LSN lsn) { page_.lsn = lsn; }
 
   /// 刷新访问时间
   void access();
@@ -97,17 +94,16 @@ public:
    * @brief 释放一个当前页帧的引用计数
    * 与pin对应，但是通常不会加着frame manager的锁来访问
    */
-  int  unpin();
+  int unpin();
 
-  int  pin_count() const { return pin_count_.load(); }
+  int pin_count() const { return pin_count_.load(); }
 
   friend std::string to_string(const Frame &frame);
 
-private:
-  bool              dirty_     = false;
-  std::atomic<int>  pin_count_{0};
-  unsigned long     acc_time_  = 0;
-  int               file_desc_ = -1;
-  Page              page_;
+ private:
+  bool dirty_ = false;
+  std::atomic<int> pin_count_{0};
+  unsigned long acc_time_ = 0;
+  int file_desc_ = -1;
+  Page page_;
 };
-

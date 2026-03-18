@@ -7,7 +7,7 @@
 class LogicalNode;
 
 /**
- * @defgroup Rewriter 
+ * @defgroup Rewriter
  * @brief 根据规则对逻辑计划进行重写
  */
 
@@ -17,9 +17,8 @@ class LogicalNode;
  * @details 当前仅实现了一两个非常简单的规则。
  * 重写包括对逻辑计划和计划中包含的表达式。
  */
-class Rewriter 
-{
-public:
+class Rewriter {
+ public:
   Rewriter();
   virtual ~Rewriter() = default;
 
@@ -32,6 +31,6 @@ public:
    */
   RC rewrite(std::unique_ptr<LogicalNode> &oper, bool &change_made);
 
-private:
+ private:
   std::vector<std::unique_ptr<RewriteRule>> rewrite_rules_;
 };

@@ -5,8 +5,7 @@
 
 #include "include/storage_engine/recorder/record.h"
 
-enum class LogEntryType
-{
+enum class LogEntryType {
   ERROR,
   MTR_BEGIN,
   MTR_COMMIT,
@@ -15,21 +14,19 @@ enum class LogEntryType
   DELETE
 };
 
-const char* logentry_type_name(LogEntryType type);  // log entry type 转换成字符串
-int32_t logentry_type_to_integer(LogEntryType type);  // log entry type 转换成数字
+const char *logentry_type_name(LogEntryType type);       // log entry type 转换成字符串
+int32_t logentry_type_to_integer(LogEntryType type);     // log entry type 转换成数字
 LogEntryType logentry_type_from_integer(int32_t value);  // 数字转换成 log entry type
 
 /**
  * @brief LogEntry的头部信息，每条日志项都带有它。
  */
-struct LogEntryHeader
-{
-  int32_t trx_id_ = -1;  // 该日志项所属事务的事务id
+struct LogEntryHeader {
+  int32_t trx_id_ = -1;                                           // 该日志项所属事务的事务id
   int32_t type_ = logentry_type_to_integer(LogEntryType::ERROR);  // 日志项类型
-  int32_t log_entry_len_ = 0;  // 日志项的长度，但不包含header长度
+  int32_t log_entry_len_ = 0;                                     // 日志项的长度，但不包含header长度
 
-  bool operator==(const LogEntryHeader &other) const
-  {
+  bool operator==(const LogEntryHeader &other) const {
     return trx_id_ == other.trx_id_ && type_ == other.type_ && log_entry_len_ == other.log_entry_len_;
   }
 
@@ -39,12 +36,10 @@ struct LogEntryHeader
 /**
  * @brief 提交语句对应的日志项
  */
-struct CommitEntry
-{
+struct CommitEntry {
   int32_t commit_xid_ = -1;  // 事务提交时的事务号
 
-  bool operator == (const CommitEntry &other) const
-  {
+  bool operator==(const CommitEntry &other) const {
     return this->commit_xid_ == other.commit_xid_;
   }
 
@@ -54,18 +49,16 @@ struct CommitEntry
 /**
  * @brief 修改数据的日志项（比如插入、删除一条数据）
  */
-struct RecordEntry
-{
-  int32_t          table_id_ = -1;    // 操作的表
-  RID              rid_;              // 操作的哪条记录
-  int32_t          data_len_ = 0;     // 记录的数据长度(因为header中也包含长度信息，这个长度可以不要)
-  int32_t          data_offset_ = 0;  // 操作的数据在完整记录中的偏移量
-  char *           data_ = nullptr;   // 具体的数据，可能没有任何数据
+struct RecordEntry {
+  int32_t table_id_ = -1;    // 操作的表
+  RID rid_;                  // 操作的哪条记录
+  int32_t data_len_ = 0;     // 记录的数据长度(因为header中也包含长度信息，这个长度可以不要)
+  int32_t data_offset_ = 0;  // 操作的数据在完整记录中的偏移量
+  char *data_ = nullptr;     // 具体的数据，可能没有任何数据
 
   ~RecordEntry();
 
-  bool operator==(const RecordEntry &other) const
-  {
+  bool operator==(const RecordEntry &other) const {
     return table_id_ == other.table_id_ &&
            rid_ == other.rid_ &&
            data_len_ == other.data_len_ &&
@@ -78,13 +71,11 @@ struct RecordEntry
   const static int32_t HEADER_SIZE;  // 指RecordEntry的头长度，即不包含data_的长度
 };
 
-
 /**
  * @brief 表示一条日志项
  */
-class LogEntry
-{
-public:
+class LogEntry {
+ public:
   LogEntry() = default;  // 通常不需要直接调用这个函数来创建一条日志，而是调用 `build_xxx`创建对象。
   ~LogEntry() {}
 
@@ -123,9 +114,9 @@ public:
    */
   static LogEntry *build(const LogEntryHeader &header, char *data);
 
-  int32_t  trx_id() const { return entry_header_.trx_id_; }
-  LogEntryType log_type() const  { return logentry_type_from_integer(entry_header_.type_); }
-  int32_t  log_entry_len() const { return entry_header_.log_entry_len_; }
+  int32_t trx_id() const { return entry_header_.trx_id_; }
+  LogEntryType log_type() const { return logentry_type_from_integer(entry_header_.type_); }
+  int32_t log_entry_len() const { return entry_header_.log_entry_len_; }
 
   LogEntryHeader &header() { return entry_header_; }
   CommitEntry &commit_entry() { return commit_entry_; }
@@ -137,7 +128,7 @@ public:
   std::string to_string() const;
 
  protected:
-  LogEntryHeader  entry_header_;  // 日志头信息
-  RecordEntry  record_entry_;  // 如果是修改数据的日志项，此结构体生效
-  CommitEntry  commit_entry_;  // 如果是事务提交的日志项，此结构体生效
+  LogEntryHeader entry_header_;  // 日志头信息
+  RecordEntry record_entry_;     // 如果是修改数据的日志项，此结构体生效
+  CommitEntry commit_entry_;     // 如果是事务提交的日志项，此结构体生效
 };

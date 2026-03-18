@@ -8,18 +8,14 @@ using namespace std;
 const int32_t DEFAULT_BUFFER_SIZE = 16 * 1024;
 
 RingBuffer::RingBuffer()
-    : RingBuffer(DEFAULT_BUFFER_SIZE)
-{}
+    : RingBuffer(DEFAULT_BUFFER_SIZE) {}
 
 RingBuffer::RingBuffer(int32_t size)
-    : buffer_(size)
-{}
+    : buffer_(size) {}
 
-RingBuffer::~RingBuffer()
-{}
+RingBuffer::~RingBuffer() {}
 
-RC RingBuffer::read(char *buf, int32_t size, int32_t &read_size)
-{
+RC RingBuffer::read(char *buf, int32_t size, int32_t &read_size) {
   if (size < 0) {
     return RC::INVALID_ARGUMENT;
   }
@@ -42,8 +38,7 @@ RC RingBuffer::read(char *buf, int32_t size, int32_t &read_size)
   return rc;
 }
 
-RC RingBuffer::buffer(const char *&buf, int32_t &read_size)
-{
+RC RingBuffer::buffer(const char *&buf, int32_t &read_size) {
   const int32_t size = this->size();
   if (size == 0) {
     buf = buffer_.data();
@@ -61,8 +56,7 @@ RC RingBuffer::buffer(const char *&buf, int32_t &read_size)
   return RC::SUCCESS;
 }
 
-RC RingBuffer::forward(int32_t size)
-{
+RC RingBuffer::forward(int32_t size) {
   if (size <= 0) {
     return RC::INVALID_ARGUMENT;
   }
@@ -76,8 +70,7 @@ RC RingBuffer::forward(int32_t size)
   return RC::SUCCESS;
 }
 
-RC RingBuffer::write(const char *data, int32_t size, int32_t &write_size)
-{
+RC RingBuffer::write(const char *data, int32_t size, int32_t &write_size) {
   if (size < 0) {
     return RC::INVALID_ARGUMENT;
   }
@@ -85,7 +78,6 @@ RC RingBuffer::write(const char *data, int32_t size, int32_t &write_size)
   RC rc = RC::SUCCESS;
   write_size = 0;
   while (RC_SUCC(rc) && write_size < size && this->remain() > 0) {
-
     const int32_t read_pos = this->read_pos();
     const int32_t tmp_buf_size = (read_pos <= write_pos_) ? (capacity() - write_pos_) : (read_pos - write_pos_);
 

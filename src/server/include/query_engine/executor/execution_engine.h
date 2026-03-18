@@ -10,9 +10,10 @@
 #include <cstddef>
 #include <memory>
 
-class Executor{
-    public:
-        RC execute(SessionRequest *request, QueryInfo *queryInfo, bool &need_disconnect);
-    private:
-        size_t min_width = 0;
+class Executor {
+ public:
+  RC execute(SessionRequest *request, QueryInfo *queryInfo, bool &need_disconnect);
+
+ private:
+  size_t min_width = 0;
 };

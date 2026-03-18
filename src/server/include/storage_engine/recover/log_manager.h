@@ -9,12 +9,11 @@ class Db;
  * @brief 日志项遍历器
  * @details 使用时先执行初始化(init)，然后多次调用next，直到valid返回false。
  */
-class LogEntryIterator
-{
+class LogEntryIterator {
  public:
   LogEntryIterator() = default;
   ~LogEntryIterator() = default;
-  
+
   RC init(LogFile &log_file);
   bool valid() const;
   RC next();
@@ -30,9 +29,8 @@ class LogEntryIterator
  * @details 一个日志管理器属于某一个DB（当前仅有一个DB sys）。
  * 管理器负责写日志（运行时）、读日志与恢复（启动时）
  */
-class LogManager
-{
-public:
+class LogManager {
+ public:
   LogManager() = default;
   ~LogManager();
 
@@ -75,7 +73,8 @@ public:
    * 否则可能无法恢复成功。
    */
   RC recover(Db *db);
-private:
+
+ private:
   LogBuffer *log_buffer_ = nullptr;  // 日志缓存。新增日志时先放到这个buffer中
-  LogFile *log_file_ = nullptr;  // 管理日志，比如读写日志
+  LogFile *log_file_ = nullptr;      // 管理日志，比如读写日志
 };

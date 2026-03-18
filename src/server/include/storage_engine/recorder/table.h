@@ -15,9 +15,8 @@ class Index;
 /**
  * @brief 表
  */
-class Table 
-{
-public:
+class Table {
+ public:
   Table() = default;
   ~Table();
 
@@ -29,12 +28,12 @@ public:
    * @param attribute_count 字段个数
    * @param attributes 字段
    */
-  RC create(int32_t table_id, 
-      const char *path,
-      const char *name,
-      const char *base_dir,
-      int attribute_count,
-      const AttrInfoSqlNode attributes[]);
+  RC create(int32_t table_id,
+            const char *path,
+            const char *name,
+            const char *base_dir,
+            int attribute_count,
+            const AttrInfoSqlNode attributes[]);
 
   /**
    * 创建一个视图
@@ -43,11 +42,11 @@ public:
    * @param select_stmt 视图的 select 语句
    */
   RC create(int32_t table_id,
-      const char *name,
-      const char *origin_table_name,
-      SelectStmt *select_stmt,
-      int attribute_count,
-      const AttrInfoSqlNode attributes[]);
+            const char *name,
+            const char *origin_table_name,
+            SelectStmt *select_stmt,
+            int attribute_count,
+            const AttrInfoSqlNode attributes[]);
 
   /**
    * 删除一个表
@@ -55,8 +54,8 @@ public:
    * @param base_dir 表数据存放的路径
    */
   RC drop(int32_t table_id,
-      const char *name,
-      const char *base_dir);
+          const char *name,
+          const char *base_dir);
 
   /**
    * 打开一个表
@@ -90,12 +89,11 @@ public:
 
   RC get_record_scanner(RecordFileScanner &scanner, Trx *trx, bool readonly);
 
-  RecordFileHandler *record_handler() const
-  {
+  RecordFileHandler *record_handler() const {
     return record_handler_;
   }
 
-public:
+ public:
   int32_t table_id() const { return table_meta_.table_id(); }
   const char *name() const;
   const char *dir() const;
@@ -108,21 +106,21 @@ public:
 
   RC sync();
 
-private:
+ private:
   RC insert_entry_of_indexes(const char *record, const RID &rid);
   RC delete_entry_of_indexes(const char *record, const RID &rid, bool error_on_not_exists);
 
-private:
+ private:
   RC init_record_handler(const char *base_dir);
   RC change_record_value(char *&record, int idx, const Value &value) const;
 
-public:
+ public:
   Index *find_index(const char *index_name) const;
   Index *find_index_by_field(const char *field_name) const;
 
-private:
+ private:
   std::string base_dir_;
-  TableMeta   table_meta_;
+  TableMeta table_meta_;
   FileBufferPool *data_buffer_pool_ = nullptr;   /// 数据文件关联的buffer pool
   RecordFileHandler *record_handler_ = nullptr;  /// 记录操作
   std::vector<Index *> indexes_;

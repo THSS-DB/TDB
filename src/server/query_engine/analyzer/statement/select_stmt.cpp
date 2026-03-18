@@ -12,8 +12,7 @@
 
 #include <algorithm>
 
-SelectStmt::~SelectStmt()
-{
+SelectStmt::~SelectStmt() {
   // 这些都是 create 中创建的对象，独占所有权，需要释放
   for (auto *field : query_fields_) {
     delete field;
@@ -35,7 +34,7 @@ SelectStmt::~SelectStmt()
   }
 }
 
-static void wildcard_fields_without_table_name(Table *table, std::vector<Expression*> &projects, const std::string &table_name) {
+static void wildcard_fields_without_table_name(Table *table, std::vector<Expression *> &projects, const std::string &table_name) {
   const TableMeta &table_meta = table->table_meta();
   const int field_num = table_meta.field_num();
   for (int i = table_meta.sys_field_num(); i < field_num; i++) {
@@ -48,7 +47,7 @@ static void wildcard_fields_without_table_name(Table *table, std::vector<Express
   }
 }
 
-static void wildcard_fields_with_table_name(Table *table, std::vector<Expression*> &projects, const std::string &table_name) {
+static void wildcard_fields_with_table_name(Table *table, std::vector<Expression *> &projects, const std::string &table_name) {
   const TableMeta &table_meta = table->table_meta();
   const int field_num = table_meta.field_num();
   for (int i = table_meta.sys_field_num(); i < field_num; i++) {
@@ -64,9 +63,8 @@ static void wildcard_fields_with_table_name(Table *table, std::vector<Expression
 static void wildcard_fields(
     Table *table,
     int table_count,
-    std::vector<Expression*> &projects,
+    std::vector<Expression *> &projects,
     const std::string &alias) {
-
   if (table_count == 1) {
     wildcard_fields_without_table_name(table, projects, alias);
   } else {
@@ -74,10 +72,10 @@ static void wildcard_fields(
   }
 }
 
-RC _process_attribute_expression(Db *db, const Expression *expr, const char *table_name, const char* field_name,
-    const std::vector<Table *> &tables /*in*/,
-    std::vector<Expression *> &projects /*out*/,
-    const std::vector<std::string> &table_alias /*in*/) {
+RC _process_attribute_expression(Db *db, const Expression *expr, const char *table_name, const char *field_name,
+                                 const std::vector<Table *> &tables /*in*/,
+                                 std::vector<Expression *> &projects /*out*/,
+                                 const std::vector<std::string> &table_alias /*in*/) {
   int table_count = static_cast<int>(tables.size());
   /**
    * There should be four possible states for attribute_expression with '*'
@@ -153,7 +151,6 @@ RC _process_attribute_expression(Db *db, const Expression *expr, const char *tab
   return RC::SUCCESS;
 }
 
-
 RC SelectStmt::analyze_tables_and_projects(
     Db *db,
     const SelectSqlNode &select_sql,
@@ -161,12 +158,11 @@ RC SelectStmt::analyze_tables_and_projects(
     std::vector<std::string> &table_alias,
     std::unordered_map<std::string, Table *> &table_map,
     std::vector<Expression *> &projects) {
-
   // 1. Collect tables in `from` statement
   for (size_t i = 0; i < select_sql.relations.size(); i++) {
     const string &table_name = select_sql.relations[i].relation_name;
     string alias_name = select_sql.relations[i].alias;
-    
+
     // If alias is empty, use table_name as alias
     if (alias_name.empty()) {
       alias_name = table_name;
@@ -195,12 +191,12 @@ RC SelectStmt::analyze_tables_and_projects(
     const Expression *expr = select_sql.attributes[i];
 
     // AttributeExpression needs to be processed separately because '*' in attributes may cause difference.
-    if (expr->type() == ExprType::REL_ATTR) { // Simple FiledExpr
+    if (expr->type() == ExprType::REL_ATTR) {  // Simple FiledExpr
       const auto *rel_attr_expr = dynamic_cast<const RelAttrExpr *>(expr);
       const RelAttrSqlNode relation_attr = rel_attr_expr->rel_attr_sql_node();
       // special logic for attribute expression to deal with '*'
       RC rc = _process_attribute_expression(db, expr, relation_attr.relation_name.c_str(), relation_attr.attribute_name.c_str(),
-          tables, projects, table_alias);
+                                            tables, projects, table_alias);
       if (rc != RC::SUCCESS) {
         return rc;
       }
@@ -218,8 +214,7 @@ RC SelectStmt::analyze_tables_and_projects(
   return RC::SUCCESS;
 }
 
-RC SelectStmt::create(Db *db, const SelectSqlNode &select_sql, Stmt *&stmt)
-{
+RC SelectStmt::create(Db *db, const SelectSqlNode &select_sql, Stmt *&stmt) {
   if (nullptr == db) {
     LOG_WARN("invalid argument. db is null");
     return RC::INVALID_ARGUMENT;
@@ -242,7 +237,7 @@ RC SelectStmt::create(Db *db, const SelectSqlNode &select_sql, Stmt *&stmt)
 
   // collect query fields in `select` statement
   std::vector<Field *> query_fields;
-  for (auto& project : projects) {
+  for (auto &project : projects) {
     project->getFields(query_fields);
   }
 
@@ -255,14 +250,14 @@ RC SelectStmt::create(Db *db, const SelectSqlNode &select_sql, Stmt *&stmt)
 
   // create filter statements in join_lists
   std::vector<FilterStmt *> join_filter_stmts;
-  for (auto& join_list :select_sql.join_lists) {
+  for (auto &join_list : select_sql.join_lists) {
     FilterStmt *join_filter_stmt = nullptr;
     rc = FilterStmt::create(db,
-        default_table,
-        &table_map,
-        join_list.join_conditions.data(),
-        static_cast<int>(join_list.join_conditions.size()),
-        join_filter_stmt);
+                            default_table,
+                            &table_map,
+                            join_list.join_conditions.data(),
+                            static_cast<int>(join_list.join_conditions.size()),
+                            join_filter_stmt);
     join_filter_stmts.emplace_back(join_filter_stmt);
     if (rc != RC::SUCCESS) {
       LOG_WARN("cannot construct filter stmt");
@@ -273,11 +268,11 @@ RC SelectStmt::create(Db *db, const SelectSqlNode &select_sql, Stmt *&stmt)
   // create filter statement in `where` statement
   FilterStmt *filter_stmt = nullptr;
   rc = FilterStmt::create(db,
-      default_table,
-      &table_map,
-      select_sql.where_conditions.conditions.data(),
-      static_cast<int>(select_sql.where_conditions.conditions.size()),
-      filter_stmt);
+                          default_table,
+                          &table_map,
+                          select_sql.where_conditions.conditions.data(),
+                          static_cast<int>(select_sql.where_conditions.conditions.size()),
+                          filter_stmt);
   if (rc != RC::SUCCESS) {
     LOG_WARN("cannot construct filter stmt");
     return rc;
@@ -296,11 +291,11 @@ RC SelectStmt::create(Db *db, const SelectSqlNode &select_sql, Stmt *&stmt)
   // create having filter statement in `having` clause
   FilterStmt *having_stmt = nullptr;
   rc = FilterStmt::create(db,
-      default_table,
-      &table_map,
-      select_sql.having_conditions.conditions.data(),
-      static_cast<int>(select_sql.having_conditions.conditions.size()),
-      having_stmt);
+                          default_table,
+                          &table_map,
+                          select_sql.having_conditions.conditions.data(),
+                          static_cast<int>(select_sql.having_conditions.conditions.size()),
+                          having_stmt);
   if (rc != RC::SUCCESS) {
     LOG_WARN("cannot construct filter stmt");
     return rc;
@@ -311,11 +306,11 @@ RC SelectStmt::create(Db *db, const SelectSqlNode &select_sql, Stmt *&stmt)
   // create order by statement in `order by` statement
   OrderByStmt *order_stmt = nullptr;
   rc = OrderByStmt::create(db,
-      default_table,
-      &table_map,
-      select_sql.order_lists,
-      static_cast<int>(select_sql.order_lists.size()),
-      order_stmt);
+                           default_table,
+                           &table_map,
+                           select_sql.order_lists,
+                           static_cast<int>(select_sql.order_lists.size()),
+                           order_stmt);
   if (rc != RC::SUCCESS) {
     LOG_WARN("cannot construct order by stmt");
     return rc;
@@ -340,7 +335,7 @@ RC SelectStmt::create(Db *db, const SelectSqlNode &select_sql, Stmt *&stmt)
         bool exist = false;
         auto *field_expr = dynamic_cast<FieldExpr *>(expr);
         for (auto *group_by_expr : group_by_stmt->group_by_exprs()) {
-          if (field_expr->field() == ((FieldExpr *) group_by_expr)->field()) {
+          if (field_expr->field() == ((FieldExpr *)group_by_expr)->field()) {
             exist = true;
             break;
           }

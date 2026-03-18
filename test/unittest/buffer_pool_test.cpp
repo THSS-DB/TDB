@@ -6,8 +6,7 @@
 #include "include/storage_engine/recorder/record.h"
 #include "include/storage_engine/recorder/record_manager.h"
 
-void test1()
-{
+void test1() {
   const char *data_file = "test_buffer_pool.data";
   ::remove(data_file);
   BufferPoolManager *bpm = new BufferPoolManager();
@@ -56,8 +55,7 @@ void test1()
   delete bpm;
 }
 
-void test2()
-{
+void test2() {
   const char *data_file = "test_buffer_pool.data";
   BufferPoolManager *bpm = new BufferPoolManager();
   FileBufferPool *bp = nullptr;
@@ -76,7 +74,7 @@ void test2()
     count++;
     rc = iterator.next(record);
     ASSERT_EQ(rc, RC::SUCCESS);
-    printf("%s\n",record.data());
+    printf("%s\n", record.data());
   }
   ASSERT_EQ(count, 10);
 
@@ -87,14 +85,12 @@ void test2()
   delete bpm;
 }
 
-TEST(test_buffer, test_buffer_pool)
-{
+TEST(test_buffer, test_buffer_pool) {
   test1();  // 创建新文件并写入数据
   test2();  // 读取该文件，检验是否持久化成功
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   // 分析gtest程序的命令行参数
   testing::InitGoogleTest(&argc, argv);
 

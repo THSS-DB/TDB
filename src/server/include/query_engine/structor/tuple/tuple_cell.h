@@ -6,9 +6,8 @@
 #include "include/storage_engine/recorder/table.h"
 #include "include/storage_engine/recorder/field_meta.h"
 
-class TupleCellSpec
-{
-public:
+class TupleCellSpec {
+ public:
   explicit TupleCellSpec(const Expression *expression) : expression_(expression->copy()) {
     alias_ = expression->name();
   }
@@ -31,11 +30,11 @@ public:
   }
 
   const Expression *expression() const {
-      return expression_;
+    return expression_;
   }
 
-private:
-  Expression* expression_ = nullptr;
+ private:
+  Expression *expression_ = nullptr;
   std::string alias_;
 
   std::string table_name_;

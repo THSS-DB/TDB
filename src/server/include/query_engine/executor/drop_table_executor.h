@@ -4,9 +4,8 @@
 
 class QueryInfo;
 
-class DropTableExecutor
-{
-public:
+class DropTableExecutor {
+ public:
   DropTableExecutor() = default;
   virtual ~DropTableExecutor() = default;
 

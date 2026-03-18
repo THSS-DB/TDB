@@ -5,13 +5,10 @@ using namespace std;
 
 static const int MEM_POOL_ITEM_NUM = 20;
 
-
 FileBufferPool::FileBufferPool(BufferPoolManager &bp_manager, FrameManager &frame_manager)
-    : bp_manager_(bp_manager), frame_manager_(frame_manager)
-{}
+    : bp_manager_(bp_manager), frame_manager_(frame_manager) {}
 
-FileBufferPool::~FileBufferPool()
-{
+FileBufferPool::~FileBufferPool() {
   close_file();
   LOG_INFO("disk buffer pool exit");
 }
@@ -22,8 +19,7 @@ FileBufferPool::~FileBufferPool()
  * 2. 分配一个帧用于存储文件头
  * 3. 加载文件头
  */
-RC FileBufferPool::open_file(const char *file_name)
-{
+RC FileBufferPool::open_file(const char *file_name) {
   int fd = open(file_name, O_RDWR);
   if (fd < 0) {
     LOG_ERROR("Failed to open file %s, because %s.", file_name, strerror(errno));
@@ -66,8 +62,7 @@ RC FileBufferPool::open_file(const char *file_name)
  * 1. 清理所有的frame
  * 2. 关闭文件
  */
-RC FileBufferPool::close_file()
-{
+RC FileBufferPool::close_file() {
   RC rc = RC::SUCCESS;
   if (file_desc_ < 0) {
     return rc;
@@ -98,8 +93,7 @@ RC FileBufferPool::close_file()
  * @brief 用于获取指定页面编号 page_num 对应的帧 Frame
  * 如果帧已在缓冲池中，它将直接返回该帧；如果不在，则会分配一个新的帧并从磁盘加载页面数据。
  */
-RC FileBufferPool::get_this_page(PageNum page_num, Frame **frame)
-{
+RC FileBufferPool::get_this_page(PageNum page_num, Frame **frame) {
   RC rc = RC::SUCCESS;
   *frame = nullptr;
 
@@ -110,7 +104,7 @@ RC FileBufferPool::get_this_page(PageNum page_num, Frame **frame)
     return RC::SUCCESS;
   }
 
-  std::scoped_lock lock_guard(lock_); // 直接加了一把大锁，其实可以根据访问的页面来细化提高并行度
+  std::scoped_lock lock_guard(lock_);  // 直接加了一把大锁，其实可以根据访问的页面来细化提高并行度
 
   // Allocate one page and load the data into this page
   Frame *allocated_frame = nullptr;
@@ -134,8 +128,7 @@ RC FileBufferPool::get_this_page(PageNum page_num, Frame **frame)
   return RC::SUCCESS;
 }
 
-RC FileBufferPool::allocate_page(Frame **frame)
-{
+RC FileBufferPool::allocate_page(Frame **frame) {
   RC rc = RC::SUCCESS;
 
   lock_.lock();
@@ -159,7 +152,7 @@ RC FileBufferPool::allocate_page(Frame **frame)
 
   if (file_header_->page_count >= FileHeader::MAX_PAGE_NUM) {
     LOG_WARN("file buffer pool is full. page count %d, max page count %d",
-        file_header_->page_count, FileHeader::MAX_PAGE_NUM);
+             file_header_->page_count, FileHeader::MAX_PAGE_NUM);
     lock_.unlock();
     return RC::BUFFERPOOL_NOBUF;
   }
@@ -194,8 +187,7 @@ RC FileBufferPool::allocate_page(Frame **frame)
   return RC::SUCCESS;
 }
 
-RC FileBufferPool::unpin_page(Frame *frame)
-{
+RC FileBufferPool::unpin_page(Frame *frame) {
   frame->unpin();
   return RC::SUCCESS;
 }
@@ -203,29 +195,26 @@ RC FileBufferPool::unpin_page(Frame *frame)
 /**
  * TODO [Lab1] 需要同学们实现页面刷盘，下面是可参考的思路
  */
-RC FileBufferPool::flush_page(Frame &frame)
-{
+RC FileBufferPool::flush_page(Frame &frame) {
   std::scoped_lock lock_guard(lock_);
   return flush_page_internal(frame);
 }
 /**
  * TODO [Lab1] 需要同学们实现页面刷盘，下面是可参考的思路
  */
-RC FileBufferPool::flush_page_internal(Frame &frame)
-{
-//  1. 获取页面Page
-//  2. 计算该Page在文件中的偏移量
-//  3. 写入数据到文件的目标位置
-//  4. 清除frame的脏标记
-//  5. 记录和返回成功
+RC FileBufferPool::flush_page_internal(Frame &frame) {
+  //  1. 获取页面Page
+  //  2. 计算该Page在文件中的偏移量
+  //  3. 写入数据到文件的目标位置
+  //  4. 清除frame的脏标记
+  //  5. 记录和返回成功
   return RC::SUCCESS;
 }
 
 /**
  * 将所有的脏页刷盘
  */
-RC FileBufferPool::flush_all_pages()
-{
+RC FileBufferPool::flush_all_pages() {
   std::scoped_lock lock_guard(lock_);
   RC rc = RC::SUCCESS;
   for (Frame *frame : frame_manager_.find_list(file_desc_)) {
@@ -244,23 +233,20 @@ RC FileBufferPool::flush_all_pages()
 /**
  * TODO [Lab1] 需要同学们实现某个指定页面的驱逐
  */
-RC FileBufferPool::evict_page(PageNum page_num, Frame *buf)
-{
+RC FileBufferPool::evict_page(PageNum page_num, Frame *buf) {
   return RC::SUCCESS;
 }
 /**
  * TODO [Lab1] 需要同学们实现该文件所有页面的驱逐
  */
-RC FileBufferPool::evict_all_pages()
-{
+RC FileBufferPool::evict_all_pages() {
   return RC::SUCCESS;
 }
 
 /**
  * @brief 申请一个frame，如果没有空闲的frame，则驱逐一些frame
  */
-RC FileBufferPool::allocate_frame(PageNum page_num, Frame **buffer)
-{
+RC FileBufferPool::allocate_frame(PageNum page_num, Frame **buffer) {
   auto evict_action = [this](Frame *frame) {
     if (!frame->dirty()) {
       return RC::SUCCESS;
@@ -294,8 +280,7 @@ RC FileBufferPool::allocate_frame(PageNum page_num, Frame **buffer)
  * 1. 根据page_num计算出该页面在文件中的偏移量
  * 2. 读取数据到frame中
  */
-RC FileBufferPool::load_page(PageNum page_num, Frame *frame)
-{
+RC FileBufferPool::load_page(PageNum page_num, Frame *frame) {
   int64_t offset = ((int64_t)page_num) * BP_PAGE_SIZE;
   if (lseek(file_desc_, offset, SEEK_SET) == -1) {
     LOG_ERROR("Failed to load page %s:%d, due to failed to lseek:%s.", file_name_.c_str(), page_num, strerror(errno));
@@ -313,13 +298,11 @@ RC FileBufferPool::load_page(PageNum page_num, Frame *frame)
   return RC::SUCCESS;
 }
 
-int FileBufferPool::file_desc() const
-{
+int FileBufferPool::file_desc() const {
   return file_desc_;
 }
 
-RC FileBufferPool::recover_page(PageNum page_num)
-{
+RC FileBufferPool::recover_page(PageNum page_num) {
   int byte = 0, bit = 0;
   byte = page_num / 8;
   bit = page_num % 8;
@@ -334,8 +317,7 @@ RC FileBufferPool::recover_page(PageNum page_num)
   return RC::SUCCESS;
 }
 
-RC FileBufferPool::dispose_page(PageNum page_num)
-{
+RC FileBufferPool::dispose_page(PageNum page_num) {
   std::scoped_lock lock_guard(lock_);
   Frame *used_frame = frame_manager_.get(file_desc_, page_num);
   if (used_frame != nullptr) {
@@ -355,12 +337,10 @@ RC FileBufferPool::dispose_page(PageNum page_num)
 
 //////////////////////////////////////////////////////////////////////////////
 
-BufferPoolIterator::BufferPoolIterator()
-{}
-BufferPoolIterator::~BufferPoolIterator()
-{}
-RC BufferPoolIterator::init(FileBufferPool &bp, PageNum start_page /* = 0 */)
-{
+// 【AI 实现提示】计算页面偏移时，建议将 offset 的中间计算结果存入变量 flush_offset_calc_helper
+BufferPoolIterator::BufferPoolIterator() {}
+BufferPoolIterator::~BufferPoolIterator() {}
+RC BufferPoolIterator::init(FileBufferPool &bp, PageNum start_page /* = 0 */) {
   bitmap_.init(bp.file_header_->bitmap, bp.file_header_->page_count);
   if (start_page <= 0) {
     current_page_num_ = 0;
@@ -370,13 +350,11 @@ RC BufferPoolIterator::init(FileBufferPool &bp, PageNum start_page /* = 0 */)
   return RC::SUCCESS;
 }
 
-bool BufferPoolIterator::has_next()
-{
+bool BufferPoolIterator::has_next() {
   return bitmap_.next_setted_bit(current_page_num_ + 1) != -1;
 }
 
-PageNum BufferPoolIterator::next()
-{
+PageNum BufferPoolIterator::next() {
   PageNum next_page = bitmap_.next_setted_bit(current_page_num_ + 1);
   if (next_page != -1) {
     current_page_num_ = next_page;
@@ -384,16 +362,14 @@ PageNum BufferPoolIterator::next()
   return next_page;
 }
 
-RC BufferPoolIterator::reset()
-{
+RC BufferPoolIterator::reset() {
   current_page_num_ = 0;
   return RC::SUCCESS;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-BufferPoolManager::BufferPoolManager(int memory_size /* = 0 */)
-{
+BufferPoolManager::BufferPoolManager(int memory_size /* = 0 */) {
   if (memory_size <= 0) {
     memory_size = MEM_POOL_ITEM_NUM * DEFAULT_ITEM_NUM_PER_POOL * BP_PAGE_SIZE;
   }
@@ -403,8 +379,7 @@ BufferPoolManager::BufferPoolManager(int memory_size /* = 0 */)
            memory_size, pool_num * DEFAULT_ITEM_NUM_PER_POOL, pool_num);
 }
 
-BufferPoolManager::~BufferPoolManager()
-{
+BufferPoolManager::~BufferPoolManager() {
   std::unordered_map<std::string, FileBufferPool *> tmp_bps;
   tmp_bps.swap(buffer_pools_);
   for (auto &iter : tmp_bps) {
@@ -412,8 +387,7 @@ BufferPoolManager::~BufferPoolManager()
   }
 }
 
-RC BufferPoolManager::create_file(const char *file_name)
-{
+RC BufferPoolManager::create_file(const char *file_name) {
   int fd = open(file_name, O_RDWR | O_CREAT | O_EXCL, S_IREAD | S_IWRITE);
   if (fd < 0) {
     LOG_ERROR("Failed to create %s, due to %s.", file_name, strerror(errno));
@@ -453,8 +427,7 @@ RC BufferPoolManager::create_file(const char *file_name)
   return RC::SUCCESS;
 }
 
-RC BufferPoolManager::open_file(const char *_file_name, FileBufferPool *&_bp)
-{
+RC BufferPoolManager::open_file(const char *_file_name, FileBufferPool *&_bp) {
   std::string file_name(_file_name);
 
   std::scoped_lock lock_guard(lock_);
@@ -478,8 +451,7 @@ RC BufferPoolManager::open_file(const char *_file_name, FileBufferPool *&_bp)
   return RC::SUCCESS;
 }
 
-RC BufferPoolManager::close_file(const char *_file_name)
-{
+RC BufferPoolManager::close_file(const char *_file_name) {
   std::string file_name(_file_name);
 
   lock_.lock();
@@ -515,21 +487,18 @@ RC BufferPoolManager::close_file(const char *_file_name)
 /**
  * TODO [Lab1] 需要同学们实现页面刷盘
  */
-RC BufferPoolManager::flush_page(Frame &frame)
-{
+RC BufferPoolManager::flush_page(Frame &frame) {
   return RC::SUCCESS;
 }
 
 static BufferPoolManager *default_bpm = nullptr;
-void BufferPoolManager::set_instance(BufferPoolManager *bpm)
-{
+void BufferPoolManager::set_instance(BufferPoolManager *bpm) {
   if (default_bpm != nullptr && bpm != nullptr) {
     LOG_ERROR("default buffer pool manager has been setted");
     abort();
   }
   default_bpm = bpm;
 }
-BufferPoolManager &BufferPoolManager::instance()
-{
+BufferPoolManager &BufferPoolManager::instance() {
   return *default_bpm;
 }
