@@ -6,6 +6,7 @@ TOPDIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 BUILD_SH=$TOPDIR/build.sh
 
 CMAKE_COMMAND="cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 --log-level=STATUS"
+LOCAL_DEPS_PREFIX="${CMAKE_INSTALL_PREFIX:-${TOPDIR}/local}"
 
 ALL_ARGS=("$@")
 BUILD_ARGS=()
@@ -29,6 +30,8 @@ function usage
   echo "Examples:"
   echo "# Init."
   echo "./build.sh init"
+  echo "# Install dependencies into a local directory."
+  echo "CMAKE_INSTALL_PREFIX=\$PWD/local ./build.sh init"
   echo ""
   echo "# Build： by debug mode and make with -j4."
   echo "./build.sh debug --make -j4"
@@ -72,12 +75,14 @@ function do_init
 
   MAKE_COMMAND="make --silent"
 
+  mkdir -p "${LOCAL_DEPS_PREFIX}"
+
   # build libevent
   cd ${TOPDIR}/deps/3rd/libevent && \
     git checkout release-2.1.12-stable && \
     mkdir -p build && \
     cd build && \
-    ${CMAKE_COMMAND} .. -DEVENT__DISABLE_OPENSSL=ON -DEVENT__LIBRARY_TYPE=BOTH && \
+    ${CMAKE_COMMAND} .. -DCMAKE_INSTALL_PREFIX="${LOCAL_DEPS_PREFIX}" -DEVENT__DISABLE_OPENSSL=ON -DEVENT__LIBRARY_TYPE=BOTH && \
     ${MAKE_COMMAND} -j4 && \
     make install
 
@@ -85,7 +90,7 @@ function do_init
   cd ${TOPDIR}/deps/3rd/googletest && \
     mkdir -p build && \
     cd build && \
-    ${CMAKE_COMMAND} .. && \
+    ${CMAKE_COMMAND} .. -DCMAKE_INSTALL_PREFIX="${LOCAL_DEPS_PREFIX}" && \
     ${MAKE_COMMAND} -j4 && \
     ${MAKE_COMMAND} install
 
@@ -93,7 +98,7 @@ function do_init
   cd ${TOPDIR}/deps/3rd/benchmark && \
     mkdir -p build && \
     cd build && \
-    ${CMAKE_COMMAND} .. -DBENCHMARK_ENABLE_TESTING=OFF  -DBENCHMARK_INSTALL_DOCS=OFF -DBENCHMARK_ENABLE_GTEST_TESTS=OFF -DBENCHMARK_USE_BUNDLED_GTEST=OFF -DBENCHMARK_ENABLE_ASSEMBLY_TESTS=OFF && \
+    ${CMAKE_COMMAND} .. -DCMAKE_INSTALL_PREFIX="${LOCAL_DEPS_PREFIX}" -DBENCHMARK_ENABLE_TESTING=OFF  -DBENCHMARK_INSTALL_DOCS=OFF -DBENCHMARK_ENABLE_GTEST_TESTS=OFF -DBENCHMARK_USE_BUNDLED_GTEST=OFF -DBENCHMARK_ENABLE_ASSEMBLY_TESTS=OFF && \
     ${MAKE_COMMAND} -j4 && \
     ${MAKE_COMMAND} install
 
@@ -101,7 +106,7 @@ function do_init
   cd ${TOPDIR}/deps/3rd/jsoncpp && \
     mkdir -p build && \
     cd build && \
-    ${CMAKE_COMMAND} -DJSONCPP_WITH_TESTS=OFF -DJSONCPP_WITH_POST_BUILD_UNITTEST=OFF .. && \
+    ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX="${LOCAL_DEPS_PREFIX}" -DJSONCPP_WITH_TESTS=OFF -DJSONCPP_WITH_POST_BUILD_UNITTEST=OFF .. && \
     ${MAKE_COMMAND} && \
     ${MAKE_COMMAND} install
 
@@ -120,7 +125,7 @@ function do_build
   TYPE=$1; shift
   prepare_build_dir || return
   echo "${CMAKE_COMMAND} ${TOPDIR} $@"
-  ${CMAKE_COMMAND} -S ${TOPDIR} $@
+  ${CMAKE_COMMAND} -S ${TOPDIR} -DCMAKE_PREFIX_PATH="${LOCAL_DEPS_PREFIX}" $@
   cp ${TOPDIR}/test/data.txt ${TOPDIR}/build/bin/
 }
 
